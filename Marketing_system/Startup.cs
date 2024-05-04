@@ -3,6 +3,8 @@ using Marketing_system.DA.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Marketing_system.DA.Contracts.Model;
+using Microsoft.AspNetCore.Identity;
 
 namespace Marketing_system
 {
@@ -21,14 +23,36 @@ namespace Marketing_system
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
-            /*services.Configure<SMTPConfig>(Configuration.GetSection("SMTPConfig"));*/
+            services.Configure<SMTPConfig>(Configuration.GetSection("SMTPConfig"));
 
-            /*services.AddDbContext<DataContext>(options =>
+            services.AddDbContext<DataContext>(options =>
             {
                 options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"),
                     x => x.MigrationsHistoryTable("__EFMigrationsHistory", "marketingsystem"));
 
-            });*/
+            });
+
+            services.AddIdentity<User, IdentityRole>()
+                .AddEntityFrameworkStores<DataContext>()
+                .AddDefaultTokenProviders();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 16;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+                options.User.RequireUniqueEmail = true;
+            });
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
+                options.LoginPath = "/Login";
+                options.SlidingExpiration = true;
+            });
 
             services.AddCors(options =>
             {
@@ -36,20 +60,6 @@ namespace Marketing_system
                  AllowAnyHeader());
             });
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy("_mySpecificOrigins", builder =>
-                {
-                    builder.WithOrigins("http://localhost:4200")
-                           .AllowAnyOrigin()
-                           .AllowAnyMethod()
-                           .AllowAnyHeader();
-                });
-            });
-
-            // Mapper configuration:
-
-            //JWT authentication
             var key = Environment.GetEnvironmentVariable("JWT_KEY") ?? "marketingsystem_secret_key";
             var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "marketingsystem";
             var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "marketingsystem-front.com";
@@ -88,6 +98,9 @@ namespace Marketing_system
             //Authorization
             services.AddAuthorization(options =>
             {
+                options.AddPolicy("adminPolicy", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("adminPolicy", policy => policy.RequireRole("Client"));
+                options.AddPolicy("adminPolicy", policy => policy.RequireRole("Employee"));
             });
 
             BindServices(services);

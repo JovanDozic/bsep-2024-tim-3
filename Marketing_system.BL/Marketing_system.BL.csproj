@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.18" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Marketing_system.BL.Contracts\Marketing_system.BL.Contracts.csproj" />
     <ProjectReference Include="..\Marketing_system.DA.Contracts\Marketing_system.DA.Contracts.csproj" />
   </ItemGroup>

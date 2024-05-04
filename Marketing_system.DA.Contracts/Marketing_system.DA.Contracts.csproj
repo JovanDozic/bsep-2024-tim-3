@@ -7,13 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.18" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.18" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="IRepository\" />
-    <Folder Include="Model\" />
-    <Folder Include="Shared\" />
   </ItemGroup>
 
   <ItemGroup>
