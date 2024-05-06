@@ -1,5 +1,7 @@
 ﻿using Marketing_system.DA.Contexts;
 using Marketing_system.DA.Contracts;
+using Marketing_system.DA.Contracts.IRepository;
+using Marketing_system.DA.Repository;
 
 namespace Marketing_system.DA
 {
@@ -35,5 +37,19 @@ namespace Marketing_system.DA
                 throw;
             }
         }
+
+        private IUserRepository _userRepository { get; set; }
+        private ITokenGeneratorRepository _tokenGeneratorRepository { get; set; }
+
+        public IUserRepository GetUserRepository()
+        {
+            return _userRepository ?? (_userRepository = new UserRepository(_context));
+        }
+
+        public ITokenGeneratorRepository GetTokenGeneratorRepository()
+        {
+            return _tokenGeneratorRepository ?? (_tokenGeneratorRepository = new TokenGeneratorRepository());
+        }
+
     }
 }

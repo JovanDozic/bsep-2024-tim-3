@@ -12,10 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="IRepository\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Marketing_system.BL.Contracts\Marketing_system.BL.Contracts.csproj" />
   </ItemGroup>
 

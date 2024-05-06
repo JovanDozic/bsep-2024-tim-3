@@ -1,6 +1,5 @@
 ﻿using Marketing_system.DA.Contracts.Shared;
 using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
 
 namespace Marketing_system.DA.Contracts.Model
 {
@@ -19,7 +18,8 @@ namespace Marketing_system.DA.Contracts.Model
         public int? TaxId { get; set; }
         public UserRole Role { get; set; }
         public ClientType? ClientType { get; set; }
-        public User(string email, string password, string firstname, string lastname, string address, string city, string country, string phone, UserRole role, ClientType clientType)
+        public string Salt { get; set; }
+        public User(string email, string password, string firstname, string lastname, string address, string city, string country, string phone, UserRole role, ClientType clientType, string salt)
         {
             Email = email;
             Password = password;
@@ -31,9 +31,10 @@ namespace Marketing_system.DA.Contracts.Model
             Phone = phone;
             Role = role;
             ClientType = clientType;
+            Salt = salt;
         }
 
-        public User(string email, string password, string companyName, int taxId, string address, string city, string country, string phone, UserRole role, ClientType clientType)
+        public User(string email, string password, string companyName, int taxId, string address, string city, string country, string phone, UserRole role, ClientType clientType, string salt)
         {
             Email = email;
             Password = password;
@@ -45,6 +46,7 @@ namespace Marketing_system.DA.Contracts.Model
             Phone = phone;
             Role = role;
             ClientType = clientType;
+            Salt = salt;
         }
 
 

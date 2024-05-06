@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Mapper\" />
-    <Folder Include="Service\" />
   </ItemGroup>
 
   <ItemGroup>

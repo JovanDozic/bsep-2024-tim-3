@@ -5,6 +5,12 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Marketing_system.DA.Contracts.Model;
 using Microsoft.AspNetCore.Identity;
+using Marketing_system.DA.Contracts;
+using Marketing_system.DA;
+using Marketing_system.DA.Contracts.IRepository;
+using Marketing_system.DA.Repository;
+using Marketing_system.BL.Contracts.IService;
+using Marketing_system.BL.Service;
 
 namespace Marketing_system
 {
@@ -135,6 +141,10 @@ namespace Marketing_system
 
         private void BindServices(IServiceCollection services)
         {
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<ITokenGeneratorRepository, TokenGeneratorRepository>();
+            services.AddTransient<IPasswordHasher, PasswordHasher>();
+            services.AddTransient<IAuthenticationService, AuthenticationService>();
         }
 
     }
