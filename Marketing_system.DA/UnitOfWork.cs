@@ -40,6 +40,9 @@ namespace Marketing_system.DA
 
         private IUserRepository _userRepository { get; set; }
         private ITokenGeneratorRepository _tokenGeneratorRepository { get; set; }
+        private IPasswordHasher _passwordHasher { get; set; }
+        private IRegistrationRequestRepository _registrationRequestRepository { get; set; }
+
 
         public IUserRepository GetUserRepository()
         {
@@ -49,6 +52,14 @@ namespace Marketing_system.DA
         public ITokenGeneratorRepository GetTokenGeneratorRepository()
         {
             return _tokenGeneratorRepository ?? (_tokenGeneratorRepository = new TokenGeneratorRepository());
+        }
+        public IPasswordHasher GetPasswordHasher()
+        {
+            return _passwordHasher ?? (_passwordHasher = new PasswordHasher());
+        }
+        public IRegistrationRequestRepository GetRegistrationRequestRepository()
+        {
+            return _registrationRequestRepository ?? (_registrationRequestRepository = new RegistrationRequestRepository(_context));
         }
 
     }

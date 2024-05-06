@@ -1,8 +1,8 @@
-﻿namespace Marketing_system.BL.Contracts.IService
+﻿namespace Marketing_system.DA.Contracts.IRepository
 {
     public interface IPasswordHasher
     {
-        string HashPassword(string password, out string salt);
+        (string hashedPassword, string salt) HashPassword(string password);
         byte[] GenerateSalt();
         bool VerifyPassword(string password, string salt, string hashedPassword);
         byte[] CombineBytes(byte[] first, byte[] second);

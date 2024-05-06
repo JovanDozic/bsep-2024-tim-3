@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Marketing_system.DA.Contracts.Model
 {
-    public class User : IdentityUser
+    public class User : Entity
     {
-        public int Id { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
         public string? Firstname { get; set; }
@@ -19,7 +18,10 @@ namespace Marketing_system.DA.Contracts.Model
         public UserRole Role { get; set; }
         public ClientType? ClientType { get; set; }
         public string Salt { get; set; }
-        public User(string email, string password, string firstname, string lastname, string address, string city, string country, string phone, UserRole role, ClientType clientType, string salt)
+        public PackageType PackageType { get; set; }
+        public AccountStatus AccountStatus { get; set; }
+        public string RefreshToken { get; set; }
+        public User(string email, string password, string firstname, string lastname, string address, string city, string country, string phone, UserRole role, ClientType clientType, string salt, PackageType packageType)
         {
             Email = email;
             Password = password;
@@ -32,9 +34,11 @@ namespace Marketing_system.DA.Contracts.Model
             Role = role;
             ClientType = clientType;
             Salt = salt;
+            PackageType = packageType;
+            AccountStatus = AccountStatus.Requested;
         }
 
-        public User(string email, string password, string companyName, int taxId, string address, string city, string country, string phone, UserRole role, ClientType clientType, string salt)
+        public User(string email, string password, string companyName, int? taxId, string address, string city, string country, string phone, UserRole role, ClientType clientType, string salt, PackageType packageType)
         {
             Email = email;
             Password = password;
@@ -47,8 +51,37 @@ namespace Marketing_system.DA.Contracts.Model
             Role = role;
             ClientType = clientType;
             Salt = salt;
+            PackageType = packageType;
+            AccountStatus = AccountStatus.Requested;
         }
 
+        /*private static UserRole userRoleConverter(int role)
+        {
+            return role switch
+            {
+                0 => UserRole.Client,
+                1 => UserRole.Employee,
+                _ => UserRole.Admin,
+            };
+        }
 
+        private static ClientType clientTypeConverter(int type)
+        {
+            return type switch
+            {
+                0 => Shared.ClientType.Individual,
+                _ => Shared.ClientType.Legal_entity,
+            };
+        }
+
+        private static PackageType packageTypeConverter(int type)
+        {
+            return type switch
+            {
+                0 => PackageType.Basic,
+                1 => PackageType.Standard,
+                _ => PackageType.Golden,
+            };
+        }*/
     }
 }

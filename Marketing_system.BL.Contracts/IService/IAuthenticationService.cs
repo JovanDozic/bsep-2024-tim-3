@@ -4,6 +4,7 @@ namespace Marketing_system.BL.Contracts.IService
 {
     public interface IAuthenticationService
     {
-        Task<AuthenticationTokensDto> RegisterUser(UserDto userDto);
+        Task<bool?> RegisterUser(UserDto userDto);
+        Task<AuthenticationTokensDto> Login(string email, string password);
     }
 }

@@ -37,10 +37,10 @@ namespace Marketing_system
                     x => x.MigrationsHistoryTable("__EFMigrationsHistory", "marketingsystem"));
 
             });
-
+/*
             services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<DataContext>()
-                .AddDefaultTokenProviders();
+                .AddDefaultTokenProviders();*/
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -50,6 +50,13 @@ namespace Marketing_system
                 options.Password.RequireUppercase = true;
                 options.Password.RequireLowercase = true;
                 options.User.RequireUniqueEmail = true;
+
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
+
+                options.User.AllowedUserNameCharacters =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
             });
 
             services.ConfigureApplicationCookie(options =>
@@ -105,8 +112,8 @@ namespace Marketing_system
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("adminPolicy", policy => policy.RequireRole("Admin"));
-                options.AddPolicy("adminPolicy", policy => policy.RequireRole("Client"));
-                options.AddPolicy("adminPolicy", policy => policy.RequireRole("Employee"));
+                options.AddPolicy("clientPolicy", policy => policy.RequireRole("Client"));
+                options.AddPolicy("employeePolicy", policy => policy.RequireRole("Employee"));
             });
 
             BindServices(services);

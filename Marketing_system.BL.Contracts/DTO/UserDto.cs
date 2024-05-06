@@ -13,8 +13,9 @@
         public string Phone { get; set; }
         public string? CompanyName { get; set; }
         public int? TaxId { get; set; }
-        //TODO
-        /*public ClientType ClientType { get; set; }*/
+        public int PackageType { get; set; }
+        public int ClientType { get; set; }
+        public int Role { get; set; }
 
     }
 }

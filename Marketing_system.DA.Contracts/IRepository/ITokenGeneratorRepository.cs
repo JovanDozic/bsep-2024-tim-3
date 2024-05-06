@@ -5,6 +5,8 @@ namespace Marketing_system.DA.Contracts.IRepository
 {
     public interface ITokenGeneratorRepository
     {
-        Task<AuthenticationTokensDto> GenerateAccessToken(User user);
+        Task<AuthenticationTokensDto> GenerateTokens(User user);
+        string CreateRefreshToken();
+        Task<bool> ValidateAccessToken(string token);
     }
 }

@@ -1,16 +1,19 @@
 ﻿using Marketing_system.DA.Contracts.IRepository;
+using Marketing_system.DA.Contracts.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Marketing_system.DA.Repository
 {
-    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity
     {
         public readonly DbContext _dbContext;
+
         public Repository(DbContext dbContext)
         {
             _dbContext = dbContext;
         }
+
         public async Task<IEnumerable<TEntity>> GetAll()
         {
             return await _dbContext.Set<TEntity>().ToListAsync();

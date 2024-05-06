@@ -1,4 +1,5 @@
-﻿using Marketing_system.DA.Contracts.IRepository;
+﻿using Marketing_system.BL.Contracts.IService;
+using Marketing_system.DA.Contracts.IRepository;
 
 namespace Marketing_system.DA.Contracts
 {
@@ -7,5 +8,7 @@ namespace Marketing_system.DA.Contracts
         Task<int> Save();
         public IUserRepository GetUserRepository();
         public ITokenGeneratorRepository GetTokenGeneratorRepository();
+        public IPasswordHasher GetPasswordHasher();
+        public IRegistrationRequestRepository GetRegistrationRequestRepository();
     }
 }

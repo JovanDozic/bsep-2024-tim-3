@@ -1,15 +1,15 @@
-﻿using Marketing_system.BL.Contracts.IService;
+﻿using Marketing_system.DA.Contracts.IRepository;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Marketing_system.BL.Service
+namespace Marketing_system.DA.Repository
 {
     public class PasswordHasher : IPasswordHasher
     {
-        public string HashPassword(string password, out string salt)
+        public (string hashedPassword, string salt) HashPassword(string password)
         {
             byte[] saltBytes = GenerateSalt();
-            salt = Convert.ToBase64String(saltBytes);
+            string salt = Convert.ToBase64String(saltBytes);
 
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
             byte[] saltedPasswordBytes = CombineBytes(passwordBytes, saltBytes);
@@ -17,7 +17,8 @@ namespace Marketing_system.BL.Service
             using (SHA256 sha256 = SHA256.Create())
             {
                 byte[] hashedBytes = sha256.ComputeHash(saltedPasswordBytes);
-                return Convert.ToBase64String(hashedBytes);
+                string hashedPassword = Convert.ToBase64String(hashedBytes);
+                return (hashedPassword, salt);
             }
         }
 

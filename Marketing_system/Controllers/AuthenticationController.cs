@@ -1,6 +1,5 @@
 ﻿using Marketing_system.BL.Contracts.DTO;
 using Marketing_system.BL.Contracts.IService;
-using Marketing_system.DA.Contracts.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,9 +14,15 @@ public class AuthenticationController
     }
     [HttpPost("register")]
     [AllowAnonymous]
-    public async Task<AuthenticationTokensDto> RegisterUser([FromBody] UserDto user)
+    public async Task<bool?> RegisterUser([FromBody] UserDto user)
     {
         return await _authenticationService.RegisterUser(user);
+    }
+    [HttpPost("login")]
+    [AllowAnonymous]
+    public async Task<AuthenticationTokensDto> Login([FromBody] string email, string password)
+    {
+        return await _authenticationService.Login(email, password);
     }
 
 }
