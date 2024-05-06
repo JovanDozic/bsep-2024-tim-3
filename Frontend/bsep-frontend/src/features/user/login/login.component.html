@@ -1,0 +1,17 @@
+<div class="container">
+    <div class="login-container">
+      <h2>Login</h2>
+      <form [formGroup]="loginForm" (submit)="onSubmit()">
+        <label for="username">Username:</label>
+        <input type="text" id="username" formControlName="username">
+    
+        <label for="password">Password:</label>
+        <input type="password" id="password" formControlName="password">
+    
+        <button type="submit">Login</button>
+      </form>
+      <div class="register-section">
+        <p class="register-text">Don't have an account? <a (click)="register()"><u>Register</u></a></p>
+      </div>
+    </div>
+  </div>
