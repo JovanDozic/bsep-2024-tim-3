@@ -12,7 +12,7 @@
         public string Country { get; set; }
         public string Phone { get; set; }
         public string? CompanyName { get; set; }
-        public int? TaxId { get; set; }
+        public string? TaxId { get; set; }
         public int PackageType { get; set; }
         public int ClientType { get; set; }
         public int Role { get; set; }

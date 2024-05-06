@@ -14,14 +14,14 @@ namespace Marketing_system.DA.Contracts.Model
         public string Country { get; set; }
         public string Phone { get; set; }
         public string? CompanyName { get; set; }
-        public int? TaxId { get; set; }
+        public string? TaxId { get; set; }
         public UserRole Role { get; set; }
-        public ClientType? ClientType { get; set; }
+        public ClientType ClientType { get; set; }
         public string Salt { get; set; }
         public PackageType PackageType { get; set; }
         public AccountStatus AccountStatus { get; set; }
         public string RefreshToken { get; set; }
-        public User(string email, string password, string firstname, string lastname, string address, string city, string country, string phone, UserRole role, ClientType clientType, string salt, PackageType packageType)
+        public User(string email, string password, string firstname, string lastname, string address, string city, string country, string phone, UserRole role, ClientType clientType, string salt, PackageType packageType, AccountStatus status)
         {
             Email = email;
             Password = password;
@@ -35,10 +35,10 @@ namespace Marketing_system.DA.Contracts.Model
             ClientType = clientType;
             Salt = salt;
             PackageType = packageType;
-            AccountStatus = AccountStatus.Requested;
+            AccountStatus = status;
         }
 
-        public User(string email, string password, string companyName, int? taxId, string address, string city, string country, string phone, UserRole role, ClientType clientType, string salt, PackageType packageType)
+        public User(string email, string password, string companyName, string? taxId, string address, string city, string country, string phone, UserRole role, ClientType clientType, string salt, PackageType packageType)
         {
             Email = email;
             Password = password;

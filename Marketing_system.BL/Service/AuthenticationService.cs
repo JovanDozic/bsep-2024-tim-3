@@ -53,7 +53,7 @@ namespace Marketing_system.BL.Service
 
             if((ClientType)userDto.ClientType == ClientType.Individual)
             {
-                await _unitOfWork.GetUserRepository().Add(new User(userDto.Email, password, userDto.Firstname, userDto.Lastname, userDto.Address, userDto.City, userDto.Country, userDto.Phone, (UserRole)userDto.Role, ClientType.Individual, salt, (PackageType)userDto.PackageType));
+                await _unitOfWork.GetUserRepository().Add(new User(userDto.Email, password, userDto.Firstname, userDto.Lastname, userDto.Address, userDto.City, userDto.Country, userDto.Phone, (UserRole)userDto.Role, ClientType.Individual, salt, (PackageType)userDto.PackageType, AccountStatus.Requested));
             } else
             {
                 await _unitOfWork.GetUserRepository().Add(new User(userDto.Email, password, userDto.CompanyName, userDto.TaxId, userDto.Address, userDto.City, userDto.Country, userDto.Phone, (UserRole)userDto.Role, (ClientType)userDto.ClientType, salt, (PackageType)userDto.PackageType));

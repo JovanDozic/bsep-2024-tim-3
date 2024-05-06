@@ -11,12 +11,12 @@ namespace Marketing_system.DA.Contracts.Model
         public AccountStatus AccountStatus { get; set; }
         public PackageType PackageType { get; set; }
 
-        public RegistrationRequest(string firstname, string lastname, string email, DateTime dateTime, PackageType packageType)
+        public RegistrationRequest(string firstname, string lastname, string email, DateTime registrationDateTime, PackageType packageType)
         {
             Firstname = firstname;
             Lastname = lastname;
             Email = email;
-            RegistrationDateTime = dateTime;
+            RegistrationDateTime = registrationDateTime;
             AccountStatus = AccountStatus.Requested;
             PackageType = packageType;
         }

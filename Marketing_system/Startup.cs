@@ -11,6 +11,8 @@ using Marketing_system.DA.Contracts.IRepository;
 using Marketing_system.DA.Repository;
 using Marketing_system.BL.Contracts.IService;
 using Marketing_system.BL.Service;
+using Marketing_system.BL.Mapper;
+using Microsoft.OpenApi.Models;
 
 namespace Marketing_system
 {
@@ -37,10 +39,35 @@ namespace Marketing_system
                     x => x.MigrationsHistoryTable("__EFMigrationsHistory", "marketingsystem"));
 
             });
-/*
-            services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<DataContext>()
-                .AddDefaultTokenProviders();*/
+
+            services.AddAutoMapper(typeof(UserProfile));
+            services.AddSwaggerGen(setup =>
+            {
+                setup.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Marketing API",
+                    Version = "v1"
+                });
+                var jwtSecurityScheme = new OpenApiSecurityScheme
+                {
+                    BearerFormat = "JWT",
+                    Name = "JWT Authentication",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = JwtBearerDefaults.AuthenticationScheme,
+                    Description = "Put **ONLY** your JWT Bearer token in the text box below!",
+                    Reference = new OpenApiReference
+                    {
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+                setup.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+                setup.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                { jwtSecurityScheme, Array.Empty<string>() }
+            });
+            });
 
             services.Configure<IdentityOptions>(options =>
             {
