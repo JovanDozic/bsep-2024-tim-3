@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration</title>
+</head>
+<body>
+    <div class="registration-form">
+      <h2>Registration</h2>
+      <form id="registrationForm" (submit)="register()">
+
+        <label for="name">Type:</label>
+        <div class="radio">
+            <input type="radio" id="natural" name="options" value="natural" style="width: 40px;" [(ngModel)]="selectedOption" (change)="onChange()">
+            <label for="option1">Natural person</label><br>
+        </div>
+        <div class="radio">
+            <input type="radio" id="legal" name="options" value="legal" style="width: 40px;" [(ngModel)]="selectedOption" (change)="onChange()">
+            <label for="option2">Legal entity</label><br>
+        </div>
+
+        <label for="name">Name:</label>
+        <input type="name" id="name" name="name" [(ngModel)]="name" required>
+
+        <label for="name" *ngIf="isNatural">Surname:</label>
+        <label for="name" *ngIf="!isNatural">PIB:</label>
+        <input type="name" id="surname" name="surname" [(ngModel)]="surnameOrPIB" required>
+
+        <label for="email">Email address:</label>
+        <input type="email" id="email" name="email" [(ngModel)]="email" required>
+  
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" [(ngModel)]="password" required>
+  
+        <label for="confirmPassword">Confirm Password:</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" [(ngModel)]="confirmPassword" required>
+        <span id="passwordError" class="password-error"></span>
+  
+        <label for="address" *ngIf="isNatural">Address:</label>
+        <label for="address" *ngIf="!isNatural">Headquarters address:</label>
+        <input type="text" id="address" name="address" [(ngModel)]="address" required>
+  
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city" [(ngModel)]="city" required>
+  
+        <label for="country">Country:</label>
+        <input type="text" id="country" name="country" [(ngModel)]="country" required>
+  
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="tel" id="phoneNumber" name="phoneNumber" [(ngModel)]="phoneNumber" required>
+  
+        <button type="submit" id="registerButton">Register</button>
+      </form>
+    </div>
+  </body>
+</html>

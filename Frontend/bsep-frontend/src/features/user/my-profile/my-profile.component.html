@@ -1,0 +1,40 @@
+<div class="profile-container">
+    <h2>My Profile</h2>
+    <div class="user-details">
+      <div><strong>Type:</strong> {{ user.type }}</div>
+      <form (submit)="updateProfile($event)">
+        <div>
+            <label for="firstName"><strong>Name:</strong></label>
+            <input type="text" id="firstName" [(ngModel)]="user.name" name="name">
+        </div>
+        <div>
+            <label for="lastName"><strong>Surname:</strong></label>
+            <input type="text" id="lastName" [(ngModel)]="user.surname" name="surname">
+        </div>
+        <div>
+            <label for="email"><strong>Email:</strong></label>
+            <input type="text" id="email" [(ngModel)]="user.email" name="email">
+        </div>
+        <div>
+            <label for="address"><strong>Address:</strong></label>
+            <input type="text" id="address" [(ngModel)]="user.address" name="address">
+          </div>
+        <div>
+          <label for="city"><strong>City:</strong></label>
+          <input type="text" id="city" [(ngModel)]="user.city" name="city">
+        </div>
+        <div>
+          <label for="country"><strong>Country:</strong></label>
+          <input type="text" id="country" [(ngModel)]="user.country" name="country">
+        </div>
+        <div>
+          <label for="phoneNumber"><strong>Phone number:</strong></label>
+          <input type="text" id="phoneNumber" [(ngModel)]="user.phone" name="phone">
+        </div>
+        <button type="submit">Update Profile</button>
+      </form>
+      
+    </div>
+  </div>
+  
+  
