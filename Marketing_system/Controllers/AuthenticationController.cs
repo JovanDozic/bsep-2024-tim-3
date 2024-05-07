@@ -23,18 +23,18 @@ public class AuthenticationController : Controller
     }
     [HttpPost("login")]
     [AllowAnonymous]
-    public async Task<ActionResult<AuthenticationTokensDto>> Login([FromBody] string email, string password)
+    public async Task<ActionResult<AuthenticationTokensDto>> Login(string email, string password)
     {
         var token = await _authenticationService.Login(email, password);
         if (token == null)
             return BadRequest(token);
         return Ok(token);
     }
-    [HttpPost("updateRefresh")]
+    [HttpPost("updateAccess")]
     [Authorize]
-    public async Task<ActionResult<string>> UpdateRefreshToken([FromBody] int userId)
+    public async Task<ActionResult<string>> UpdateAccessToken([FromBody] int userId)
     {
-        var token = await _authenticationService.UpdateRefreshToken(userId);
+        var token = await _authenticationService.UpdateAccessToken(userId);
         if (token == null)
             return BadRequest(token);
         return Ok(token);

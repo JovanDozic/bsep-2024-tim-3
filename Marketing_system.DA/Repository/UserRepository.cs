@@ -28,14 +28,7 @@ namespace Marketing_system.DA.Repository
 
         public async Task<User> GetByEmailAsync(string email)
         {
-            return await _dbContext.Set<User>().FirstOrDefaultAsync(x => x.Email == email && x.AccountStatus == AccountStatus.Active);
-        }
-
-        public string? GetSaltByEmail(string email)
-        {
-            var user = _dbContext.Set<User>().SingleOrDefault(x => x.Email == email);
-            if (user == null) { return null; }
-            return user.Salt;
+            return await _dbContext.Set<User>().FirstOrDefaultAsync(x => x.Email == email);
         }
 
         public string? GetPasswordByEmail(string email)

@@ -48,7 +48,6 @@ namespace Marketing_system.DA.Migrations
                     TaxId = table.Column<string>(type: "text", nullable: true),
                     Role = table.Column<int>(type: "integer", nullable: false),
                     ClientType = table.Column<int>(type: "integer", nullable: false),
-                    Salt = table.Column<string>(type: "text", nullable: false),
                     PackageType = table.Column<int>(type: "integer", nullable: false),
                     AccountStatus = table.Column<int>(type: "integer", nullable: false),
                     RefreshToken = table.Column<string>(type: "text", nullable: true)

@@ -6,7 +6,7 @@ namespace Marketing_system.BL.Contracts.IService
     {
         Task<bool> RegisterUser(UserDto userDto);
         Task<AuthenticationTokensDto> Login(string email, string password);
-        Task<string> UpdateRefreshToken(int userId);
+        Task<string> UpdateAccessToken(int userId);
         Task<bool> ValidateRefreshToken(int userId, string refreshToken);
         Task<bool> ValidateAccessToken(string accessToken);
     }

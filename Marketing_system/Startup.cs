@@ -153,6 +153,7 @@ namespace Marketing_system
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            //app.UseMiddleware<AuthenticationMiddleware>();
 
             app.UseHttpsRedirection();
 

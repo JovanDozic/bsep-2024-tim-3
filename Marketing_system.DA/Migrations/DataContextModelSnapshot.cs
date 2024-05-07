@@ -112,10 +112,6 @@ namespace Marketing_system.DA.Migrations
                     b.Property<int>("Role")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Salt")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("TaxId")
                         .HasColumnType("text");
 

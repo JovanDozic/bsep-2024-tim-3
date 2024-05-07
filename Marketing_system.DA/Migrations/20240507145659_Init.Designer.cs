@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marketing_system.DA.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240507072251_Init")]
+    [Migration("20240507145659_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -114,10 +114,6 @@ namespace Marketing_system.DA.Migrations
 
                     b.Property<int>("Role")
                         .HasColumnType("integer");
-
-                    b.Property<string>("Salt")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("TaxId")
                         .HasColumnType("text");
