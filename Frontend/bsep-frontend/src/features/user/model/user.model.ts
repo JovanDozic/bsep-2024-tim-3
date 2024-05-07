@@ -8,10 +8,11 @@ export interface User {
     city: string,
     country: string,
     phone: string,
-    type: ClientType
+    type: UserType
 }
 
-export enum ClientType {
-    LegalEntity = 1,
-    NaturalPerson
+export enum UserType {
+    Admin = 1,
+    Employee,
+    Client
   }

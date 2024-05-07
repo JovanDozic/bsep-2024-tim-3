@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ClientType, User } from '../model/user.model';
+import { UserType, User } from '../model/user.model';
 import { UserService } from '../user.service';
 
 @Component({
@@ -22,7 +22,7 @@ export class MyProfileComponent implements OnInit {
     this.user.country = "Srbija";
     this.user.email = "luka@gmail.com";
     this.user.phone = "372364824";
-    this.user.type = ClientType.NaturalPerson;
+    this.user.type = UserType.Client;
     /*this.userService.getCurrentUser().subscribe(
       (user: User) => {
         this.user = user;

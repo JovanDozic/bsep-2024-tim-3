@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../user.service';
 import { Router } from '@angular/router';
-import { ClientType, User } from '../model/user.model';
+import { UserType, User } from '../model/user.model';
 
 @Component({
   selector: 'app-register',
@@ -20,7 +20,7 @@ export class RegisterComponent implements OnInit {
   country: string = '';
   phoneNumber: string = '';
   isNatural: boolean = true;
-  type: ClientType = ClientType.NaturalPerson;
+  type: UserType = UserType.Client;
   user: User[] = [];
 
   selectedOption: string = "natural";
