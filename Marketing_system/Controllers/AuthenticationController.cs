@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Marketing_system.Controllers;
 [Route("api/users")]
-public class AuthenticationController
+public class AuthenticationController : Controller
 {
     private readonly IAuthenticationService _authenticationService;
     public AuthenticationController(IAuthenticationService authenticationService)
@@ -14,15 +14,47 @@ public class AuthenticationController
     }
     [HttpPost("register")]
     [AllowAnonymous]
-    public async Task<bool?> RegisterUser([FromBody] UserDto user)
+    public async Task<ActionResult<bool>> RegisterUser([FromBody] UserDto user)
     {
-        return await _authenticationService.RegisterUser(user);
+        var isRegistred = await _authenticationService.RegisterUser(user);
+        if (isRegistred)
+            return Ok(isRegistred);
+        return BadRequest(!isRegistred);
     }
     [HttpPost("login")]
     [AllowAnonymous]
-    public async Task<AuthenticationTokensDto> Login([FromBody] string email, string password)
+    public async Task<ActionResult<AuthenticationTokensDto>> Login([FromBody] string email, string password)
     {
-        return await _authenticationService.Login(email, password);
+        var token = await _authenticationService.Login(email, password);
+        if (token == null)
+            return BadRequest(token);
+        return Ok(token);
+    }
+    [HttpPost("updateRefresh")]
+    [Authorize]
+    public async Task<ActionResult<string>> UpdateRefreshToken([FromBody] int userId)
+    {
+        var token = await _authenticationService.UpdateRefreshToken(userId);
+        if (token == null)
+            return BadRequest(token);
+        return Ok(token);
     }
 
+    [HttpPost("validateRefresh")]
+    public async Task<ActionResult<bool>> ValidateRefreshToken([FromBody] int userId, string refreshToken)
+    {
+        var token = await _authenticationService.ValidateRefreshToken(userId, refreshToken);
+        if (!token)
+            return BadRequest(token);
+        return Ok(token);
+    }
+    [HttpPost("validateAccess")]
+    [Authorize]
+    public async Task<ActionResult<bool>> ValidateAccessToken([FromBody] string accessToken)
+    {
+        var token = await _authenticationService.ValidateAccessToken(accessToken);
+        if (!token)
+            return BadRequest(token);
+        return Ok(token);
+    }
 }

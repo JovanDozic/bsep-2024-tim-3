@@ -107,7 +107,6 @@ namespace Marketing_system.DA.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("RefreshToken")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Role")

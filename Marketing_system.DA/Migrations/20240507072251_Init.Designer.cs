@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marketing_system.DA.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240506225624_Init")]
+    [Migration("20240507072251_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -110,7 +110,6 @@ namespace Marketing_system.DA.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("RefreshToken")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Role")

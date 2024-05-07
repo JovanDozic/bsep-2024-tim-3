@@ -51,7 +51,7 @@ namespace Marketing_system.DA.Migrations
                     Salt = table.Column<string>(type: "text", nullable: false),
                     PackageType = table.Column<int>(type: "integer", nullable: false),
                     AccountStatus = table.Column<int>(type: "integer", nullable: false),
-                    RefreshToken = table.Column<string>(type: "text", nullable: false)
+                    RefreshToken = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {

@@ -20,7 +20,7 @@ namespace Marketing_system.DA.Contracts.Model
         public string Salt { get; set; }
         public PackageType PackageType { get; set; }
         public AccountStatus AccountStatus { get; set; }
-        public string RefreshToken { get; set; }
+        public string? RefreshToken { get; set; }
         public User(string email, string password, string firstname, string lastname, string address, string city, string country, string phone, UserRole role, ClientType clientType, string salt, PackageType packageType, AccountStatus status)
         {
             Email = email;

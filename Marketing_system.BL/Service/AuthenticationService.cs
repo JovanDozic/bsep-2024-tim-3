@@ -14,9 +14,6 @@ namespace Marketing_system.BL.Service
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly string _key = Environment.GetEnvironmentVariable("JWT_KEY") ?? "marketingsystem_secret_key";
-        private readonly string _issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "marketingsystem";
-        private readonly string _audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "marketingsystem-front.com";
 
         public AuthenticationService(IUnitOfWork unitOfWork)
         {
@@ -35,13 +32,14 @@ namespace Marketing_system.BL.Service
                     var tokens = await _unitOfWork.GetTokenGeneratorRepository().GenerateTokens(user);
                     user.RefreshToken = tokens.RefreshToken;
                     _unitOfWork.GetUserRepository().Update(user);
+                    await _unitOfWork.Save();
                     return tokens;
                 }
             }
             return null;
         }
 
-        public async Task<bool?> RegisterUser(UserDto userDto)
+        public async Task<bool> RegisterUser(UserDto userDto)
         {
             var userdb = await _unitOfWork.GetUserRepository().GetByEmailAsync(userDto.Email);
             if(userdb != null)
@@ -59,7 +57,8 @@ namespace Marketing_system.BL.Service
                 await _unitOfWork.GetUserRepository().Add(new User(userDto.Email, password, userDto.CompanyName, userDto.TaxId, userDto.Address, userDto.City, userDto.Country, userDto.Phone, (UserRole)userDto.Role, (ClientType)userDto.ClientType, salt, (PackageType)userDto.PackageType));
             }
 
-            await _unitOfWork.GetRegistrationRequestRepository().Add(new RegistrationRequest(userDto.Firstname, userDto.Lastname, userDto.Email, DateTime.Now, (PackageType)userDto.PackageType));
+            await _unitOfWork.GetRegistrationRequestRepository().Add(new RegistrationRequest(userDto.Firstname, userDto.Lastname, userDto.Email, DateTime.Now.ToUniversalTime(), (PackageType)userDto.PackageType));
+            await _unitOfWork.Save();
             return true;
         }
         public async Task<string> UpdateRefreshToken(int userId)
@@ -73,6 +72,7 @@ namespace Marketing_system.BL.Service
             var newRefreshToken = _unitOfWork.GetTokenGeneratorRepository().CreateRefreshToken();
             user.RefreshToken = newRefreshToken;
             _unitOfWork.GetUserRepository().Update(user);
+            await _unitOfWork.Save();
 
             return newRefreshToken;
         }
