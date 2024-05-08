@@ -32,6 +32,7 @@ namespace Marketing_system
             services.AddSwaggerGen();
 
             services.Configure<SMTPConfig>(Configuration.GetSection("SMTPConfig"));
+            services.Configure<HMACConfig>(Configuration.GetSection("HMACConfig"));
 
             services.AddDbContext<DataContext>(options =>
             {
@@ -180,6 +181,7 @@ namespace Marketing_system
             services.AddTransient<ITokenGeneratorRepository, TokenGeneratorRepository>();
             services.AddTransient<IPasswordHasher, PasswordHasher>();
             services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IEmailHandler, EmailHandler>();
         }
 
     }

@@ -44,7 +44,6 @@ namespace Marketing_system.DA
         private IPasswordHasher _passwordHasher { get; set; }
         private IRegistrationRequestRepository _registrationRequestRepository { get; set; }
         private IPasswordlessTokenRepository _passwordlessTokenRepository { get; set; }
-        private IEmailHandler _emailHandler { get; set; }
 
         public IUserRepository GetUserRepository()
         {
@@ -67,11 +66,5 @@ namespace Marketing_system.DA
         {
             return _passwordlessTokenRepository ?? (_passwordlessTokenRepository = new PasswordlessTokenRepository(_context));
         }
-
-        public IEmailHandler GetEmailHandler()
-        {
-            return _emailHandler ?? (_emailHandler = new EmailHandler());
-        }
-
     }
 }

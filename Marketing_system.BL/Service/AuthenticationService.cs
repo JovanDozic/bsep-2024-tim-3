@@ -1,8 +1,10 @@
 ﻿using Marketing_system.BL.Contracts.DTO;
 using Marketing_system.BL.Contracts.IService;
 using Marketing_system.DA.Contracts;
+using Marketing_system.DA.Contracts.IRepository;
 using Marketing_system.DA.Contracts.Model;
 using Marketing_system.DA.Contracts.Shared;
+using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -15,10 +17,16 @@ namespace Marketing_system.BL.Service
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly HMACConfig _hmacConfig;
+        private readonly SMTPConfig _smtpConfig;
+        private readonly IEmailHandler _emailHandler;
 
-        public AuthenticationService(IUnitOfWork unitOfWork)
+        public AuthenticationService(IUnitOfWork unitOfWork, IOptions<HMACConfig> hmacConfig, IOptions<SMTPConfig> smtpConfig, IEmailHandler emailHandler)
         {
             _unitOfWork = unitOfWork;
+            _hmacConfig = hmacConfig.Value;
+            _smtpConfig = smtpConfig.Value;
+            _emailHandler = emailHandler;
         }
 
         public async Task<AuthenticationTokensDto?> Login(string email, string password)
@@ -125,7 +133,7 @@ namespace Marketing_system.BL.Service
                 });
             await _unitOfWork.Save();
 
-            return await _unitOfWork.GetEmailHandler().SendPasswordlessLink(email, link);
+            return await _emailHandler.SendPasswordlessLink(email, link);
         }
 
         public async Task<AuthenticationTokensDto?> AuthenticatePasswordlessTokenAsync(string token)
@@ -160,22 +168,20 @@ namespace Marketing_system.BL.Service
             return tokens;
         }
 
-        private static string GeneratePasswordlessToken(string email)
+        private string GeneratePasswordlessToken(string email)
         {
-            var secretKey = "temp_secret_key"; // TODO: Move this to appsettings.json at least
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
             var payload = $"{email}:{timestamp}";
 
-            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secretKey));
+            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_hmacConfig.Secret));
             var tokenBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(payload));
             var token = Convert.ToBase64String(tokenBytes);
 
             return token;
         }
 
-        private static bool ValidatePasswordlessToken(string token)
+        private bool ValidatePasswordlessToken(string token)
         {
-            var secretKey = "temp_secret_key"; // TODO: kao onaj gore bro
             var parts = token.Split(':');
             if (parts.Length != 2)
             {
@@ -186,7 +192,7 @@ namespace Marketing_system.BL.Service
             var timestamp = parts[1];
 
             var payload = $"{email}:{timestamp}";
-            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secretKey));
+            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_hmacConfig.Secret));
             var computedToken = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(payload)));
             return token == computedToken;
         }
