@@ -1,5 +1,4 @@
-﻿using Marketing_system.BL.Contracts.IService;
-using Marketing_system.DA.Contracts.IRepository;
+﻿using Marketing_system.DA.Contracts.IRepository;
 
 namespace Marketing_system.DA.Contracts
 {
@@ -10,5 +9,7 @@ namespace Marketing_system.DA.Contracts
         public ITokenGeneratorRepository GetTokenGeneratorRepository();
         public IPasswordHasher GetPasswordHasher();
         public IRegistrationRequestRepository GetRegistrationRequestRepository();
+        public IPasswordlessTokenRepository GetPasswordlessTokenRepository();
+        public IEmailHandler GetEmailHandler();
     }
 }

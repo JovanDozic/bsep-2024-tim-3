@@ -9,5 +9,6 @@ namespace Marketing_system.BL.Contracts.IService
         Task<string> UpdateAccessToken(int userId);
         Task<bool> ValidateRefreshToken(int userId, string refreshToken);
         Task<bool> ValidateAccessToken(string accessToken);
+        Task<bool?> SendPasswordlessLogin(string email);
     }
 }

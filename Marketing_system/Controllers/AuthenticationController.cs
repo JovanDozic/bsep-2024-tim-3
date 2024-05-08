@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marketing_system.Controllers;
-[Route("api/users")]
+[Route("api/authentication")]
 public class AuthenticationController : Controller
 {
     private readonly IAuthenticationService _authenticationService;
@@ -12,15 +12,17 @@ public class AuthenticationController : Controller
     {
         _authenticationService = authenticationService;
     }
+
     [HttpPost("register")]
     [AllowAnonymous]
     public async Task<ActionResult<bool>> RegisterUser([FromBody] UserDto user)
     {
-        var isRegistred = await _authenticationService.RegisterUser(user);
-        if (isRegistred)
-            return Ok(isRegistred);
-        return BadRequest(!isRegistred);
+        var isRegistered = await _authenticationService.RegisterUser(user);
+        if (isRegistered)
+            return Ok(isRegistered);
+        return BadRequest(!isRegistered);
     }
+
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<ActionResult<AuthenticationTokensDto>> Login(string email, string password)
@@ -30,6 +32,7 @@ public class AuthenticationController : Controller
             return BadRequest(token);
         return Ok(token);
     }
+
     [HttpPost("updateAccess")]
     [Authorize]
     public async Task<ActionResult<string>> UpdateAccessToken([FromBody] int userId)
@@ -48,6 +51,7 @@ public class AuthenticationController : Controller
             return BadRequest(token);
         return Ok(token);
     }
+
     [HttpPost("validateAccess")]
     [Authorize]
     public async Task<ActionResult<bool>> ValidateAccessToken([FromBody] string accessToken)
@@ -56,5 +60,20 @@ public class AuthenticationController : Controller
         if (!token)
             return BadRequest(token);
         return Ok(token);
+    }
+
+    [HttpPost("requestPasswordlessLogin")]
+    public async Task<ActionResult<AuthenticationTokensDto>> RequestPasswordlessLogin(string email)
+    {
+        var result = await _authenticationService.SendPasswordlessLogin(email);
+        if (result == null)
+            return BadRequest(result);
+        return Ok(result);
+    }
+
+    [HttpPost("authenticatePasswordlessLogin")]
+    public async Task<ActionResult<AuthenticationTokensDto>> AuthenticatePasswordlessToken(string email, string token)
+    {
+        throw new NotImplementedException();
     }
 }

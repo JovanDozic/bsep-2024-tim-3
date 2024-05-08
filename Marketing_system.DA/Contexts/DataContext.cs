@@ -6,8 +6,9 @@ namespace Marketing_system.DA.Contexts
     public class DataContext : DbContext
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
-        public DbSet<User> Users {  get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<RegistrationRequest> RegistrationRequests { get; set; }
+        public DbSet<PasswordlessToken> PasswordlessTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
