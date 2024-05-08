@@ -1,18 +1,18 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Marketing_system.BL.Contracts.IService;
+using Marketing_system.BL.Mapper;
+using Marketing_system.BL.Service;
+using Marketing_system.DA;
 using Marketing_system.DA.Contexts;
+using Marketing_system.DA.Contracts;
+using Marketing_system.DA.Contracts.IRepository;
+using Marketing_system.DA.Contracts.Model;
+using Marketing_system.DA.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Marketing_system.DA.Contracts.Model;
-using Microsoft.AspNetCore.Identity;
-using Marketing_system.DA.Contracts;
-using Marketing_system.DA;
-using Marketing_system.DA.Contracts.IRepository;
-using Marketing_system.DA.Repository;
-using Marketing_system.BL.Contracts.IService;
-using Marketing_system.BL.Service;
-using Marketing_system.BL.Mapper;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 namespace Marketing_system
 {
@@ -32,6 +32,7 @@ namespace Marketing_system
             services.AddSwaggerGen();
 
             services.Configure<SMTPConfig>(Configuration.GetSection("SMTPConfig"));
+            services.Configure<HMACConfig>(Configuration.GetSection("HMACConfig"));
 
             services.AddDbContext<DataContext>(options =>
             {
@@ -180,6 +181,7 @@ namespace Marketing_system
             services.AddTransient<ITokenGeneratorRepository, TokenGeneratorRepository>();
             services.AddTransient<IPasswordHasher, PasswordHasher>();
             services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IEmailHandler, EmailHandler>();
         }
 
     }

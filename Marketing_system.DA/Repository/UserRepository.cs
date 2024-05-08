@@ -1,7 +1,6 @@
 ﻿using Marketing_system.DA.Contexts;
 using Marketing_system.DA.Contracts.IRepository;
 using Marketing_system.DA.Contracts.Model;
-using Marketing_system.DA.Contracts.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marketing_system.DA.Repository
@@ -13,9 +12,9 @@ namespace Marketing_system.DA.Repository
             get { return _dbContext as DataContext; }
         }
 
-        public UserRepository(DataContext context) : base(context) 
+        public UserRepository(DataContext context) : base(context)
         {
-            
+
         }
         public new IEnumerable<User> GetAll()
         {

@@ -9,7 +9,7 @@ namespace Marketing_system.DA
     {
         private DataContext _context;
 
-        public UnitOfWork(DataContext context) 
+        public UnitOfWork(DataContext context)
         {
             _context = context;
         }
@@ -21,7 +21,7 @@ namespace Marketing_system.DA
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)  
+            if (disposing)
                 _context.Dispose();
             _context = null;
         }
@@ -31,7 +31,8 @@ namespace Marketing_system.DA
             try
             {
                 return await _context.SaveChangesAsync();
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine($"Error savig changes to the database: {ex.Message}");
                 throw;
@@ -42,7 +43,7 @@ namespace Marketing_system.DA
         private ITokenGeneratorRepository _tokenGeneratorRepository { get; set; }
         private IPasswordHasher _passwordHasher { get; set; }
         private IRegistrationRequestRepository _registrationRequestRepository { get; set; }
-
+        private IPasswordlessTokenRepository _passwordlessTokenRepository { get; set; }
 
         public IUserRepository GetUserRepository()
         {
@@ -61,6 +62,9 @@ namespace Marketing_system.DA
         {
             return _registrationRequestRepository ?? (_registrationRequestRepository = new RegistrationRequestRepository(_context));
         }
-
+        public IPasswordlessTokenRepository GetPasswordlessTokenRepository()
+        {
+            return _passwordlessTokenRepository ?? (_passwordlessTokenRepository = new PasswordlessTokenRepository(_context));
+        }
     }
 }
