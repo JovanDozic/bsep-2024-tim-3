@@ -72,8 +72,11 @@ public class AuthenticationController : Controller
     }
 
     [HttpPost("authenticatePasswordlessLogin")]
-    public async Task<ActionResult<AuthenticationTokensDto>> AuthenticatePasswordlessToken(string email, string token)
+    public async Task<ActionResult<AuthenticationTokensDto>> AuthenticatePasswordlessToken([FromQuery] string token)
     {
-        throw new NotImplementedException();
+        var result = await _authenticationService.AuthenticatePasswordlessTokenAsync(token);
+        if (result == null)
+            return BadRequest(result);
+        return Ok(result);
     }
 }

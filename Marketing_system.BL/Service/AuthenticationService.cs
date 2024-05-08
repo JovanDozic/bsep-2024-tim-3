@@ -100,8 +100,6 @@ namespace Marketing_system.BL.Service
         }
 
 
-        // TODO: Add to IAuthenticationService
-        // Returns `true` if email is successfully sent.
         public async Task<bool?> SendPasswordlessLogin(string email)
         {
             var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(email);
@@ -114,9 +112,8 @@ namespace Marketing_system.BL.Service
                 return null;
             }
 
-            var token = GeneratePasswordlessToken();
-            // TODO: Update if Authentication controller APIs are changed!
-            var link = $"https://localhost:7198/api/users/authenticatePasswordlessLogin?token={token}";
+            var token = GeneratePasswordlessToken(email);
+            var link = $"https://localhost:7198/api/authentication/authenticatePasswordlessLogin?token={token}";
 
             await _unitOfWork.GetPasswordlessTokenRepository().Add(
                 new PasswordlessToken()
@@ -131,19 +128,43 @@ namespace Marketing_system.BL.Service
             return await _unitOfWork.GetEmailHandler().SendPasswordlessLink(email, link);
         }
 
-        public AuthenticationTokensDto? AuthenticatePasswordlessToken(string email, string token)
+        public async Task<AuthenticationTokensDto?> AuthenticatePasswordlessTokenAsync(string token)
         {
-            // TODO: Check if passwordless token is valid, generate JWT tokens and return them
+            var passwordlessToken = await _unitOfWork.GetPasswordlessTokenRepository().GetByTokenAsync(token);
+            if (passwordlessToken == null ||
+                passwordlessToken.IsUsed ||
+                passwordlessToken.ExpirationDate < DateTime.UtcNow)
+            {
+                return null;
+            }
 
+            //if (!ValidatePasswordlessToken(token))
+            //{
+            //    return null;
+            //}
 
-            throw new NotImplementedException();
+            passwordlessToken.IsUsed = true;
+            _unitOfWork.GetPasswordlessTokenRepository().Update(passwordlessToken);
+            await _unitOfWork.Save();
+
+            var user = await _unitOfWork.GetUserRepository().GetByIdAsync(passwordlessToken.UserId);
+            if (user is null)
+            {
+                return null;
+            }
+
+            var tokens = await _unitOfWork.GetTokenGeneratorRepository().GenerateTokens(user);
+            user.RefreshToken = tokens.RefreshToken;
+            _unitOfWork.GetUserRepository().Update(user);
+            await _unitOfWork.Save();
+            return tokens;
         }
 
-        private static string GeneratePasswordlessToken()
+        private static string GeneratePasswordlessToken(string email)
         {
             var secretKey = "temp_secret_key"; // TODO: Move this to appsettings.json at least
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
-            var payload = $"{timestamp}.{secretKey}";
+            var payload = $"{email}:{timestamp}";
 
             using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secretKey));
             var tokenBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(payload));
@@ -151,5 +172,24 @@ namespace Marketing_system.BL.Service
 
             return token;
         }
+
+        private static bool ValidatePasswordlessToken(string token)
+        {
+            var secretKey = "temp_secret_key"; // TODO: kao onaj gore bro
+            var parts = token.Split(':');
+            if (parts.Length != 2)
+            {
+                return false;
+            }
+
+            var email = parts[0];
+            var timestamp = parts[1];
+
+            var payload = $"{email}:{timestamp}";
+            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secretKey));
+            var computedToken = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(payload)));
+            return token == computedToken;
+        }
+
     }
 }
