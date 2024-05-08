@@ -4,6 +4,9 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MyProfileComponent } from './my-profile/my-profile.component';
+import { ClientProfileComponent } from './client-profile/client-profile.component';
+import { AdminProfileComponent } from './admin-profile/admin-profile.component';
+import { EmployeeProfileComponent } from './employee-profile/employee-profile.component';
 
 
 
@@ -11,7 +14,10 @@ import { MyProfileComponent } from './my-profile/my-profile.component';
   declarations: [
     LoginComponent,
     RegisterComponent,
-    MyProfileComponent
+    MyProfileComponent,
+    ClientProfileComponent,
+    AdminProfileComponent,
+    EmployeeProfileComponent
   ],
   imports: [
     CommonModule,
