@@ -79,4 +79,29 @@ public class AuthenticationController : Controller
             return BadRequest(result);
         return Ok(result);
     }
+    [HttpGet("getUser/{id:int}")]
+    public async Task<ActionResult<UserDto>> GetUser(int id)
+    {
+        var user = await _authenticationService.GetUserById(id);
+        if (user == null)
+            return NotFound(); // User not found
+
+        return Ok(user);
+    }
+    [HttpGet("getAllUsers")]
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
+    {
+        var users = await _authenticationService.GetAllUsers();
+        return Ok(users);
+    }
+    [HttpPost("updateUser")]
+    public async Task<ActionResult<bool>> UpdateUser([FromBody] UserDto user)
+    {
+        var isUpdated = await _authenticationService.UpdateUser(user);
+        if (isUpdated)
+        {
+            return Ok(isUpdated);
+        }
+        return NotFound(); // Return appropriate status code if user not found
+    }
 }
