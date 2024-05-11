@@ -1,18 +1,16 @@
 export interface User {
-    id: number,
-    name: string,
-    surname: string,
-    email: string,
-    password: string,
-    address: string,
-    city: string,
-    country: string,
-    phone: string,
-    type: UserType
+  id: number;
+  email: string;
+  password: string;
+  firstname?: string;
+  lastname?: string;
+  address: string;
+  city: string;
+  country: string;
+  phone: string;
+  companyName?: string;
+  taxId?: string;
+  packageType: number;
+  clientType: number;
+  role: number; // Change type to number
 }
-
-export enum UserType {
-    Admin = 1,
-    Employee,
-    Client
-  }

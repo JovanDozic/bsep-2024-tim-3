@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { UserType, User } from '../model/user.model';
 import { UserService } from '../user.service';
 import { Advertisement } from '../model/advertisement.model';
+import { concat } from 'rxjs';
+import { User } from '../model/user.model';
 
 @Component({
   selector: 'app-employee-profile',
@@ -12,22 +13,23 @@ export class EmployeeProfileComponent implements OnInit {
 
   employee: User;
   advertisements: Advertisement[] = [];
+  id:number;
 
   constructor(private userService: UserService) { }
 
   ngOnInit(): void {
-    this.employee = {
-      id: 1,
-      name: 'Luka',
-      surname: 'Zelovic',
-      email: 'zelovic.luka@example.com',
-      password: 'password',
-      address: '123 Main St',
-      city: 'City',
-      country: 'Country',
-      phone: '123-456-7890',
-      type: UserType.Employee // Assuming the employee is a natural person
-    };
+    this.id = 6;
+    this.userService.getUserById(this.id).subscribe(
+      (user: User) => {
+        this.employee = user;
+        console.log('User Details:', this.employee);
+
+      },
+      error => {
+        console.error('Error fetching user:', error);
+      }
+    )
+    
     this.advertisements = [
       { id: 1, slogan: 'Slogan 1', duration: 30, description: 'Description 1', clientId: 1 },
       { id: 2, slogan: 'Slogan 2', duration: 45, description: 'Description 2', clientId: 2 },
@@ -38,5 +40,20 @@ export class EmployeeProfileComponent implements OnInit {
       // Add more advertisements here
     ];
   }
+  updateUser() {
+    console.log("usao u funkciju");
+    this.userService.updateUser(this.employee).subscribe(
+        (updated: boolean) => {
+            if (updated) {
+                console.log('Employee updated successfully');
+            } else {
+                console.error('Failed to update employee');
+            }
+        },
+        error => {
+            console.error('Error updating employee:', error);
+        }
+    );
+}
 
 }
