@@ -1,42 +1,37 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
-import { User, UserType } from '../model/user.model';
+import { User } from '../model/user.model';
 import { UserService } from '../user.service';
+import { Observable, catchError, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminGuard implements CanActivate {
-    user: User;
+    user: User = null;
+    userId:number;
+
   constructor(private router: Router, private userService: UserService) {
-    this.user = {
-      id: 1,
-      name: 'Luka',
-      surname: 'Zelovic',
-      email: 'zelovic.luka@example.com',
-      password: 'password',
-      address: '123 Main St',
-      city: 'City',
-      country: 'Country',
-      phone: '123-456-7890',
-      type: UserType.Admin
-    };
+    this.userId = 9;
   }
 
-  canActivate(): boolean {
-    /*
-    this.userService.getUser(this.tokenStorage.getId()).subsribe({
-        next: (result: User) => {
-            user = result;
+  canActivate(): Observable<boolean> {
+    return this.userService.getUserById(this.userId).pipe(
+      map((user: User) => {
+        this.user = user;
+        console.log(this.user.role);
+        console.log('User Details:', this.user);
+        if (user.role === 2) {
+            return true;
         }
-    })
-    */
-
-    if (this.user.type === UserType.Admin) {
-      return true;
-    } else {
-      this.router.navigate(['/login']);
-      return false;
-    }
+        this.router.navigate(['/login']);
+        return false;
+      }),
+      catchError(error => {
+        console.error('Error fetching user:', error);
+        return [false]; // Return false in case of error
+      })
+    );
   }
+
 }

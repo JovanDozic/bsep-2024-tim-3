@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UserType, User } from '../model/user.model';
+import { User } from '../model/user.model';
 import { UserService } from '../user.service';
 
 @Component({
@@ -13,48 +13,43 @@ export class AdminProfileComponent implements OnInit {
   allClients: User[] = [];
   allEmployees: User[] = [];
   allUsers: User[] = [];
+  id:number;
 
   constructor(private userService: UserService) { }
 
   ngOnInit(): void {
-    this.admin = {
-      id: 1,
-      name: 'Luka',
-      surname: 'Zelovic',
-      email: 'zelovic.luka@example.com',
-      password: 'password',
-      address: '123 Main St',
-      city: 'City',
-      country: 'Country',
-      phone: '123-456-7890',
-      type: UserType.Admin // Assuming the employee is a natural person
-    };
-    /*
-    this.userService.GetAllUsers().subscribe({
-      next: (result: PagedResult<User>) => {
-        this.allUsers = result.results;
+    this.id = 9;
+    this.userService.getUserById(this.id).subscribe(
+      (user: User) => {
+        this.admin = user;
+        console.log('User Details:', this.admin);
+
       },
-      error: (err:any) => {
-        console.log(err);
+      error => {
+        console.error('Error fetching user:', error);
       }
+    )
+    
+    this.userService.getAllUsers().subscribe(users => {
+      this.allUsers = users;
+      this.allClients = this.allUsers.filter(user => user.role === 0);
+      this.allEmployees = this.allUsers.filter(user => user.role === 1);
     });
-    */
-
-    const users: User[] = [
-      { id: 2, name: 'John', surname: 'Doe', email: 'john.doe@example.com', password: 'password', address: '456 Elm St', city: 'City', country: 'Country', phone: '987-654-3210', type: UserType.Client },
-      { id: 3, name: 'Jane', surname: 'Smith', email: 'jane.smith@example.com', password: 'password', address: '789 Oak St', city: 'City', country: 'Country', phone: '123-789-4560', type: UserType.Employee },
-      { id: 3, name: 'Spae', surname: 'Smith', email: 'jane.smith@example.com', password: 'password', address: '789 Oak St', city: 'City', country: 'Country', phone: '123-789-4560', type: UserType.Employee },
-    ];
-
-    this.allUsers = users;
-
-    this.allUsers.forEach(user => {
-      if (user.type === UserType.Client) {
-        this.allClients.push(user);
-      } else if (user.type === UserType.Employee) {
-        this.allEmployees.push(user);
-      }
-    });
-
+  
   }
+  updateUser() {
+    console.log("usao u funkciju");
+    this.userService.updateUser(this.admin).subscribe(
+        (updated: boolean) => {
+            if (updated) {
+                console.log('Employee updated successfully');
+            } else {
+                console.error('Failed to update employee');
+            }
+        },
+        error => {
+            console.error('Error updating employee:', error);
+        }
+    );
+}
 }

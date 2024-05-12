@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../user.service';
 import { Router } from '@angular/router';
-import { UserType, User } from '../model/user.model';
+import { User } from '../model/user.model';
 
 @Component({
   selector: 'app-register',
@@ -10,6 +10,7 @@ import { UserType, User } from '../model/user.model';
 })
 
 export class RegisterComponent implements OnInit {
+  /*
   name: string = '';
   surnameOrPIB: string = '';
   email: string = '';
@@ -21,7 +22,7 @@ export class RegisterComponent implements OnInit {
   phoneNumber: string = '';
   isNatural: boolean = true;
   type: UserType = UserType.Client;
-  user: User[] = [];
+  user: User[] = [];*/
 
   selectedOption: string = "natural";
 
@@ -35,23 +36,26 @@ export class RegisterComponent implements OnInit {
     )*/
   }
 
-  validateForm() : boolean {
+  validateForm() : void {
+    /*
     if (this.password !== this.confirmPassword) {
       return false;
     } else {
       return true;
-    }
+    }*/
   }
 
   onChange() : void {
+    /*
     if(this.selectedOption == "natural") {
       this.isNatural = true
     } else {
       this.isNatural = false
-    }
+    }*/
   }
 
   register() : void {
+    /*
     if (this.validateForm()) {
       const user = {
         name: this.name,
@@ -84,19 +88,21 @@ export class RegisterComponent implements OnInit {
         }
     );*/
     this.router.navigate(['/home']);
-    
+    /*
     }
     else{
       alert('Passwords do not match');
 
-    }
+    }*/
   }
 
   onConfirmPasswordInput(): void {
+    /*
     const registerButton: HTMLButtonElement | null = document.getElementById('registerButton') as HTMLButtonElement | null;
 
     if (registerButton) {
       registerButton.disabled = this.password !== this.confirmPassword;
     }
-  }
+  }*/
+}
 }

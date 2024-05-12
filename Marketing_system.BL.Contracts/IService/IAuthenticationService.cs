@@ -11,6 +11,9 @@ namespace Marketing_system.BL.Contracts.IService
         Task<bool> ValidateAccessToken(string accessToken);
         Task<bool?> SendPasswordlessLogin(string email);
         Task<AuthenticationTokensDto?> AuthenticatePasswordlessTokenAsync(string token);
+        Task<UserDto> GetUserById(int userId);
+        Task<IEnumerable<UserDto>> GetAllUsers();
+        Task<bool> UpdateUser(UserDto user);
 
     }
 }

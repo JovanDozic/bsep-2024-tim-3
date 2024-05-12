@@ -196,6 +196,86 @@ namespace Marketing_system.BL.Service
             var computedToken = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(payload)));
             return token == computedToken;
         }
+        public async Task<UserDto> GetUserById(int userId)
+        {
+            var user = await _unitOfWork.GetUserRepository().GetByIdAsync(userId);
+            if (user == null)
+            {
+                return null; // User not found
+            }
+
+            // Map User entity to UserDto
+            var userDto = new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Password = user.Password,
+                Firstname = user.Firstname,
+                Lastname = user.Lastname,
+                Address = user.Address,
+                City = user.City,
+                Country = user.Country,
+                Phone = user.Phone,
+                CompanyName = user.CompanyName,
+                TaxId = user.TaxId,
+                PackageType = (int)user.PackageType, // Convert PackageType enum to int
+                ClientType = (int)user.ClientType, // Convert ClientType enum to int
+                Role = (int)user.Role // Convert UserRole enum to int
+            };
+
+            return userDto;
+        }
+        public async Task<IEnumerable<UserDto>> GetAllUsers()
+        {
+            var users = await _unitOfWork.GetUserRepository().GetAll(); 
+                                                                             
+            var userDtos = users.Select(user => new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Firstname = user.Firstname,
+                Lastname = user.Lastname,
+                Address = user.Address,
+                City = user.City,
+                Country = user.Country,
+                Phone = user.Phone,
+                CompanyName = user.CompanyName,
+                TaxId = user.TaxId,
+                PackageType = (int)user.PackageType,
+                ClientType = (int)user.ClientType,
+                Role = (int)user.Role
+            });
+            return userDtos;
+        }
+
+        public async Task<bool> UpdateUser(UserDto user)
+        {
+            var userToUpdate = await _unitOfWork.GetUserRepository().GetByIdAsync(user.Id);
+            if (userToUpdate == null)
+            {
+                return false; // User not found
+            }
+
+            // Update user properties
+            userToUpdate.Firstname = user.Firstname;
+            userToUpdate.Lastname = user.Lastname;
+            userToUpdate.Address = user.Address;
+            userToUpdate.City = user.City;
+            userToUpdate.Country = user.Country;
+            userToUpdate.Phone = user.Phone;
+            userToUpdate.CompanyName = user.CompanyName;
+            userToUpdate.TaxId = user.TaxId;
+            userToUpdate.Role = (UserRole)user.Role;
+            userToUpdate.ClientType = (ClientType)user.ClientType;
+            userToUpdate.PackageType = (PackageType)user.PackageType;
+
+            _unitOfWork.GetUserRepository().Update(userToUpdate);
+            await _unitOfWork.Save();
+
+            return true;
+        }
+
+
 
     }
 }

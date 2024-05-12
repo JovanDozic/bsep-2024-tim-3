@@ -9,6 +9,7 @@ namespace Marketing_system.DA.Contexts
         public DbSet<User> Users { get; set; }
         public DbSet<RegistrationRequest> RegistrationRequests { get; set; }
         public DbSet<PasswordlessToken> PasswordlessTokens { get; set; }
+        public DbSet<Advertisement> Advertisements { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
