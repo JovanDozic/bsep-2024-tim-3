@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { User} from '../model/user.model';
-import { Advertisement } from '../model/advertisement.model';
 import { UserService } from '../user.service';
+import { AdvertisementService } from 'src/features/advertisement/advertisement.service';
+import { Advertisement } from 'src/features/advertisement/model/advertisement.model';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-client-profile',
@@ -11,13 +13,16 @@ import { UserService } from '../user.service';
 export class ClientProfileComponent implements OnInit {
   client: User;
   advertisements: Advertisement[] = [];
+  adsForClient: Advertisement[] = [];
+  adRequest: Advertisement;
   showPopup = false;
   id:number;
+  adRequestForm: FormGroup;
 
-  constructor(private userService: UserService) { }
+  constructor(private formBuilder: FormBuilder,private userService: UserService, private adservis: AdvertisementService) { }
   
   ngOnInit(): void {
-    this.id = 7;
+    this.id = 6;
     this.userService.getUserById(this.id).subscribe(
       (user: User) => {
         this.client = user;
@@ -27,26 +32,66 @@ export class ClientProfileComponent implements OnInit {
       error => {
         console.error('Error fetching user:', error);
       }
-    )
-    this.advertisements = [
-      { id: 1, slogan: 'Slogan 1', duration: 30, description: 'Description 1', clientId: 1 },
-      { id: 2, slogan: 'Slogan 2', duration: 45, description: 'Description 2', clientId: 2 },
-      { id: 3, slogan: 'Slogan 3', duration: 30, description: 'Description 1', clientId: 2 },
-      { id: 4, slogan: 'Slogan 4', duration: 30, description: 'Description 1', clientId: 1 },
-      { id: 5, slogan: 'Slogan 5', duration: 30, description: 'Description 1', clientId: 1 },
-      { id: 1, slogan: 'Slogan 6', duration: 30, description: 'Description 1', clientId: 1 },
+    );
+    this.adRequestForm = this.formBuilder.group({
+      description: ['', Validators.required],
+      startDate: ['', Validators.required],
+      endDate: ['', Validators.required],
+      deadline: ['', Validators.required]
+    }, {
+      validators: this.endDateAfterStartDateAndDeadlineValidator // Custom validator for end date after start date
+    });
 
-    ];
-    this.advertisements = this.advertisements.filter(ad => ad.clientId === this.client.id);
-
+    this.adservis.getAllAdvertisements().subscribe(ads => {
+      this.advertisements = ads;
+      this.adsForClient = this.advertisements.filter(ad => ad.clientId === 6 && ad.status === 1);
+    });
 
   }
-
+  endDateAfterStartDateAndDeadlineValidator(formGroup: FormGroup) {
+    const startDate = formGroup.get('startDate').value;
+    const endDate = formGroup.get('endDate').value;
+    const deadline = formGroup.get('deadline').value;
+  
+    if (deadline && startDate && endDate) {
+      if (new Date(deadline) < new Date(startDate) && new Date(startDate) < new Date(endDate)) {
+        return null;
+      } else {
+        return { endDateAfterStartDateAndDeadline: true };
+      }
+    }
+  
+    return null;
+  }
   openPopup(): void {
     this.showPopup = true;
   }
-  submitButton(): void {
-    this.showPopup = false;
+  submitForm() {
+    if (this.adRequestForm.valid) {
+      const formData = this.adRequestForm.value;
+      const advertisement: Advertisement = {
+        id: 0,
+        slogan: null,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        description: formData.description,
+        clientId: 6, // Update this with actual client ID
+        deadline: formData.deadline,
+        status: 0
+      };
+      this.adservis.createAdvertisement(advertisement).subscribe(result => {
+        if (result) {
+          this.showPopup = false;
+          console.log("Advertisement created successfully");
+        } else {
+
+          console.log("Error in creating advertisement");
+        }
+      });
+    } else {
+      // Form is invalid
+      console.log("Form is invalid");
+    }
   }
   updateUser() {
     console.log("usao u funkciju");

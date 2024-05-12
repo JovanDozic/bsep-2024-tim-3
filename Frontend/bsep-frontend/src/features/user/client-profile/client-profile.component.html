@@ -29,7 +29,7 @@
           </div>
           <div class="form-group">
             <label for="email">Email:</label>
-            <input type="text" id="email" [(ngModel)]="client.email" name="email" readonly class="form-control">
+            <input type="text" id="email" [(ngModel)]="client.email" name="email" required>
           </div>
         </form>
       </div>
@@ -43,41 +43,40 @@
             <button class="btn btn-primary rounded-pill btn-lg" (click)="openPopup()">Create request</button>
         </div>
     </div>
-      <div class="advertisement-list">
-        <div *ngFor="let ad of advertisements" class="advertisement">
-            <div class="advertisement-border">
-                <p>Slogan: {{ ad.slogan }}</p>
-                <p>Duration: {{ ad.duration }}</p>
-                <p>Description: {{ ad.description }}</p>
-            </div>
-        </div>
-    </div>
+    <div class="advertisement-list">
+      <div *ngFor="let ad of adsForClient" class="advertisement">
+          <div class="advertisement-border">
+              <p>Slogan: {{ ad.slogan }}</p>
+              <p>Duration: {{ ad.startDate }}</p>
+              <p>Description: {{ ad.description }}</p>
+          </div>
+      </div>
+  </div>
 </div>
 <div class="popup-container" *ngIf="showPopup">
     <div class="popup">
         <h2>Create Request</h2>
-        <form>
-            <div class="form-group">
-                <label for="requestName">Name:</label>
-                <input type="text" id="requestName" [(ngModel)]="requestName" name="requestName" required>
+        <form [formGroup]="adRequestForm" (ngSubmit)="submitForm()">
+          <div class="form-group">
+              <label for="description">Description:</label>
+              <input type="text" formControlName="description" id="description" required>
+          </div>
+          <div class="form-group">
+            <label for="deadline">Deadline Date:</label>
+            <input type="date" formControlName="deadline" id="deadline" required>
+        </div>
+        <div class="form-group">
+            <label for="startDate">Start Date:</label>
+            <input type="date" formControlName="startDate" id="startDate" required>
+        </div>
+        <div class="form-group">
+            <label for="endDate">End Date:</label>
+            <input type="date" formControlName="endDate" id="endDate" required>
+            <div *ngIf="adRequestForm.hasError('endDateAfterStartDateAndDeadline', 'endDate')">
+                End Date must be after Start Date and Deadline.
             </div>
-            <div class="form-group">
-                <label for="requestDescription">Description:</label>
-                <textarea id="requestDescription" [(ngModel)]="requestDescription" name="requestDescription" rows="4" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="startDate">Start Date:</label>
-                <input type="date" id="startDate" [(ngModel)]="startDate" name="startDate" required>
-            </div>
-            <div class="form-group">
-                <label for="endDate">End Date:</label>
-                <input type="date" id="endDate" [(ngModel)]="endDate" name="endDate" required>
-            </div>
-            <div class="form-group">
-                <label for="deadline">Deadline:</label>
-                <input type="date" id="deadline" [(ngModel)]="deadline" name="deadline" required>
-            </div>
-            <button class="btn btn-primary rounded-pill btn-lg" (click)="submitButton()">Submit</button>
-        </form>
+        </div>
+          <button type="submit" class="btn btn-primary rounded-pill btn-lg">Submit</button>
+      </form>
     </div>
 </div>

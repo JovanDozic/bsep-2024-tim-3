@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../user.service';
-import { Advertisement } from '../model/advertisement.model';
 import { concat } from 'rxjs';
 import { User } from '../model/user.model';
+import { Advertisement } from 'src/features/advertisement/model/advertisement.model';
+import { AdvertisementService } from 'src/features/advertisement/advertisement.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-employee-profile',
@@ -13,9 +15,13 @@ export class EmployeeProfileComponent implements OnInit {
 
   employee: User;
   advertisements: Advertisement[] = [];
+  adRequests: Advertisement[] = [];
   id:number;
+  showPopup = false;
+  addSloganForm: FormGroup;
+  updatedAd: Advertisement;
 
-  constructor(private userService: UserService) { }
+  constructor(private formBuilder: FormBuilder,private userService: UserService, private adService: AdvertisementService) { }
 
   ngOnInit(): void {
     this.id = 6;
@@ -28,18 +34,55 @@ export class EmployeeProfileComponent implements OnInit {
       error => {
         console.error('Error fetching user:', error);
       }
-    )
-    
-    this.advertisements = [
-      { id: 1, slogan: 'Slogan 1', duration: 30, description: 'Description 1', clientId: 1 },
-      { id: 2, slogan: 'Slogan 2', duration: 45, description: 'Description 2', clientId: 2 },
-      { id: 3, slogan: 'Slogan 1', duration: 30, description: 'Description 1', clientId: 1 },
-      { id: 4, slogan: 'Slogan 1', duration: 30, description: 'Description 1', clientId: 1 },
-      { id: 5, slogan: 'Slogan 1', duration: 30, description: 'Description 1', clientId: 1 },
-      { id: 1, slogan: 'Slogan 1', duration: 30, description: 'Description 1', clientId: 1 },
-      // Add more advertisements here
-    ];
+    );
+    this.loadAdvertisements();
+
+    this.addSloganForm = this.formBuilder.group({
+      slogan: ['', Validators.required]
+    })
   }
+
+  loadAdvertisements(): void {
+    this.adService.getAllAdvertisements().subscribe(ads => {
+      this.advertisements = ads.filter(ad => ad.status === 1);
+      this.adRequests = ads.filter(ad => ad.status === 0);
+    });
+  }
+
+  openPopup(ad: Advertisement): void {
+    this.showPopup = true;
+    this.updatedAd = ad;
+    console.log(this.updatedAd.description);
+  }
+
+  submitForm() {
+    if (this.addSloganForm.valid) {
+      const formData = this.addSloganForm.value;
+      const advertisement: Advertisement = {
+        id: this.updatedAd.id,
+        slogan: formData.slogan,
+        startDate: this.updatedAd.startDate,
+        endDate: this.updatedAd.endDate,
+        description: this.updatedAd.description,
+        clientId: this.updatedAd.clientId,
+        deadline: this.updatedAd.deadline,
+        status: 1
+      };
+      this.adService.updateAdvertisement(advertisement).subscribe(result => {
+        if(result) {
+          this.showPopup = false;
+          this.loadAdvertisements();
+          console.log("Advertisement created successfully");
+        } else {
+          console.log("Error in createing advertisement");
+        }
+      });
+    } else {
+      console.log("Form is invalid");
+    }
+
+  }
+  
   updateUser() {
     console.log("usao u funkciju");
     this.userService.updateUser(this.employee).subscribe(
