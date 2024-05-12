@@ -116,6 +116,23 @@ namespace Marketing_system.DA.Migrations
                     b.ToTable("RegistrationRequests");
                 });
 
+            modelBuilder.Entity("Marketing_system.DA.Contracts.Model.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
             modelBuilder.Entity("Marketing_system.DA.Contracts.Model.User", b =>
                 {
                     b.Property<int>("Id")

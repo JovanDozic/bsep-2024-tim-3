@@ -63,6 +63,7 @@ public class AuthenticationController : Controller
     }
 
     [HttpPost("requestPasswordlessLogin")]
+    [AllowAnonymous]
     public async Task<ActionResult<AuthenticationTokensDto>> RequestPasswordlessLogin(string email)
     {
         var result = await _authenticationService.SendPasswordlessLogin(email);
