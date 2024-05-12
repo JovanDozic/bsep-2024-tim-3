@@ -1,1 +1,96 @@
-<p>home works!</p>
+<div>
+    <div *ngIf="isAdmin">
+        <br />
+        <h1>User List</h1>
+        <br />
+        <table class="table table-striped" id="userTable">
+            <thead>
+                <tr>
+                    <th>
+                        User
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                    <th style="width:10%">
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+            <tbody *ngFor="let u of allUsers">
+                    <tr>
+                        <td>
+                            <div class="row">
+                                <div class="col-sm">
+                                    <a>
+                                        {{u.firstname}} {{u.lastname}}
+                                    </a>
+                                    <br>
+                                    <small>
+                                        {{u.id}}
+                                    </small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <a>
+                                {{u.email}}
+                            </a>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle" (click)="roleManagement(u.id)">
+                                    Manage roles
+                                </button>
+                            </div>
+                        </td>    
+            </tbody>
+        </table>
+        <br />
+
+        <div>
+            <h1>Roles</h1>
+            <br />
+            <table class="table table-striped" id="roleTable">
+                <thead>
+                    <tr>
+                        <th>
+                            Role
+                        </th>
+                        <th style="width:10%">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Admin</td>
+                        <td class="text-right">     
+                            <button (click)="permissionManagement(0)">Manage permissions</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Client</td>
+                        <td class="text-right">     
+                            <button (click)="permissionManagement(1)">Manage permissions</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Employee</td>
+                        <td class="text-right">     
+                            <button (click)="permissionManagement(2)">Manage permissions</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div *ngIf="isClient">
+        <p>Welcome, client!</p>
+    </div>
+    
+    <div *ngIf="isEmployee">
+        <p>Welcome, employee!</p>
+    </div>
+</div>

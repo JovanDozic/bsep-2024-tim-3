@@ -1,0 +1,23 @@
+/* Stilizacija tabele */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/* Stilizacija zaglavlja tabele */
+thead {
+    background-color: #f2f2f2;
+}
+
+/* Stilizacija ćelija tabele */
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+/* Stilizacija hover efekta na redovima tabele */
+tr:hover {
+    background-color: #f5f5f5;
+}

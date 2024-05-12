@@ -9,6 +9,8 @@ import { EmployeeGuard } from 'src/features/user/guards/employee-guard';
 import { EmployeeProfileComponent } from 'src/features/user/employee-profile/employee-profile.component';
 import { LoginComponent } from 'src/features/user/login/login.component';
 import { RegisterComponent } from 'src/features/user/register/register.component';
+import { RoleManagementComponent } from 'src/features/user/role-management/role-management.component';
+import { PermissionManagementComponent } from 'src/features/user/permission-management/permission-management.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -17,6 +19,8 @@ const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'employee-profile', component:EmployeeProfileComponent, canActivate:[EmployeeGuard]},
   { path: 'admin-profile', component:AdminProfileComponent,canActivate:[AdminGuard]},
+  { path: 'role-management/:userId', component:RoleManagementComponent,canActivate:[AdminGuard]},
+  { path: 'permission-management/:permissionId', component:PermissionManagementComponent,canActivate:[AdminGuard]},
   { path: 'client-profile', component:ClientProfileComponent,canActivate:[ClientGuard]}
 ];
 

@@ -15,6 +15,7 @@ public class AdvertisementController : Controller
     }
 
     [HttpPost("create")]
+    //[Authorize(Policy = "clientPolicy")]
     public async Task<ActionResult<bool>> CreateAdvertisement([FromBody] AdvertisementDto advertisementDTO)
     {
        var isCreated = await _advertisementService.CreateAdvertisement(advertisementDTO);
@@ -23,12 +24,14 @@ public class AdvertisementController : Controller
         return BadRequest(!isCreated);
     }
     [HttpGet("getAll")]
+    //[Authorize(Policy = "clientPolicy")]
     public async Task<ActionResult<IEnumerable<AdvertisementDto>>> GetAllAdvertisements()
     {
         var ads = await _advertisementService.GetAllAdvertisements();
         return Ok(ads);
     }
     [HttpPost("update")]
+    //[Authorize(Policy = "clientPolicy")]
     public async Task<ActionResult<bool>> UpdateAdvertisement([FromBody] AdvertisementDto ad)
     {
         var isUpdated = await _advertisementService.UpdateAdvertisement(ad);
@@ -36,7 +39,7 @@ public class AdvertisementController : Controller
         {
             return Ok(isUpdated);
         }
-        return NotFound(); // Return appropriate status code if user not found
+        return NotFound();
     }
 
 }
