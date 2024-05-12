@@ -10,5 +10,6 @@ namespace Marketing_system.DA.Contracts
         public IPasswordHasher GetPasswordHasher();
         public IRegistrationRequestRepository GetRegistrationRequestRepository();
         public IPasswordlessTokenRepository GetPasswordlessTokenRepository();
+        public IAdvertisementRepository GetAdvertisementRepository();
     }
 }

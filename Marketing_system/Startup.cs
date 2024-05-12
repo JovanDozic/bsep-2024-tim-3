@@ -182,6 +182,7 @@ namespace Marketing_system
             services.AddTransient<IPasswordHasher, PasswordHasher>();
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IEmailHandler, EmailHandler>();
+            services.AddTransient<IAdvertisementService, AdvertisementService>();
         }
 
     }
