@@ -21,7 +21,7 @@ export class ClientGuard implements CanActivate {
         this.user = user;
         console.log(this.user.role);
         console.log('User Details:', this.user);
-        if (user.role === 2) {
+        if (user.role === 0) {
             return true;
         }
         this.router.navigate(['/login']);

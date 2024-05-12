@@ -39,25 +39,36 @@
       <hr style="border-top: 2px solid black;"> <!-- Black line -->
       <h3>Advertisements</h3>
       <div class="advertisement-list">
-          <div *ngFor="let ad of advertisements" class="advertisement">
-              <div class="advertisement-border">
-                  <p>Slogan: {{ ad.slogan }}</p>
-                  <p>Duration: {{ ad.duration }}</p>
-                  <p>Description: {{ ad.description }}</p>
-              </div>
-          </div>
-      </div>
+        <div *ngFor="let ad of advertisements" class="advertisement">
+            <div class="advertisement-border">
+                <p>Slogan: {{ ad.slogan }}</p>
+                <p>Start Date: {{ ad.startDate }}</p>
+                <p>Description: {{ ad.description }}</p>
+            </div>
+        </div>
+    </div>
       <hr style="border-top: 2px solid black;"> <!-- Black line -->
       <h3>Advertisements Requests</h3>
       <div class="advertisement-list">
-          <div *ngFor="let ad of advertisements" class="advertisement">
-              <div class="advertisement-border">
-                  <p>Slogan: {{ ad.slogan }}</p>
-                  <p>Duration: {{ ad.duration }}</p>
-                  <p>Description: {{ ad.description }}</p>
-                  <button> Create </button>
+        <div *ngFor="let ad of adRequests" class="advertisement">
+            <div class="advertisement-border">
+                <p>Deadline: {{ ad.deadline }}</p>
+                <p>Description: {{ ad.description }}</p>
+                <button (click)="openPopup(ad)"> Create </button>
               </div>
-          </div>
-      </div>
+        </div>
+    </div>
   </div>
+<div class="popup-container" *ngIf="showPopup">
+    <div class="popup">
+        <h2>Enter the slogan for this advertisement</h2>
+        <form [formGroup]="addSloganForm" (ngSubmit)="submitForm()">
+          <div class="form-group">
+              <label for="slogan">Slogan:</label>
+              <input type="text" formControlName="slogan" id="slogan" required>
+          </div>
+          <button type="submit" class="btn btn-primary rounded-pill btn-lg">Confirm</button>
+      </form>
+    </div>
+</div>
   
