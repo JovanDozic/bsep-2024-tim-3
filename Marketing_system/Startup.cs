@@ -41,6 +41,8 @@ namespace Marketing_system
                     x => x.MigrationsHistoryTable("__EFMigrationsHistory", "marketingsystem"));
 
             });
+            services.AddHttpContextAccessor();
+
 
             services.AddAutoMapper(typeof(UserProfile));
             services.AddSwaggerGen(setup =>
@@ -155,7 +157,6 @@ namespace Marketing_system
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            //app.UseMiddleware<AuthenticationMiddleware>();
 
             app.UseHttpsRedirection();
 

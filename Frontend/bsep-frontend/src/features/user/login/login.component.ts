@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../user.service';
+import { Login } from '../model/login.model';
 
 @Component({
   selector: 'app-login',
@@ -19,8 +20,19 @@ export class LoginComponent {
     });
   }
 
-  onSubmit() : void {
-
+  login() : void {
+    const login: Login = {
+      username: this.loginForm.value.username || '',
+      password: this.loginForm.value.password || ''
+    };
+    if (this.loginForm.valid) {
+      this.userService.login(login).subscribe({
+        next: () => {
+          const user = this.userService.user$.getValue();
+          console.log(user)
+        },
+      });
+    }
   }
 
   register() : void {

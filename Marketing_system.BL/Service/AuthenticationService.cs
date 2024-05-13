@@ -4,6 +4,7 @@ using Marketing_system.DA.Contracts;
 using Marketing_system.DA.Contracts.IRepository;
 using Marketing_system.DA.Contracts.Model;
 using Marketing_system.DA.Contracts.Shared;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -20,16 +21,18 @@ namespace Marketing_system.BL.Service
         private readonly HMACConfig _hmacConfig;
         private readonly SMTPConfig _smtpConfig;
         private readonly IEmailHandler _emailHandler;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthenticationService(IUnitOfWork unitOfWork, IOptions<HMACConfig> hmacConfig, IOptions<SMTPConfig> smtpConfig, IEmailHandler emailHandler)
+        public AuthenticationService(IUnitOfWork unitOfWork, IOptions<HMACConfig> hmacConfig, IOptions<SMTPConfig> smtpConfig, IEmailHandler emailHandler, IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _hmacConfig = hmacConfig.Value;
             _smtpConfig = smtpConfig.Value;
             _emailHandler = emailHandler;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<AuthenticationTokensDto?> Login(string email, string password)
+        public async Task<AuthenticationResponseDTO?> Login(string email, string password)
         {
             var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(email);
             if (user != null)
@@ -38,10 +41,9 @@ namespace Marketing_system.BL.Service
                 if (_unitOfWork.GetPasswordHasher().VerifyPassword(password, hashedPassword))
                 {
                     var tokens = await _unitOfWork.GetTokenGeneratorRepository().GenerateTokens(user);
-                    user.RefreshToken = tokens.RefreshToken;
-                    _unitOfWork.GetUserRepository().Update(user);
-                    await _unitOfWork.Save();
-                    return tokens;
+                    SetRefreshTokenCookie(tokens.RefreshToken);
+                    AuthenticationResponseDTO response = new AuthenticationResponseDTO { AccessToken = tokens.AccessToken, Id = user.Id }; 
+                    return response;
                 }
             }
             return null;
@@ -59,11 +61,11 @@ namespace Marketing_system.BL.Service
 
             if ((ClientType)userDto.ClientType == ClientType.Individual)
             {
-                await _unitOfWork.GetUserRepository().Add(new User(userDto.Email, password, userDto.Firstname, userDto.Lastname, userDto.Address, userDto.City, userDto.Country, userDto.Phone, (UserRole)userDto.Role, ClientType.Individual, (PackageType)userDto.PackageType, AccountStatus.Requested));
+                await _unitOfWork.GetUserRepository().Add(new User(userDto.Email, password, userDto.Firstname, userDto.Lastname, userDto.Address, userDto.City, userDto.Country, userDto.Phone, (UserRole)userDto.Role, ClientType.Individual, (PackageType)userDto.PackageType, AccountStatus.Requested, null, null));
             }
             else
             {
-                await _unitOfWork.GetUserRepository().Add(new User(userDto.Email, password, userDto.CompanyName, userDto.TaxId, userDto.Address, userDto.City, userDto.Country, userDto.Phone, (UserRole)userDto.Role, (ClientType)userDto.ClientType, (PackageType)userDto.PackageType));
+                await _unitOfWork.GetUserRepository().Add(new User(userDto.Email, password, null, null, userDto.Address, userDto.City, userDto.Country, userDto.Phone, (UserRole)userDto.Role, (ClientType)userDto.ClientType, (PackageType)userDto.PackageType, AccountStatus.Requested, userDto.CompanyName, userDto.TaxId));
             }
 
             await _unitOfWork.GetRegistrationRequestRepository().Add(new RegistrationRequest(userDto.Firstname, userDto.Lastname, userDto.Email, DateTime.Now.ToUniversalTime(), (PackageType)userDto.PackageType));
@@ -94,7 +96,7 @@ namespace Marketing_system.BL.Service
         public async Task<bool> ValidateRefreshToken(int userId, string refreshToken)
         {
             var user = await _unitOfWork.GetUserRepository().GetByIdAsync(userId);
-            if (user == null || user.RefreshToken != refreshToken)
+            if (user == null)
             {
                 return false;
             }
@@ -136,7 +138,7 @@ namespace Marketing_system.BL.Service
             return await _emailHandler.SendPasswordlessLink(email, link);
         }
 
-        public async Task<AuthenticationTokensDto?> AuthenticatePasswordlessTokenAsync(string token)
+        public async Task<TokensDto?> AuthenticatePasswordlessTokenAsync(string token)
         {
             var passwordlessToken = await _unitOfWork.GetPasswordlessTokenRepository().GetByTokenAsync(token);
             if (passwordlessToken == null ||
@@ -162,9 +164,6 @@ namespace Marketing_system.BL.Service
             }
 
             var tokens = await _unitOfWork.GetTokenGeneratorRepository().GenerateTokens(user);
-            user.RefreshToken = tokens.RefreshToken;
-            _unitOfWork.GetUserRepository().Update(user);
-            await _unitOfWork.Save();
             return tokens;
         }
 
@@ -275,7 +274,20 @@ namespace Marketing_system.BL.Service
             return true;
         }
 
+        private void SetRefreshTokenCookie(string refreshToken)
+        {
+            var response = _httpContextAccessor.HttpContext.Response;
 
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true, 
+                Secure = true,   
+                SameSite = SameSiteMode.Strict, 
+                Expires = DateTime.UtcNow.AddDays(1) 
+            };
+
+            response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+        }
 
     }
 }

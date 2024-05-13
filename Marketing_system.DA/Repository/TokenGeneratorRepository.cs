@@ -15,9 +15,9 @@ namespace Marketing_system.DA.Repository
         private readonly string _issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "marketingsystem";
         private readonly string _audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "marketingsystem-front.com";
 
-        public async Task<AuthenticationTokensDto> GenerateTokens(User user)
+        public async Task<TokensDto> GenerateTokens(User user)
         {
-            var authenticationResponse = new AuthenticationTokensDto();
+            var authenticationResponse = new TokensDto();
             try
             {
                 var claims = new List<Claim>
@@ -25,7 +25,7 @@ namespace Marketing_system.DA.Repository
                     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new("id", user.Id.ToString()),
                     new("email", user.Email),
-                    new("userRole", user.Role.ToString()),
+                    new("role", user.Role.ToString()),
                     new(ClaimTypes.Role, user.GetPrimaryRoleName())
                 };
 

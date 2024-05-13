@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ACCESS_TOKEN, USER } from 'src/app/shared/constants';
+import { AuthenticationResponse } from '../model/authentication-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -7,11 +8,11 @@ import { ACCESS_TOKEN, USER } from 'src/app/shared/constants';
 export class TokenStorage {
   constructor() {}
 
-  saveAccessToken(token: string, userId: number): void {
+  saveAccessToken(response: AuthenticationResponse): void {
     localStorage.removeItem(ACCESS_TOKEN);
     localStorage.removeItem(USER);
-    localStorage.setItem(ACCESS_TOKEN, token);
-    localStorage.setItem(USER, userId.toString());
+    localStorage.setItem(ACCESS_TOKEN, response.accessToken);
+    localStorage.setItem(USER, response.id.toString());
   }
 
   getAccessToken() {

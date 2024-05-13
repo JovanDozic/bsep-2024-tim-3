@@ -16,11 +16,10 @@ namespace Marketing_system.DA.Contracts.Model
         public string? CompanyName { get; set; }
         public string? TaxId { get; set; }
         public UserRole Role { get; set; }
-        public ClientType ClientType { get; set; }
-        public PackageType PackageType { get; set; }
+        public ClientType? ClientType { get; set; }
+        public PackageType? PackageType { get; set; }
         public AccountStatus AccountStatus { get; set; }
-        public string? RefreshToken { get; set; }
-        public User(string email, string password, string firstname, string lastname, string address, string city, string country, string phone, UserRole role, ClientType clientType, PackageType packageType, AccountStatus status)
+        public User(string email, string password, string firstname, string lastname, string address, string city, string country, string phone, UserRole role, ClientType? clientType, PackageType? packageType, AccountStatus accountStatus, string? companyName, string? taxId)
         {
             Email = email;
             Password = password;
@@ -33,24 +32,11 @@ namespace Marketing_system.DA.Contracts.Model
             Role = role;
             ClientType = clientType;
             PackageType = packageType;
-            AccountStatus = status;
-        }
-
-        public User(string email, string password, string companyName, string? taxId, string address, string city, string country, string phone, UserRole role, ClientType clientType, PackageType packageType)
-        {
-            Email = email;
-            Password = password;
+            AccountStatus = accountStatus;
             CompanyName = companyName;
             TaxId = taxId;
-            Address = address;
-            City = city;
-            Country = country;
-            Phone = phone;
-            Role = role;
-            ClientType = clientType;
-            PackageType = packageType;
-            AccountStatus = AccountStatus.Requested;
         }
+
 
         public string GetPrimaryRoleName()
         {
