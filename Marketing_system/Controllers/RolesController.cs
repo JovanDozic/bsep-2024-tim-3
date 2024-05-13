@@ -1,41 +1,34 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Marketing_system.BL.Contracts.DTO;
+using Marketing_system.BL.Contracts.IService;
+using Marketing_system.BL.Service;
+using Marketing_system.DA.Contracts.Model;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marketing_system.Controllers
 {
     //[Authorize(Roles = "Admin")]
-    /*[Route("api/roles")]
+    [Route("api/roles")]
     public class RolesController : Controller
     {
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IRoleService _roleService;
 
-        public RolesController(RoleManager<IdentityRole> roleManager)
+        public RolesController(IRoleService roleService)
         {
-            _roleManager = roleManager;
+            _roleService= roleService;
         }
-        [HttpGet("allRoles")]
-        public async Task<IActionResult> Index()
+        [HttpGet("getAll")]
+        public async Task<ActionResult<IEnumerable<RoleDto>>> GetAll()
         {
-            try
-            {
-                var roles = await _roleManager.Roles.ToListAsync();
-                return Ok(roles);
-            }catch(Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-
-            return Ok();
+            var roles = await _roleService.GetAllRoles();
+            return Ok(roles);
         }
-        [HttpPost("addRole")]
-        public async Task<IActionResult> AddRole(string roleName)
+        [HttpPost("update")]
+        public async Task<IActionResult> UpdateRole([FromBody] RoleDto roleDto)
         {
-            if (roleName != null)
-            {
-                await _roleManager.CreateAsync(new IdentityRole(roleName.Trim()));
-            }
-            return RedirectToAction("Index");
+            var isUpdated = await _roleService.UpdateRole(roleDto);
+            return Ok(isUpdated);
         }
-    }*/
+    }
 }

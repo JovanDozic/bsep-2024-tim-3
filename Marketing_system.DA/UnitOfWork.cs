@@ -44,7 +44,8 @@ namespace Marketing_system.DA
         private IPasswordHasher _passwordHasher { get; set; }
         private IRegistrationRequestRepository _registrationRequestRepository { get; set; }
         private IPasswordlessTokenRepository _passwordlessTokenRepository { get; set; }
-        private IAdvertisementRepository _advertisementRepository { get; set; }   
+        private IAdvertisementRepository _advertisementRepository { get; set; }
+        private IRoleRepository _roleRepository { get; set; }
 
         public IUserRepository GetUserRepository()
         {
@@ -70,6 +71,10 @@ namespace Marketing_system.DA
         public IAdvertisementRepository GetAdvertisementRepository()
         {
             return _advertisementRepository ?? (_advertisementRepository = new AdvertisementRepository(_context));
+        }
+        public IRoleRepository GetRoleRepository()
+        {
+            return _roleRepository ?? (_roleRepository = new RoleRepository(_context));
         }
     }
 }
