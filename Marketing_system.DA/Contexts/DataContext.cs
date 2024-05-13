@@ -14,6 +14,8 @@ namespace Marketing_system.DA.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Permission>().HasNoKey();
+            modelBuilder.Entity<Role>().Property(role => role.Permissions).HasColumnType("jsonb");
         }
     }
 }

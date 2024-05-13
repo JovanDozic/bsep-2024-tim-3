@@ -11,5 +11,6 @@ namespace Marketing_system.DA.Contracts
         public IRegistrationRequestRepository GetRegistrationRequestRepository();
         public IPasswordlessTokenRepository GetPasswordlessTokenRepository();
         public IAdvertisementRepository GetAdvertisementRepository();
+        public IRoleRepository GetRoleRepository();
     }
 }
