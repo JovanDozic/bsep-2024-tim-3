@@ -32,12 +32,8 @@ export class AdminProfileComponent implements OnInit {
         console.error('Error fetching user:', error);
       }
     )
+    this.loadUsers();
     
-    this.userService.getAllUsers().subscribe(users => {
-      this.allUsers = users;
-      this.allClients = this.allUsers.filter(user => user.role === 0);
-      this.allEmployees = this.allUsers.filter(user => user.role === 1);
-    });
 
     this.registerForm = this.formBuilder.group({
       email: ['', Validators.required],
@@ -52,7 +48,13 @@ export class AdminProfileComponent implements OnInit {
     });
   
   }
-
+  loadUsers() {
+    this.userService.getAllUsers().subscribe(users => {
+      this.allUsers = users;
+      this.allClients = this.allUsers.filter(user => user.role === 0);
+      this.allEmployees = this.allUsers.filter(user => user.role === 1);
+    });
+  }
   openPopup(): void {
     this.showPopup = true;
   }
@@ -79,6 +81,7 @@ export class AdminProfileComponent implements OnInit {
       this.userService.registerUser(user).subscribe(result => {
         if(result) {
           this.showPopup = false;
+          this.loadUsers();
           console.log("User registered successfully");
         } else {
           console.log("Error");

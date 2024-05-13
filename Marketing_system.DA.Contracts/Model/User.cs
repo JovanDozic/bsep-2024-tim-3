@@ -20,7 +20,8 @@ namespace Marketing_system.DA.Contracts.Model
         public PackageType PackageType { get; set; }
         public AccountStatus AccountStatus { get; set; }
         public string? RefreshToken { get; set; }
-        public User(string email, string password, string firstname, string lastname, string address, string city, string country, string phone, UserRole role, ClientType clientType, PackageType packageType, AccountStatus status)
+        public bool IsFirstLogin { get; set; }
+        public User(string email, string password, string firstname, string lastname, string address, string city, string country, string phone, UserRole role, ClientType clientType, PackageType packageType, AccountStatus status, bool isFirstLogin)
         {
             Email = email;
             Password = password;
@@ -34,6 +35,7 @@ namespace Marketing_system.DA.Contracts.Model
             ClientType = clientType;
             PackageType = packageType;
             AccountStatus = status;
+            IsFirstLogin = isFirstLogin;
         }
 
         public User(string email, string password, string companyName, string? taxId, string address, string city, string country, string phone, UserRole role, ClientType clientType, PackageType packageType)

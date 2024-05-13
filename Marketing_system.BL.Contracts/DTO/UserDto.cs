@@ -16,6 +16,7 @@
         public int PackageType { get; set; }
         public int ClientType { get; set; }
         public int Role { get; set; }
+        public bool IsFirstLogin { get; set; }
 
     }
 }
