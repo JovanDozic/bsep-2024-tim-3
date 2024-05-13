@@ -94,3 +94,15 @@
         <p>Welcome, employee!</p>
     </div>
 </div>
+<div class="popup-container" *ngIf="showPopup">
+    <div class="popup">
+        <h2>Change password</h2>
+        <form>
+          <div class="form-group">
+              <label for="password">New Password:</label>
+              <input type="text"  id="newPasswordInput" required>
+          </div>
+          <button (click)="updateUser()" class="btn btn-primary rounded-pill btn-lg" >Confirm</button>
+      </form>
+    </div>
+</div>
