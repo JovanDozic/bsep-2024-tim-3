@@ -12,7 +12,7 @@ export class AdminGuard implements CanActivate {
     userId:number;
 
   constructor(private router: Router, private userService: UserService) {
-    this.userId = 1;
+    this.userId = 9;
   }
 
   canActivate(): Observable<boolean> {

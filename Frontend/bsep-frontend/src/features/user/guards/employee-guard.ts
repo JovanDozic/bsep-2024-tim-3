@@ -12,7 +12,7 @@ export class EmployeeGuard implements CanActivate {
     userId:number;
 
   constructor(private router: Router, private userService: UserService) {
-    this.userId = 8;
+    this.userId = null;
   }
 
   canActivate(): Observable<boolean> {
@@ -28,6 +28,7 @@ export class EmployeeGuard implements CanActivate {
         return false;
       }),
       catchError(error => {
+        this.router.navigate(['/login']);
         console.error('Error fetching user:', error);
         return [false]; // Return false in case of error
       })

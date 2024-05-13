@@ -1,5 +1,14 @@
 <div class="admin-profile">
-    <h2>Admin Profile</h2>
+    <h2>ADMIN PROFILE</h2>
+    <hr style="border-top: 2px solid black;"> <!-- Black line -->
+    <div class="register-section">
+      <label for="firstname" class="register-text" >To register new admin or employee click here </label>
+      <div class="register-button">
+      <button (click)="openPopup()">REGISTER</button>
+      </div>
+  </div>
+  <hr style="border-top: 2px solid black;"> <!-- Black line -->
+
     <div class="personal-info">
         <h3> Personal Information</h3>
         <form>
@@ -58,4 +67,48 @@
               </div>
           </div>
       </div>
+</div>
+<div class="popup-container" *ngIf="showPopup">
+  <div class="popup">
+      <h2>Register admin/employee</h2>
+      <form [formGroup]="registerForm" (ngSubmit)="submitForm()">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="text" formControlName="email" id="email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="text" formControlName="password" id="password" required>
+      </div>
+      <div class="form-group">
+          <label for="firstname">Firstname:</label>
+          <input type="text" formControlName="firstname" id="firstname" required>
+      </div>
+      <div class="form-group">
+          <label for="lastname">Lastname:</label>
+          <input type="text" formControlName="lastname" id="lastname" required>
+      </div>
+      <div class="form-group">
+        <label for="address">Address:</label>
+        <input type="text" formControlName="address" id="address" required>
+    </div>
+    <div class="form-group">
+      <label for="city">City:</label>
+      <input type="text" formControlName="city" id="city" required>
+  </div>
+  <div class="form-group">
+    <label for="country">Country:</label>
+    <input type="text" formControlName="country" id="country" required>
+</div>
+<div class="form-group">
+  <label for="phone">Phone:</label>
+  <input type="text" formControlName="phone" id="phone" required>
+</div>
+<div class="form-group">
+  <label for="role">Role(1 - employee, 2 - admin):</label>
+  <input type="number" formControlName="role" id="role" required min="1" max="2">
+</div>
+        <button type="submit" class="btn btn-primary rounded-pill btn-lg">Submit</button>
+    </form>
+  </div>
 </div>

@@ -31,4 +31,8 @@ export class UserService {
     return this.http.post<boolean>(`${environment.apiHost}authentication/updateUser`, user);
 }
 
+registerUser(user: User): Observable<boolean> {
+  return this.http.post<boolean>(`${environment.apiHost}authentication/register`, user);
+}
+
 }
