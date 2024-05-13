@@ -272,6 +272,7 @@ namespace Marketing_system.BL.Service
             }
 
             // Update user properties
+            userToUpdate.Password = _unitOfWork.GetPasswordHasher().HashPassword(user.Password);
             userToUpdate.Firstname = user.Firstname;
             userToUpdate.Lastname = user.Lastname;
             userToUpdate.Address = user.Address;
