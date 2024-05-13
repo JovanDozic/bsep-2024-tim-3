@@ -2,14 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { UserService } from '../user.service';
 import { Router } from '@angular/router';
 import { User } from '../model/user.model';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+  styleUrls: ['./register.component.css'],
 })
-
 export class RegisterComponent implements OnInit {
+  registrationForm: FormGroup;
+  isIndividual: boolean = true;
+  namePlaceholder: string = 'First Name';
   /*
   name: string = '';
   surnameOrPIB: string = '';
@@ -24,11 +27,45 @@ export class RegisterComponent implements OnInit {
   type: UserType = UserType.Client;
   user: User[] = [];*/
 
-  selectedOption: string = "natural";
+  selectedOption: string = 'natural';
 
-  constructor(private userService: UserService, private router: Router) {} 
+  constructor(
+    private userService: UserService,
+    private router: Router,
+    private formBuilder: FormBuilder
+  ) {}
 
-  ngOnInit(){
+  public onRadioChange(): void {
+    this.isIndividual = !this.isIndividual;
+  }
+
+  getPlaceholder(isIndividual: boolean): string {
+    return isIndividual ? 'First Name' : 'Company Name';
+  }
+
+  ngOnInit() {
+    this.registrationForm = this.formBuilder.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(16),
+          Validators.pattern(
+            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-._@+!?]).{16,}$/
+          ),
+        ],
+      ],
+      confirmPassword: ['', Validators.required],
+      firstName: ['', Validators.required],
+      lastName: [''],
+      companyName: [''],
+      taxId: [''],
+      city: ['', Validators.required],
+      country: ['', Validators.required],
+      phone: ['', Validators.required],
+      packageType: ['', Validators.required]
+    });
     /*this.userService.getUsers().subscribe(
       (result)=>{
         this.users = result;
@@ -36,16 +73,7 @@ export class RegisterComponent implements OnInit {
     )*/
   }
 
-  validateForm() : void {
-    /*
-    if (this.password !== this.confirmPassword) {
-      return false;
-    } else {
-      return true;
-    }*/
-  }
-
-  onChange() : void {
+  onChange(): void {
     /*
     if(this.selectedOption == "natural") {
       this.isNatural = true
@@ -54,46 +82,32 @@ export class RegisterComponent implements OnInit {
     }*/
   }
 
-  register() : void {
-    /*
-    if (this.validateForm()) {
-      const user = {
-        name: this.name,
-        email: this.email,
-        password: this.password,
-        confirmPassword: this.confirmPassword,
-        address: this.address,
-        city: this.city,
-        country: this.country,
-        phoneNumber: this.phoneNumber,
-        type: this.type,
-      };
-
-      /*for(let user of this.users){
-        if(user.email === user.email){
-          console.error('Email duplicate.');
-          alert('The entered email is already used!');
-          break;
-        }
-      }*/
-
-      /*this.userService.saveUser(user, this.password).subscribe(
-        response => {
-            console.log('User saved successfully', response);
-            this.router.navigate(['/home']);
-        },
-        error => {
-            console.error('Error saving user', error);
-            alert('There was an error while saving the data! Please try again.');
-        }
-    );*/
-    this.router.navigate(['/home']);
-    /*
-    }
-    else{
+  register(): void {
+    if (
+      this.registrationForm.value.password !==
+      this.registrationForm.value.confirmPassword
+    ) {
       alert('Passwords do not match');
-
-    }*/
+    } else {
+      let type: number;
+      if (this.isIndividual) {
+        type = 0;
+      } else{
+        type = 1;
+      }
+      let user: User = {
+        id: 0,
+        email: this.registrationForm.value.email,
+        password: this.registrationForm.value.password,
+        address: this.registrationForm.value.address,
+        city: this.registrationForm.value.city,
+        country: this.registrationForm.value.country,
+        phone: this.registrationForm.value.phone,
+        packageType: parseInt(this.registrationForm.value.packageType),
+        clientType: type,
+        role: 0,
+      };
+    }
   }
 
   onConfirmPasswordInput(): void {
@@ -104,5 +118,5 @@ export class RegisterComponent implements OnInit {
       registerButton.disabled = this.password !== this.confirmPassword;
     }
   }*/
-}
+  }
 }

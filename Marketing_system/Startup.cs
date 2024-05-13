@@ -87,7 +87,7 @@ namespace Marketing_system
                 options.Lockout.AllowedForNewUsers = true;
 
                 options.User.AllowedUserNameCharacters =
-                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+!?";
             });
 
             services.ConfigureApplicationCookie(options =>

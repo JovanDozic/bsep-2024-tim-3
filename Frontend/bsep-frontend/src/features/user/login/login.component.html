@@ -1,17 +1,8 @@
-<div class="container">
-    <div class="login-container">
-      <h2>Login</h2>
-      <form [formGroup]="loginForm" (submit)="login()">
-        <label for="username">Username:</label>
-        <input type="text" id="username" formControlName="username">
-    
-        <label for="password">Password:</label>
-        <input type="password" id="password" formControlName="password">
-    
-        <button type="submit">Login</button>
-      </form>
-      <div class="register-section">
-        <p class="register-text">Don't have an account? <a (click)="register()"><u>Register</u></a></p>
-      </div>
-    </div>
+<form [formGroup]="loginForm" (ngSubmit)="login()">
+  <div class="col-6">
+    <input type="text" formControlName="username" placeholder="Username" class="form-control m-3">
+    <input type="password" formControlName="password" placeholder="Password" class="form-control m-3">
+    <button type="submit" class="btn btn-primary m-3">Log in</button>
   </div>
+</form>
+<a class="btn btn-outline-primary m-3" (click)="register()">Register</a>
