@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { User } from 'src/features/user/model/user.model';
 import { UserService } from 'src/features/user/user.service';
@@ -15,20 +16,15 @@ export class HomeComponent implements OnInit {
   isAdmin: boolean = false;
   isClient: boolean = false;
   isEmployee: boolean = false;
+  showPopup = false;
+  //changePasswordForm: FormGroup;
+  newPassword: string;
 
-  constructor(private userService: UserService, private router: Router){}
+  constructor(private formBuilder: FormBuilder,private userService: UserService, private router: Router){}
 
   ngOnInit() : void {
-    this.userService.getUserById(1).subscribe(
-      (user: User) => {
-        this.loggedUser = user;
-        console.log('User Details:', this.loggedUser);
-        this.isLoggedIn();
-      },
-      error => {
-        console.error('Error fetching user:', error);
-      }
-    )
+    this.newPassword = '';
+    this.fetchUserWithDelay();
     
     this.userService.getAllUsers().subscribe(users => {
       this.allUsers = users;
@@ -38,7 +34,38 @@ export class HomeComponent implements OnInit {
     error => {
       console.error('Greska kod dobavljanja svih:', error);
     });
+/*
+    this.changePasswordForm = this.formBuilder.group({
+      password: ['', Validators.required]
+    })*/
   }
+
+  fetchUserWithDelay(): void {
+    console.log("u fetc");
+    setTimeout(() => {
+      this.loadUser();
+    }, 2500); // Adjust the delay time as needed
+  }
+
+  loadUser() {
+    this.userService.getUserById(8).subscribe(
+      (user: User) => {
+        this.loggedUser = user;
+        if(this.loggedUser.clientType === 1) {
+          this.showPopup = true;
+        }
+        console.log('User Details:', this.loggedUser);
+        this.isLoggedIn();
+      },
+      error => {
+        console.error('Error fetching user:', error);
+      }
+    )
+  }
+  openPopup(): void {
+    this.showPopup = true;
+  }
+
 
   isLoggedIn() : void {
     if(this.loggedUser.role == 2){
@@ -59,4 +86,25 @@ export class HomeComponent implements OnInit {
     console.log("permissionId: " + permissionId)
     this.router.navigate(['/permission-management', permissionId]);
   }
+  updateUser() {
+    const newPasswordInput = document.getElementById('newPasswordInput') as HTMLInputElement;
+  const newPassword = newPasswordInput.value;
+  console.log("Nova lozinka:", newPassword);
+    this.loggedUser.password = newPassword;
+    this.userService.updateUser(this.loggedUser).subscribe(
+        (updated: boolean) => {
+            if (updated) {
+              this.router.navigate(['/login']);
+                console.log('Employee updated successfully');
+              } else {
+                console.error('Failed to update employee');
+            }
+        },
+        error => {
+            console.error('Error updating employee:', error);
+        }
+    );
+    this.router.navigate(['/login']);
+}
+
 }

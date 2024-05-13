@@ -12,7 +12,7 @@ export class EmployeeGuard implements CanActivate {
     userId:number;
 
   constructor(private router: Router, private userService: UserService) {
-    this.userId = null;
+    this.userId = 8;
   }
 
   canActivate(): Observable<boolean> {

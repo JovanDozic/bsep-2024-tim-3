@@ -27,7 +27,7 @@ export class UserService {
   }
 
   updateUser(user: User): Observable<boolean> {
-    console.log("usao u servis");
+    console.log("usao u service update user");
     return this.http.post<boolean>(`${environment.apiHost}authentication/updateUser`, user);
 }
 
