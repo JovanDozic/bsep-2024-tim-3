@@ -5,6 +5,7 @@ import { User } from '../model/user.model';
 import { Advertisement } from 'src/features/advertisement/model/advertisement.model';
 import { AdvertisementService } from 'src/features/advertisement/advertisement.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TokenStorage } from '../jwt/token.service';
 
 @Component({
   selector: 'app-employee-profile',
@@ -21,11 +22,11 @@ export class EmployeeProfileComponent implements OnInit {
   addSloganForm: FormGroup;
   updatedAd: Advertisement;
 
-  constructor(private formBuilder: FormBuilder,private userService: UserService, private adService: AdvertisementService) { }
+  constructor(private formBuilder: FormBuilder,private userService: UserService, private adService: AdvertisementService, private tokenStorage: TokenStorage) { }
 
   ngOnInit(): void {
-    this.id = 6;
-    this.userService.getUserById(this.id).subscribe(
+    this.id = 2;
+    this.userService.getUserById(this.tokenStorage.getUserId()).subscribe(
       (user: User) => {
         this.employee = user;
         console.log('User Details:', this.employee);

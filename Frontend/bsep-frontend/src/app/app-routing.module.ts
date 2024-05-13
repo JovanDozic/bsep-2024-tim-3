@@ -17,7 +17,7 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'home', component: HomeComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: 'employee-profile', component:EmployeeProfileComponent, canActivate:[EmployeeGuard]},
+  { path: 'employee-profile', component:EmployeeProfileComponent,canActivate:[EmployeeGuard]},
   { path: 'admin-profile', component:AdminProfileComponent,canActivate:[AdminGuard]},
   { path: 'role-management/:userId', component:RoleManagementComponent,canActivate:[AdminGuard]},
   { path: 'permission-management/:permissionId', component:PermissionManagementComponent,canActivate:[AdminGuard]},

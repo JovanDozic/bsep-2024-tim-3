@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { TokenStorage } from 'src/features/user/jwt/token.service';
 import { User } from 'src/features/user/model/user.model';
 import { UserService } from 'src/features/user/user.service';
 
@@ -16,9 +17,10 @@ export class HomeComponent implements OnInit {
   isClient: boolean = false;
   isEmployee: boolean = false;
 
-  constructor(private userService: UserService, private router: Router){}
+  constructor(private userService: UserService, private router: Router, private tokenStorage: TokenStorage){}
 
   ngOnInit() : void {
+    console.log(this.tokenStorage.getUserId());
     this.userService.getUserById(1).subscribe(
       (user: User) => {
         this.loggedUser = user;

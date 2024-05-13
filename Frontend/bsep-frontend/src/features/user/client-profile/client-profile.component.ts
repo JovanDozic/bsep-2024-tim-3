@@ -4,6 +4,7 @@ import { UserService } from '../user.service';
 import { AdvertisementService } from 'src/features/advertisement/advertisement.service';
 import { Advertisement } from 'src/features/advertisement/model/advertisement.model';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { TokenStorage } from '../jwt/token.service';
 
 @Component({
   selector: 'app-client-profile',
@@ -19,11 +20,11 @@ export class ClientProfileComponent implements OnInit {
   id:number;
   adRequestForm: FormGroup;
 
-  constructor(private formBuilder: FormBuilder,private userService: UserService, private adservis: AdvertisementService) { }
+  constructor(private formBuilder: FormBuilder,private userService: UserService, private adservis: AdvertisementService, private tokenStorage: TokenStorage) { }
   
   ngOnInit(): void {
-    this.id = 6;
-    this.userService.getUserById(this.id).subscribe(
+    this.id = 1;
+    this.userService.getUserById(this.tokenStorage.getUserId()).subscribe(
       (user: User) => {
         this.client = user;
         console.log('User Details:', this.client);
