@@ -34,6 +34,7 @@
   <input type="text" placeholder="City" formControlName="city" class="form-control m-3">
   <input type="text" placeholder="Country" formControlName="country" class="form-control m-3">
   <input type="text" placeholder="Phone" formControlName="phone" class="form-control m-3">
+  <input type="text" placeholder="Address" formControlName="address" class="form-control m-3">
   <div *ngIf="!isIndividual; else legalEntityFields">
     <input type="text" placeholder="Company Name" formControlName="companyName" class="form-control m-3">
     <input type="text" placeholder="Tax ID" formControlName="taxId" class="form-control m-3">
@@ -45,14 +46,15 @@
 
   <div class="btn-group m-3" role="group" aria-label="Package Type">
     <input type="radio" id="basic" formControlName="packageType" value="0" hidden>
-    <label for="basic" class="btn btn-outline-primary" [ngClass]="{ 'btn-primary': registrationForm.get('packageType').value == '0', 'text-white': registrationForm.get('packageType').value == '0' }">Basic</label>
+    <label for="basic" class="btn btn-outline-primary" [ngClass]="{ 'btn-primary': registrationForm.get('packageType').value == 0, 'text-white': registrationForm.get('packageType').value == 0 }">Basic</label>
   
     <input type="radio" id="standard" formControlName="packageType" value="1" hidden>
-    <label for="standard" class="btn btn-outline-primary" [ngClass]="{ 'btn-primary': registrationForm.get('packageType').value == '1', 'text-white': registrationForm.get('packageType').value == '1' }">Standard</label>
+    <label for="standard" class="btn btn-outline-primary" [ngClass]="{ 'btn-primary': registrationForm.get('packageType').value == 1, 'text-white': registrationForm.get('packageType').value == 1 }">Standard</label>
   
     <input type="radio" id="golden" formControlName="packageType" value="2" hidden>
-    <label for="golden" class="btn btn-outline-primary" [ngClass]="{ 'btn-primary': registrationForm.get('packageType').value == '2', 'text-white': registrationForm.get('packageType').value == '2' }">Golden</label>
+    <label for="golden" class="btn btn-outline-primary" [ngClass]="{ 'btn-primary': registrationForm.get('packageType').value == 2, 'text-white': registrationForm.get('packageType').value == 2 }">Golden</label>
   </div>
+  
   
   
   
@@ -60,6 +62,6 @@
       
 <div>
 
-    <button type="submit" class="btn btn-primary m-3">Register</button>
+    <button type="submit" class="btn btn-primary m-3" (submit)="register()">Register</button>
 </div>
 </form>

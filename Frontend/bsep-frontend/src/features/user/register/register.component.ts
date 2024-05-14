@@ -62,6 +62,7 @@ export class RegisterComponent implements OnInit {
       companyName: [''],
       taxId: [''],
       city: ['', Validators.required],
+      address: ['', Validators.required],
       country: ['', Validators.required],
       phone: ['', Validators.required],
       packageType: ['', Validators.required]
@@ -99,6 +100,10 @@ export class RegisterComponent implements OnInit {
         id: 0,
         email: this.registrationForm.value.email,
         password: this.registrationForm.value.password,
+        firstname: this.registrationForm.value.firstName,
+        lastname: this.registrationForm.value.lastName,
+        companyName: this.registrationForm.value.companyName,
+        taxId: this.registrationForm.value.taxId,
         address: this.registrationForm.value.address,
         city: this.registrationForm.value.city,
         country: this.registrationForm.value.country,
@@ -107,6 +112,12 @@ export class RegisterComponent implements OnInit {
         clientType: type,
         role: 0,
       };
+      this.userService.register(user)
+    .subscribe((response) => {
+      if (response) {
+        console.log('Zahtjev za registraciju je poslat.');
+      }
+    });
     }
   }
 
