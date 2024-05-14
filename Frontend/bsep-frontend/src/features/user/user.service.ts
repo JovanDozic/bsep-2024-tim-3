@@ -138,7 +138,4 @@ export class UserService {
       });
     });
     }
-  registerUser(user: User): Observable<boolean> {
-  return this.http.post<boolean>(`${environment.apiHost}authentication/register`, user);
-}
 }

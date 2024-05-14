@@ -79,7 +79,7 @@ export class AdminProfileComponent implements OnInit {
         clientType: 0,
         role: formData.role
       };
-      this.userService.registerUser(user).subscribe(result => {
+      this.userService.register(user).subscribe(result => {
         if(result) {
           this.showPopup = false;
           this.loadUsers();
