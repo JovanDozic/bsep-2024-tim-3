@@ -9,6 +9,8 @@ import { AuthenticationResponse } from './model/authentication-response.model';
 import { TokenStorage } from './jwt/token.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { PasswordlessTokenRequest } from './model/passwordless-token-request.model';
+import { RegistrationRequest } from './model/registration-request.model';
+import { RegistrationRequestUpdate } from './model/registration-request-update.model';
 
 @Injectable({
   providedIn: 'root',
@@ -171,5 +173,44 @@ export class UserService {
           }
         )
       );
+  }
+
+  getAllRegisterRequests(): Observable<RegistrationRequest[]> {
+    const token = this.tokenStorage.getAccessToken();
+    const headers = {
+      Authorization: `Bearer ${token}`, // TODO: Interceptor ne radi, neka neko vidi zasto nije moja regija
+    };
+    return this.http.get<RegistrationRequest[]>(
+      environment.apiHost + 'authentication/getAllRegistrationRequests',
+      { headers }
+    );
+  }
+
+  approveRegistrationRequest(
+    update: RegistrationRequestUpdate
+  ): Observable<any> {
+    const token = this.tokenStorage.getAccessToken();
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    return this.http.post<any>(
+      `${environment.apiHost}authentication/approveRequest`,
+      update,
+      { headers }
+    );
+  }
+
+  rejectRegistrationRequest(
+    update: RegistrationRequestUpdate
+  ): Observable<any> {
+    const token = this.tokenStorage.getAccessToken();
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    return this.http.post<any>(
+      `${environment.apiHost}authentication/rejectRequest`,
+      update,
+      { headers }
+    );
   }
 }

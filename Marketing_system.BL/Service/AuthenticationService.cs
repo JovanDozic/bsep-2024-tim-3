@@ -399,5 +399,22 @@ namespace Marketing_system.BL.Service
 
             return await _emailHandler.SendLinkToEmail(user.Email, $"<p>Administrator decided to reject your registration request.</p> {(request.Reason is null ? "" : $"Reason: {request.Reason}")}", "Registration Rejected");
         }
+
+        public async Task<IEnumerable<RegistrationRequestDto>> GetAllRegistrationRequestsAsync()
+        {
+            var requests = await _unitOfWork.GetRegistrationRequestRepository().GetAll();
+
+            var requestDtos = requests.ToList().Select(req => new RegistrationRequestDto
+            {
+                Id = req.Id,
+                UserId = req.UserId,
+                Email = req.Email,
+                RegistrationDate = req.RegistrationDate,
+                Status = (Contracts.DTO.RegistrationRequestStatus)req.Status,
+                Reason = req.Reason
+            });
+
+            return requestDtos;
+        }
     }
 }

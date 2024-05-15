@@ -10,6 +10,8 @@ import { RoleManagementComponent } from './role-management/role-management.compo
 import { PermissionManagementComponent } from './permission-management/permission-management.component';
 import { LoginPasswordlessComponent } from './login-passwordless/login-passwordless.component';
 import { LoginPasswordlessAuthenticateComponent } from './login-passwordless-authenticate/login-passwordless-authenticate.component';
+import { RegistrationRequestsManagementComponent } from './registration-requests-management/registration-requests-management.component';
+import { EmailVerificationComponent } from './email-verification/email-verification.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +24,8 @@ import { LoginPasswordlessAuthenticateComponent } from './login-passwordless-aut
     PermissionManagementComponent,
     LoginPasswordlessComponent,
     LoginPasswordlessAuthenticateComponent,
+    RegistrationRequestsManagementComponent,
+    EmailVerificationComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
 })

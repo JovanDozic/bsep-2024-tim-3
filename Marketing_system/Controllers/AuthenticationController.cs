@@ -128,30 +128,38 @@ public class AuthenticationController : Controller
         {
             return Ok(isActivated);
         }
-        return NotFound();
+        return BadRequest();
     }
 
-    [HttpGet("approveRequest/{id:int}")]
+    [HttpPost("approveRequest")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<bool>> ApproveRegistrationRequest(int id)
+    public async Task<ActionResult<bool>> ApproveRegistrationRequest([FromBody] RegistrationRequestUpdateDto dto)
     {
-        var isApproved = await _authenticationService.ApproveRegisterRequestAsync(id);
+        var isApproved = await _authenticationService.ApproveRegisterRequestAsync(dto.Id);
         if (isApproved)
         {
             return Ok(isApproved);
         }
-        return NotFound();
+        return BadRequest();
     }
 
-    [HttpGet("rejectRequest/{id:int}")]
+    [HttpPost("rejectRequest")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<bool>> RejectRegistrationRequest(int id, string reason)
+    public async Task<ActionResult<bool>> RejectRegistrationRequest([FromBody] RegistrationRequestUpdateDto dto)
     {
-        var isRejected = await _authenticationService.RejectRegisterRequestAsync(id, reason);
+        var isRejected = await _authenticationService.RejectRegisterRequestAsync(dto.Id, dto.Reason ?? string.Empty);
         if (isRejected)
         {
             return Ok(isRejected);
         }
-        return NotFound();
+        return BadRequest();
+    }
+
+    [HttpGet("getAllRegistrationRequests")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<IEnumerable<RegistrationRequestDto>>> GetAllRegistrationRequests()
+    {
+        var requests = await _authenticationService.GetAllRegistrationRequestsAsync();
+        return Ok(requests);
     }
 }
