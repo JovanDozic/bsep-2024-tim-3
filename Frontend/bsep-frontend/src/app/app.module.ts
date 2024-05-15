@@ -6,7 +6,8 @@ import { AppComponent } from './app.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UserModule } from 'src/features/user/user.module';
 import { LayoutModule } from 'src/features/layout/layout.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { JwtInterceptor } from 'src/features/user/jwt/jwt.interceptor';
 
 @NgModule({
   declarations: [AppComponent],
@@ -18,7 +19,10 @@ import { HttpClientModule } from '@angular/common/http';
     AppRoutingModule,
     HttpClientModule,
   ],
-  providers: [],
-  bootstrap: [AppComponent],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true } // Opciono, možete registrovati interceptor kao HTTP_INTERCEPTOR
+  
+  ],
+  bootstrap: [AppComponent]
 })
 export class AppModule {}

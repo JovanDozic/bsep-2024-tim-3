@@ -13,35 +13,46 @@ export class JwtInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    const accessTokenRequest = request.clone({
-      setHeaders: {
-        Authorization: `Bearer ` + localStorage.getItem(ACCESS_TOKEN),
-      },
-    });
-    console.log('Interceptor activated:', request.url);
-    const accessExpiration = this.tokenService.getTokenExpiration(ACCESS_TOKEN);
+    const accessToken = localStorage.getItem(ACCESS_TOKEN);
     const refreshToken = this.tokenService.getRefreshToken();
-    const refreshExpiration = this.tokenService.getTokenExpiration(refreshToken);
-    
-    const now = new Date().getTime();
-    if (refreshExpiration.getTime() < now) {
-      console.log("validan")
-      this.userService.logout()
-      alert("Your session has expired")
-    } else {
-      if (accessExpiration.getTime() < now) {
-        if(this.tokenService.haveSameIdsInTokens(ACCESS_TOKEN, refreshToken)){
-          this.userService.updateAccessToken(ACCESS_TOKEN, refreshToken, parseInt(this.tokenService.getTokenId(refreshToken))).subscribe(
-            response => {
-              this.tokenService.saveToken(response);
-            }
-          );
-        }
-        console.log("nije")
-      }
-      return next.handle(accessTokenRequest);
+    if (!accessToken || !refreshToken) {
+      return next.handle(request);
     }
 
-    return next.handle(accessTokenRequest);
+    const accessTokenRequest = request.clone({
+      setHeaders: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const accessExpiration = this.tokenService.getTokenExpiration(accessToken);
+    const refreshExpiration = this.tokenService.getTokenExpiration(refreshToken);
+    const now = new Date().getTime();
+    if (refreshExpiration.getTime() < now) {
+      this.userService.logout();
+      alert("Your session has expired");
+      return next.handle(request);
+    } else if (accessExpiration.getTime() < now) {
+      if (this.tokenService.haveSameIdsInTokens(accessToken, refreshToken)) {
+        this.userService.updateAccessToken(accessToken, refreshToken, parseInt(this.tokenService.getTokenId(refreshToken))).subscribe(
+          response => {
+            this.tokenService.saveToken(response);
+            return next.handle(accessTokenRequest);
+          },
+          error => {
+            console.error("Error updating access token:", error);
+            this.userService.logout();
+            alert("Your session has expired");
+            return next.handle(request);
+          }
+        );
+      } else {
+        this.userService.logout();
+        alert("Your session has expired");
+        return next.handle(request);
+      }
+    } else {
+      return next.handle(accessTokenRequest);
+    }
   }
 }
