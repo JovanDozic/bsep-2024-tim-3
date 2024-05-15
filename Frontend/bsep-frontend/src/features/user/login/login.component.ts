@@ -32,7 +32,6 @@ export class LoginComponent {
       this.userService.login(login).subscribe({
         next: () => {
           const user = this.userService.user$.getValue();
-          console.log(user);
         },
       });
     }

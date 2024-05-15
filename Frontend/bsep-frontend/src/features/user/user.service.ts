@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { User } from './model/user.model';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, switchMap, tap, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from 'src/app/env/environment';
@@ -49,31 +49,50 @@ export class UserService {
   }
 
   updateUser(user: User): Observable<boolean> {
-    console.log('usao u servis');
     return this.http.post<boolean>(
       `${environment.apiHost}authentication/updateUser`,
       user
     );
   }
+
+  updateAccessToken(accessToken: string, refreshToken: string, userId: number): Observable<string | null> {
+    return this.http.post<boolean>(`${environment.apiHost}authentication/validateRefresh`, { userId, refreshToken })
+      .pipe(
+        switchMap((refreshValid: boolean) => {
+          if (refreshValid) {
+            return this.http.post<boolean>(`${environment.apiHost}authentication/validateAccess`, accessToken);
+          } else {
+            return of(false);
+          }
+        }),
+        switchMap((accessValid: boolean) => {
+          if (accessValid) {
+            return this.http.post<string>(`${environment.apiHost}authentication/updateAccess`, userId);
+          } else {
+            return of(null);
+          }
+        })
+      );
+  }
   register(user: User): Observable<boolean> {
-    console.log('Usao u servis');
-    return this.http.post<boolean>(
-      environment.apiHost + 'authentication/register',
-      user
-    );
+    return this.http.post<boolean>(environment.apiHost + 'authentication/register', user)
   }
 
-  login(login: Login): Observable<AuthenticationResponse> {
+  login(login: Login): Observable<any> {
     return this.http
       .post<AuthenticationResponse>(
         environment.apiHost + 'authentication/login',
-        login
+        login,
+        { observe: 'response' }
       )
       .pipe(
         tap(
-          (authenticationResponse) => {
-            this.tokenStorage.saveAccessToken(authenticationResponse);
-            const refreshToken = this.getRefreshTokenFromCookie();
+          (authenticationResponse: any) => {
+            this.tokenStorage.saveAccessToken(authenticationResponse.body);
+  
+            const refreshToken = authenticationResponse.body.refreshToken;
+            this.tokenStorage.saveRefreshToken(refreshToken);
+  
             this.setUser(refreshToken);
             this.router.navigate(['/home']);
           },
@@ -116,7 +135,6 @@ export class UserService {
       clientType: 0,
       role: decodedToken.role,
     };
-    console.log('User:', user);
     this.user$.next(user);
   }
 
@@ -140,6 +158,8 @@ export class UserService {
         role: 0,
       });
     });
+    this.tokenStorage.saveRefreshToken(null);
+    }
   }
 
   sendPasswordlessLink(login: Login): Observable<any> {

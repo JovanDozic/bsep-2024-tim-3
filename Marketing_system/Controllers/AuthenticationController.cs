@@ -36,7 +36,7 @@ public class AuthenticationController : Controller
 
     [HttpPost("login")]
     [AllowAnonymous]
-    public async Task<ActionResult<AuthenticationResponseDTO>> Login([FromBody] CredentialsDto credentialsDto)
+    public async Task<ActionResult<TokensDto>> Login([FromBody] CredentialsDto credentialsDto)
     {
         var token = await _authenticationService.Login(credentialsDto.Username, credentialsDto.Password);
         if (token == null)

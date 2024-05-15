@@ -42,21 +42,18 @@ export class HomeComponent implements OnInit {
   }
 
   fetchUserWithDelay(): void {
-    console.log("u fetc");
     setTimeout(() => {
       this.loadUser();
     }, 2500); // Adjust the delay time as needed
   }
 
   loadUser() {
-    console.log(this.tokenStorage.getUserId());
     this.userService.getUserById(this.tokenStorage.getUserId()).subscribe(
       (user: User) => {
         this.loggedUser = user;
         if(this.loggedUser.role === 1 && this.loggedUser.clientType === 0) {
           this.showPopup = true;
         }
-        console.log('User Details:', this.loggedUser);
         this.isLoggedIn();
       },
       error => {
@@ -80,18 +77,15 @@ export class HomeComponent implements OnInit {
   }
 
   roleManagement(userId: number) : void {
-    console.log("userId: " + userId)
     this.router.navigate(['/role-management', userId]);
   }
 
   permissionManagement(permissionId: number) : void {
-    console.log("permissionId: " + permissionId)
     this.router.navigate(['/permission-management', permissionId]);
   }
   updateUser() {
     const newPasswordInput = document.getElementById('newPasswordInput') as HTMLInputElement;
   const newPassword = newPasswordInput.value;
-  console.log("Nova lozinka:", newPassword);
     this.loggedUser.password = newPassword;
     this.loggedUser.clientType = 1;
     this.userService.updateUser(this.loggedUser).subscribe(

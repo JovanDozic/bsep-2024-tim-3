@@ -32,7 +32,7 @@ namespace Marketing_system.BL.Service
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<AuthenticationResponseDTO?> Login(string email, string password)
+        public async Task<TokensDto?> Login(string email, string password)
         {
             var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(email);
             if (user != null)
@@ -44,8 +44,7 @@ namespace Marketing_system.BL.Service
                 {
                     var tokens = await _unitOfWork.GetTokenGeneratorRepository().GenerateTokens(user);
                     SetRefreshTokenCookie(tokens.RefreshToken);
-                    AuthenticationResponseDTO response = new AuthenticationResponseDTO { AccessToken = tokens.AccessToken, Id = user.Id };
-                    return response;
+                    return tokens;
                 }
             }
             return null;
