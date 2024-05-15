@@ -160,7 +160,6 @@ export class UserService {
     });
     this.tokenStorage.saveRefreshToken(null);
     }
-  }
 
   sendPasswordlessLink(login: Login): Observable<any> {
     login.password = '';
