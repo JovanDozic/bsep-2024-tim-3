@@ -17,5 +17,7 @@ namespace Marketing_system.BL.Contracts.IService
         Task<bool> RegisterAdminOrEmployee(UserDto userDto);
         public Task<bool?> CreateRegistrationRequestAsync(UserDto user);
         public Task<bool> ActivateAccount(string token);
+        public Task<bool> ApproveRegisterRequestAsync(int requestId);
+        public Task<bool> RejectRegisterRequestAsync(int requestId, string reason);
     }
 }

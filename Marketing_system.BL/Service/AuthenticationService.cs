@@ -58,12 +58,12 @@ namespace Marketing_system.BL.Service
             }
 
             var registrationRequests = _unitOfWork.GetRegistrationRequestRepository().GetAllByEmailAsync(userDto.Email);
-            if (registrationRequests.Any(req => req.Status == RegistrationRequestStatus.Pending))
+            if (registrationRequests.Any(req => req.Status == DA.Contracts.Model.RegistrationRequestStatus.Pending))
             {
                 // If there is a pending registration request for the same email, return false
                 return false;
             }
-            else if (registrationRequests.Where(req => req.Status == RegistrationRequestStatus.Rejected).Any(req => req.RegistrationDate >= DateTime.UtcNow.AddHours(-24)))
+            else if (registrationRequests.Where(req => req.Status == DA.Contracts.Model.RegistrationRequestStatus.Rejected).Any(req => req.RegistrationDate >= DateTime.UtcNow.AddHours(-24)))
             {
                 // If there is a rejected registration request for the same email in the last 24 hours, return false
                 return false;
@@ -303,29 +303,27 @@ namespace Marketing_system.BL.Service
         public async Task<bool?> CreateRegistrationRequestAsync(UserDto user)
         {
             user.Id = (await _unitOfWork.GetUserRepository().GetByEmailAsync(user.Email)).Id;
-            var token = GenerateTempEmailToken(user.Email);
-            var link = $"http://localhost:4200/authenticate-registration-request?token={token}"; // TODO: Adjust the link
 
             var request = new RegistrationRequest
             {
                 UserId = user.Id,
                 Email = user.Email,
                 RegistrationDate = DateTime.UtcNow,
-                Status = RegistrationRequestStatus.Pending,
-                Token = token,
-                TokenExpirationDate = DateTime.UtcNow.AddHours(24)
+                Status = DA.Contracts.Model.RegistrationRequestStatus.Pending,
+                Token = null,
+                TokenExpirationDate = null
             };
             await _unitOfWork.GetRegistrationRequestRepository().Add(request);
             await _unitOfWork.Save();
 
-            return await _emailHandler.SendLinkToEmail(user.Email, link, "Registration Verification"); // TODO: Move this to method that will handle when admin approves the request
+            return true;
         }
 
         public async Task<bool> ActivateAccount(string token)
         {
             var registrationRequest = await _unitOfWork.GetRegistrationRequestRepository().GetByTokenAsync(token);
             if (registrationRequest is null ||
-                registrationRequest.Status != RegistrationRequestStatus.Pending ||
+                registrationRequest.Status != DA.Contracts.Model.RegistrationRequestStatus.Approved ||
                 registrationRequest.TokenExpirationDate < DateTime.UtcNow ||
                 registrationRequest.UserId is null)
             {
@@ -347,14 +345,59 @@ namespace Marketing_system.BL.Service
             return true;
         }
 
-        public void ApproveRegisterRequest()
+        public async Task<bool> ApproveRegisterRequestAsync(int requestId)
         {
+            var request = await _unitOfWork.GetRegistrationRequestRepository().GetByIdAsync(requestId);
+            if (request is null)
+            {
+                return false;
+            }
 
+            var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(request.Email);
+            if (user is null)
+            {
+                return false;
+            }
+
+            var token = GenerateTempEmailToken(user.Email);
+            var link = $"http://localhost:4200/authenticate-registration-request?token={token}"; // TODO: Adjust the link
+
+            request.Status = DA.Contracts.Model.RegistrationRequestStatus.Approved;
+            request.Token = token;
+            request.TokenExpirationDate = DateTime.UtcNow.AddHours(24);
+
+            _unitOfWork.GetRegistrationRequestRepository().Update(request);
+            await _unitOfWork.Save();
+
+            return await _emailHandler.SendLinkToEmail(user.Email, $"<p>Please verify your account using the following <a href=\"{link}\">link</a>.</p>", "Registration Approved!");
         }
 
-        public void RejectRegisterRequest()
+        public async Task<bool> RejectRegisterRequestAsync(int requestId, string reason)
         {
+            var request = await _unitOfWork.GetRegistrationRequestRepository().GetByIdAsync(requestId);
+            if (request is null)
+            {
+                return false;
+            }
 
+            var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(request.Email);
+            if (user is null)
+            {
+                return false;
+            }
+
+            request.Status = DA.Contracts.Model.RegistrationRequestStatus.Rejected;
+            request.Reason = reason;
+            request.Token = null;
+            request.TokenExpirationDate = null;
+            request.UserId = null;
+
+            _unitOfWork.GetRegistrationRequestRepository().Update(request);
+            _unitOfWork.GetUserRepository().Delete(user.Id);
+
+            await _unitOfWork.Save();
+
+            return await _emailHandler.SendLinkToEmail(user.Email, $"<p>Administrator decided to reject your registration request.</p> {(request.Reason is null ? "" : $"Reason: {request.Reason}")}", "Registration Rejected");
         }
     }
 }

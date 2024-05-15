@@ -9,7 +9,6 @@ using Marketing_system.DA.Contracts.Model;
 using Marketing_system.DA.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -104,7 +103,7 @@ namespace Marketing_system
                  AllowAnyHeader());
             });
 
-            var key = Environment.GetEnvironmentVariable("JWT_KEY") ?? "marketingsystem_secret_key";
+            var key = Environment.GetEnvironmentVariable("JWT_KEY") ?? "marketingsystem_superssecret_key";
             var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "marketingsystem";
             var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "marketingsystem-front.com";
             services.AddAuthentication(x =>
@@ -146,7 +145,6 @@ namespace Marketing_system
                 options.AddPolicy("clientPolicy", policy => policy.RequireRole("Client"));
                 options.AddPolicy("employeePolicy", policy => policy.RequireRole("Employee"));
             });
-
             BindServices(services);
         }
 

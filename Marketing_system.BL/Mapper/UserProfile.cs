@@ -6,11 +6,12 @@ namespace Marketing_system.BL.Mapper
 {
     public class UserProfile : Profile
     {
-        public UserProfile() 
+        public UserProfile()
         {
             CreateMap<UserDto, User>().ReverseMap();
             CreateMap<RoleDto, Role>().ReverseMap();
             CreateMap<PermissionDto, Permission>().ReverseMap();
+            CreateMap<RegistrationRequestDto, RegistrationRequest>().ReverseMap();
         }
     }
 }

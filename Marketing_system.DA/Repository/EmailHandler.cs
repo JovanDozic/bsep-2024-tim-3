@@ -30,7 +30,8 @@ namespace Marketing_system.DA.Repository
             using var message = new MailMessage(from, to)
             {
                 Subject = subject,
-                Body = link
+                Body = link,
+                IsBodyHtml = true
             };
 
             try

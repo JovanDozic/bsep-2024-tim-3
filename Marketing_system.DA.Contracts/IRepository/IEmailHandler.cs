@@ -2,6 +2,6 @@
 {
     public interface IEmailHandler
     {
-        Task<bool> SendLinkToEmail(string email, string link, string subject);
+        Task<bool> SendLinkToEmail(string email, string body, string subject);
     }
 }

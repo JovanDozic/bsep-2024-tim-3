@@ -1,6 +1,4 @@
-﻿using Marketing_system.DA.Contracts.Shared;
-
-namespace Marketing_system.DA.Contracts.Model
+﻿namespace Marketing_system.BL.Contracts.DTO
 {
     public enum RegistrationRequestStatus
     {
@@ -9,8 +7,9 @@ namespace Marketing_system.DA.Contracts.Model
         Rejected
     }
 
-    public class RegistrationRequest : Entity
+    public class RegistrationRequestDto
     {
+        public int Id { get; set; }
         public int? UserId { get; set; } // TODO: If request is rejected, we will delete user mapped to this request.
         public string Email { get; set; }
         public DateTime RegistrationDate { get; set; }

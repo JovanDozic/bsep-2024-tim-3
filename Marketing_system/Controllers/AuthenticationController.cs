@@ -130,4 +130,28 @@ public class AuthenticationController : Controller
         }
         return NotFound();
     }
+
+    [HttpGet("approveRequest/{id:int}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<bool>> ApproveRegistrationRequest(int id)
+    {
+        var isApproved = await _authenticationService.ApproveRegisterRequestAsync(id);
+        if (isApproved)
+        {
+            return Ok(isApproved);
+        }
+        return NotFound();
+    }
+
+    [HttpGet("rejectRequest/{id:int}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<bool>> RejectRegistrationRequest(int id, string reason)
+    {
+        var isRejected = await _authenticationService.RejectRegisterRequestAsync(id, reason);
+        if (isRejected)
+        {
+            return Ok(isRejected);
+        }
+        return NotFound();
+    }
 }
