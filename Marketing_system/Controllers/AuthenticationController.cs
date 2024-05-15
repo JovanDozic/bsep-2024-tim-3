@@ -17,21 +17,21 @@ public class AuthenticationController : Controller
     [AllowAnonymous]
     public async Task<ActionResult<bool>> RegisterUser([FromBody] UserDto user)
     {
+        bool isRegistered;
         if (user.Role == 0)
         {
-            var isRegistered = await _authenticationService.RegisterUser(user);
-            if (isRegistered)
-                return Ok(isRegistered);
-            return BadRequest(!isRegistered);
+            isRegistered = await _authenticationService.RegisterUser(user);
         }
         else
         {
-            var isRegistered = await _authenticationService.RegisterAdminOrEmployee(user);
-            if (isRegistered)
-                return Ok(isRegistered);
-            return BadRequest(!isRegistered);
+            isRegistered = await _authenticationService.RegisterAdminOrEmployee(user);
         }
 
+        // TODO: call request service to send email verification
+
+
+
+        return isRegistered ? Ok(isRegistered) : BadRequest(!isRegistered);
     }
 
     [HttpPost("login")]

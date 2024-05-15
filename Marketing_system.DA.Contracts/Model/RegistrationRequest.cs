@@ -2,23 +2,22 @@
 
 namespace Marketing_system.DA.Contracts.Model
 {
+    public enum RegistrationRequestStatus
+    {
+        Pending,
+        Approved,
+        Rejected
+    }
+
     public class RegistrationRequest : Entity
     {
-        public string Firstname { get; set; }
-        public string Lastname { get; set; }
+        public int? UserId { get; set; }
+        public User? User { get; set; } // TODO: If request is rejected, we will delete user mapped to this request.
         public string Email { get; set; }
-        public DateTime RegistrationDateTime { get; set; }
-        public AccountStatus AccountStatus { get; set; }
-        public PackageType PackageType { get; set; }
-
-        public RegistrationRequest(string firstname, string lastname, string email, DateTime registrationDateTime, PackageType packageType)
-        {
-            Firstname = firstname;
-            Lastname = lastname;
-            Email = email;
-            RegistrationDateTime = registrationDateTime;
-            AccountStatus = AccountStatus.Requested;
-            PackageType = packageType;
-        }
+        public DateTime RegistrationDate { get; set; } // TODO: When user tries to register, we will check if the email exists in the request database, if it does, we will check last registration date, if it is less than 24 hours, we will not allow the user to register.
+        public RegistrationRequestStatus Status { get; set; }
+        public string? Reason { get; set; }
+        public string? Token { get; set; }
+        public DateTime? TokenExpirationDate { get; set; }
     }
 }

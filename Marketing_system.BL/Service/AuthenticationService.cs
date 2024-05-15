@@ -11,8 +11,6 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-
-
 namespace Marketing_system.BL.Service
 {
     public class AuthenticationService : IAuthenticationService
@@ -70,7 +68,7 @@ namespace Marketing_system.BL.Service
                 await _unitOfWork.GetUserRepository().Add(new User(userDto.Email, password, null, null, userDto.Address, userDto.City, userDto.Country, userDto.Phone, (UserRole)userDto.Role, (ClientType)userDto.ClientType, (PackageType)userDto.PackageType, AccountStatus.Requested, userDto.CompanyName, userDto.TaxId));
             }
 
-            await _unitOfWork.GetRegistrationRequestRepository().Add(new RegistrationRequest(userDto.Firstname, userDto.Lastname, userDto.Email, DateTime.Now.ToUniversalTime(), (PackageType)userDto.PackageType));
+            //await _unitOfWork.GetRegistrationRequestRepository().Add(new RegistrationRequest(userDto.Firstname, userDto.Lastname, userDto.Email, DateTime.Now.ToUniversalTime(), (PackageType)userDto.PackageType));
             await _unitOfWork.Save();
             return true;
         }
@@ -180,9 +178,12 @@ namespace Marketing_system.BL.Service
             return tokens;
         }
 
-        private string GeneratePasswordlessToken(string email)
+        private string GeneratePasswordlessToken(string email, string? timestamp = null)
         {
-            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+            if (timestamp is null)
+            {
+                timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+            }
             var payload = $"{email}:{timestamp}";
 
             using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_hmacConfig.Secret));
@@ -192,22 +193,6 @@ namespace Marketing_system.BL.Service
             return token;
         }
 
-        private bool ValidatePasswordlessToken(string token)
-        {
-            var parts = token.Split(':');
-            if (parts.Length != 2)
-            {
-                return false;
-            }
-
-            var email = parts[0];
-            var timestamp = parts[1];
-
-            var payload = $"{email}:{timestamp}";
-            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_hmacConfig.Secret));
-            var computedToken = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(payload)));
-            return token == computedToken;
-        }
         public async Task<UserDto> GetUserById(int userId)
         {
             var user = await _unitOfWork.GetUserRepository().GetByIdAsync(userId);
@@ -237,6 +222,7 @@ namespace Marketing_system.BL.Service
 
             return userDto;
         }
+
         public async Task<IEnumerable<UserDto>> GetAllUsers()
         {
             var users = await _unitOfWork.GetUserRepository().GetAll();
@@ -301,6 +287,19 @@ namespace Marketing_system.BL.Service
             };
 
             response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+        }
+
+        public void CreateRegistrationRequest(UserDto user)
+        {
+            var request = new RegistrationRequest
+            {
+                UserId = user.Id,
+                Email = user.Email,
+                RegistrationDate = DateTime.UtcNow,
+                Status = RegistrationRequestStatus.Pending,
+                // TODO: Generate email token: Token = Generate(user.Email),
+                TokenExpirationDate = DateTime.UtcNow.AddHours(24)
+            };
         }
 
     }

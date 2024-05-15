@@ -19,10 +19,13 @@ export class LoginPasswordlessAuthenticateComponent implements OnInit {
   ngOnInit(): void {
     this.isLoading = true;
     this.route.queryParams.subscribe((params) => {
-      const token: PasswordlessTokenRequest = {
+      var token: PasswordlessTokenRequest = {
         token: params['token'],
       };
+
       if (token) {
+        token.token = decodeURIComponent(token.token);
+
         this.userService.authenticatePasswordlessToken(token).subscribe({
           next: (response) => {
             this.isLoading = false;
