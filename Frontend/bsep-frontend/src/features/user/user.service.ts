@@ -8,6 +8,7 @@ import { Login } from './model/login.model';
 import { AuthenticationResponse } from './model/authentication-response.model';
 import { TokenStorage } from './jwt/token.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { PasswordlessTokenRequest } from './model/passwordless-token-request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -55,12 +56,14 @@ export class UserService {
     );
   }
   register(user: User): Observable<boolean> {
-    console.log("Usao u servis");
-    return this.http.post<boolean>(environment.apiHost + 'authentication/register', user)
+    console.log('Usao u servis');
+    return this.http.post<boolean>(
+      environment.apiHost + 'authentication/register',
+      user
+    );
   }
 
   login(login: Login): Observable<AuthenticationResponse> {
-    console.log(login);
     return this.http
       .post<AuthenticationResponse>(
         environment.apiHost + 'authentication/login',
@@ -75,7 +78,7 @@ export class UserService {
             this.router.navigate(['/home']);
           },
           (error) => {
-            alert('Invalid credentials');
+            alert('Invalid credentials or account not activated.');
             console.error('Login failed:', error);
           }
         )
@@ -137,5 +140,36 @@ export class UserService {
         role: 0,
       });
     });
-    }
+  }
+
+  sendPasswordlessLink(login: Login): Observable<any> {
+    login.password = '';
+    return this.http.post<any>(
+      environment.apiHost + 'authentication/requestPasswordlessLogin',
+      login
+    );
+  }
+
+  authenticatePasswordlessToken(
+    token: PasswordlessTokenRequest
+  ): Observable<AuthenticationResponse> {
+    return this.http
+      .post<AuthenticationResponse>(
+        environment.apiHost + 'authentication/authenticatePasswordlessLogin',
+        token
+      )
+      .pipe(
+        tap(
+          (response) => {
+            this.tokenStorage.saveAccessToken(response);
+            this.setUser(this.getRefreshTokenFromCookie());
+            this.router.navigate(['/home']);
+          },
+          (error) => {
+            console.error('Passwordless login failed:', error);
+            return error;
+          }
+        )
+      );
+  }
 }

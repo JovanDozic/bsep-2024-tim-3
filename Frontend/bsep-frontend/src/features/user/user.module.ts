@@ -8,8 +8,8 @@ import { AdminProfileComponent } from './admin-profile/admin-profile.component';
 import { EmployeeProfileComponent } from './employee-profile/employee-profile.component';
 import { RoleManagementComponent } from './role-management/role-management.component';
 import { PermissionManagementComponent } from './permission-management/permission-management.component';
-
-
+import { LoginPasswordlessComponent } from './login-passwordless/login-passwordless.component';
+import { LoginPasswordlessAuthenticateComponent } from './login-passwordless-authenticate/login-passwordless-authenticate.component';
 
 @NgModule({
   declarations: [
@@ -19,12 +19,10 @@ import { PermissionManagementComponent } from './permission-management/permissio
     AdminProfileComponent,
     EmployeeProfileComponent,
     RoleManagementComponent,
-    PermissionManagementComponent
+    PermissionManagementComponent,
+    LoginPasswordlessComponent,
+    LoginPasswordlessAuthenticateComponent,
   ],
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule
-  ]
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
 })
-export class UserModule { }
+export class UserModule {}

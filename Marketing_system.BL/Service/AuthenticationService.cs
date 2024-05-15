@@ -37,12 +37,14 @@ namespace Marketing_system.BL.Service
             var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(email);
             if (user != null)
             {
+                if (user.AccountStatus != AccountStatus.Active) return null;
+
                 var hashedPassword = _unitOfWork.GetUserRepository().GetPasswordByEmail(email);
                 if (_unitOfWork.GetPasswordHasher().VerifyPassword(password, hashedPassword))
                 {
                     var tokens = await _unitOfWork.GetTokenGeneratorRepository().GenerateTokens(user);
                     SetRefreshTokenCookie(tokens.RefreshToken);
-                    AuthenticationResponseDTO response = new AuthenticationResponseDTO { AccessToken = tokens.AccessToken, Id = user.Id }; 
+                    AuthenticationResponseDTO response = new AuthenticationResponseDTO { AccessToken = tokens.AccessToken, Id = user.Id };
                     return response;
                 }
             }
@@ -133,13 +135,13 @@ namespace Marketing_system.BL.Service
             {
                 return null;
             }
-            if (user.PackageType == PackageType.Basic)
+            if (user.PackageType == PackageType.Basic || user.AccountStatus != AccountStatus.Active)
             {
                 return null;
             }
 
             var token = GeneratePasswordlessToken(email);
-            var link = $"https://localhost:7198/api/authentication/authenticatePasswordlessLogin?token={token}";
+            var link = $"http://localhost:4200/authenticate-passwordless?token={token}";
 
             await _unitOfWork.GetPasswordlessTokenRepository().Add(
                 new PasswordlessToken()
@@ -163,11 +165,6 @@ namespace Marketing_system.BL.Service
             {
                 return null;
             }
-
-            //if (!ValidatePasswordlessToken(token))
-            //{
-            //    return null;
-            //}
 
             passwordlessToken.IsUsed = true;
             _unitOfWork.GetPasswordlessTokenRepository().Update(passwordlessToken);
@@ -242,8 +239,8 @@ namespace Marketing_system.BL.Service
         }
         public async Task<IEnumerable<UserDto>> GetAllUsers()
         {
-            var users = await _unitOfWork.GetUserRepository().GetAll(); 
-                                                                             
+            var users = await _unitOfWork.GetUserRepository().GetAll();
+
             var userDtos = users.Select(user => new UserDto
             {
                 Id = user.Id,
@@ -297,10 +294,10 @@ namespace Marketing_system.BL.Service
 
             var cookieOptions = new CookieOptions
             {
-                HttpOnly = true, 
-                Secure = true,   
-                SameSite = SameSiteMode.Strict, 
-                Expires = DateTime.UtcNow.AddDays(1) 
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(1)
             };
 
             response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
