@@ -12,7 +12,7 @@ namespace Marketing_system.DA.Repository
             _smtpConfig = smtpConfig.Value;
         }
 
-        public async Task<bool> SendPasswordlessLink(string email, string link)
+        public async Task<bool> SendLinkToEmail(string email, string link, string subject)
         {
             var from = new MailAddress(_smtpConfig.SenderAddress, _smtpConfig.SenderDisplayName);
             var to = new MailAddress(email);
@@ -29,7 +29,7 @@ namespace Marketing_system.DA.Repository
 
             using var message = new MailMessage(from, to)
             {
-                Subject = "Passwordless login link",
+                Subject = subject,
                 Body = link
             };
 

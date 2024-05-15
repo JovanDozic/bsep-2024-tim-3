@@ -27,9 +27,7 @@ public class AuthenticationController : Controller
             isRegistered = await _authenticationService.RegisterAdminOrEmployee(user);
         }
 
-        // TODO: call request service to send email verification
-
-
+        if (isRegistered) await _authenticationService.CreateRegistrationRequestAsync(user);
 
         return isRegistered ? Ok(isRegistered) : BadRequest(!isRegistered);
     }
@@ -85,7 +83,7 @@ public class AuthenticationController : Controller
 
     [HttpPost("authenticatePasswordlessLogin")]
     [AllowAnonymous]
-    public async Task<ActionResult<TokensDto>> AuthenticatePasswordlessToken([FromBody] PasswordlessTokenDto token)
+    public async Task<ActionResult<TokensDto>> AuthenticatePasswordlessToken([FromBody] EmailTokenDto token)
     {
         var result = await _authenticationService.AuthenticatePasswordlessTokenAsync(token.Token);
         if (result == null)
@@ -102,12 +100,14 @@ public class AuthenticationController : Controller
 
         return Ok(user);
     }
+
     [HttpGet("getAllUsers")]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
     {
         var users = await _authenticationService.GetAllUsers();
         return Ok(users);
     }
+
     [HttpPost("updateUser")]
     public async Task<ActionResult<bool>> UpdateUser([FromBody] UserDto user)
     {
@@ -117,5 +117,17 @@ public class AuthenticationController : Controller
             return Ok(isUpdated);
         }
         return NotFound(); // Return appropriate status code if user not found
+    }
+
+    [HttpPost("activateAccount")]
+    [AllowAnonymous]
+    public async Task<ActionResult<bool>> ActivateAccount([FromBody] EmailTokenDto token)
+    {
+        var isActivated = await _authenticationService.ActivateAccount(token.Token);
+        if (isActivated)
+        {
+            return Ok(isActivated);
+        }
+        return NotFound();
     }
 }

@@ -15,6 +15,7 @@ namespace Marketing_system.BL.Contracts.IService
         Task<IEnumerable<UserDto>> GetAllUsers();
         Task<bool> UpdateUser(UserDto user);
         Task<bool> RegisterAdminOrEmployee(UserDto userDto);
-
+        public Task<bool?> CreateRegistrationRequestAsync(UserDto user);
+        public Task<bool> ActivateAccount(string token);
     }
 }

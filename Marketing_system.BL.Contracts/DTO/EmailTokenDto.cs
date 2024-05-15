@@ -1,6 +1,6 @@
 ﻿namespace Marketing_system.BL.Contracts.DTO
 {
-    public class PasswordlessTokenDto
+    public class EmailTokenDto
     {
         public string Token { get; set; }
     }

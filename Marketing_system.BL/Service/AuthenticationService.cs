@@ -57,6 +57,18 @@ namespace Marketing_system.BL.Service
                 return false;
             }
 
+            var registrationRequests = _unitOfWork.GetRegistrationRequestRepository().GetAllByEmailAsync(userDto.Email);
+            if (registrationRequests.Any(req => req.Status == RegistrationRequestStatus.Pending))
+            {
+                // If there is a pending registration request for the same email, return false
+                return false;
+            }
+            else if (registrationRequests.Where(req => req.Status == RegistrationRequestStatus.Rejected).Any(req => req.RegistrationDate >= DateTime.UtcNow.AddHours(-24)))
+            {
+                // If there is a rejected registration request for the same email in the last 24 hours, return false
+                return false;
+            }
+
             var password = _unitOfWork.GetPasswordHasher().HashPassword(userDto.Password);
 
             if ((ClientType)userDto.ClientType == ClientType.Individual)
@@ -68,7 +80,6 @@ namespace Marketing_system.BL.Service
                 await _unitOfWork.GetUserRepository().Add(new User(userDto.Email, password, null, null, userDto.Address, userDto.City, userDto.Country, userDto.Phone, (UserRole)userDto.Role, (ClientType)userDto.ClientType, (PackageType)userDto.PackageType, AccountStatus.Requested, userDto.CompanyName, userDto.TaxId));
             }
 
-            //await _unitOfWork.GetRegistrationRequestRepository().Add(new RegistrationRequest(userDto.Firstname, userDto.Lastname, userDto.Email, DateTime.Now.ToUniversalTime(), (PackageType)userDto.PackageType));
             await _unitOfWork.Save();
             return true;
         }
@@ -88,6 +99,7 @@ namespace Marketing_system.BL.Service
             await _unitOfWork.Save();
             return true;
         }
+
         public async Task<string> UpdateAccessToken(int userId)
         {
             var user = await _unitOfWork.GetUserRepository().GetByIdAsync(userId);
@@ -125,7 +137,6 @@ namespace Marketing_system.BL.Service
             return await _unitOfWork.GetTokenGeneratorRepository().ValidateAccessToken(accessToken);
         }
 
-
         public async Task<bool?> SendPasswordlessLogin(string email)
         {
             var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(email);
@@ -138,7 +149,7 @@ namespace Marketing_system.BL.Service
                 return null;
             }
 
-            var token = GeneratePasswordlessToken(email);
+            var token = GenerateTempEmailToken(email);
             var link = $"http://localhost:4200/authenticate-passwordless?token={token}";
 
             await _unitOfWork.GetPasswordlessTokenRepository().Add(
@@ -151,7 +162,7 @@ namespace Marketing_system.BL.Service
                 });
             await _unitOfWork.Save();
 
-            return await _emailHandler.SendPasswordlessLink(email, link);
+            return await _emailHandler.SendLinkToEmail(email, link, "Passwordless Login");
         }
 
         public async Task<TokensDto?> AuthenticatePasswordlessTokenAsync(string token)
@@ -178,7 +189,7 @@ namespace Marketing_system.BL.Service
             return tokens;
         }
 
-        private string GeneratePasswordlessToken(string email, string? timestamp = null)
+        private string GenerateTempEmailToken(string email, string? timestamp = null)
         {
             if (timestamp is null)
             {
@@ -289,18 +300,61 @@ namespace Marketing_system.BL.Service
             response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
 
-        public void CreateRegistrationRequest(UserDto user)
+        public async Task<bool?> CreateRegistrationRequestAsync(UserDto user)
         {
+            user.Id = (await _unitOfWork.GetUserRepository().GetByEmailAsync(user.Email)).Id;
+            var token = GenerateTempEmailToken(user.Email);
+            var link = $"http://localhost:4200/authenticate-registration-request?token={token}"; // TODO: Adjust the link
+
             var request = new RegistrationRequest
             {
                 UserId = user.Id,
                 Email = user.Email,
                 RegistrationDate = DateTime.UtcNow,
                 Status = RegistrationRequestStatus.Pending,
-                // TODO: Generate email token: Token = Generate(user.Email),
+                Token = token,
                 TokenExpirationDate = DateTime.UtcNow.AddHours(24)
             };
+            await _unitOfWork.GetRegistrationRequestRepository().Add(request);
+            await _unitOfWork.Save();
+
+            return await _emailHandler.SendLinkToEmail(user.Email, link, "Registration Verification"); // TODO: Move this to method that will handle when admin approves the request
         }
 
+        public async Task<bool> ActivateAccount(string token)
+        {
+            var registrationRequest = await _unitOfWork.GetRegistrationRequestRepository().GetByTokenAsync(token);
+            if (registrationRequest is null ||
+                registrationRequest.Status != RegistrationRequestStatus.Pending ||
+                registrationRequest.TokenExpirationDate < DateTime.UtcNow ||
+                registrationRequest.UserId is null)
+            {
+                return false;
+            }
+
+            try
+            {
+                var user = await _unitOfWork.GetUserRepository().GetByIdAsync(registrationRequest.UserId ?? throw new Exception("User for this registration request does not exist."));
+                user.AccountStatus = AccountStatus.Active;
+                _unitOfWork.GetUserRepository().Update(user);
+                await _unitOfWork.Save();
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public void ApproveRegisterRequest()
+        {
+
+        }
+
+        public void RejectRegisterRequest()
+        {
+
+        }
     }
 }
