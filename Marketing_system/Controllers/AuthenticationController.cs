@@ -31,7 +31,7 @@ public class AuthenticationController : Controller
                 return Ok(isRegistered);
             return BadRequest(!isRegistered);
         }
-        
+
     }
 
     [HttpPost("login")]
@@ -75,22 +75,24 @@ public class AuthenticationController : Controller
 
     [HttpPost("requestPasswordlessLogin")]
     [AllowAnonymous]
-    public async Task<ActionResult<TokensDto>> RequestPasswordlessLogin(string email)
+    public async Task<ActionResult<TokensDto>> RequestPasswordlessLogin([FromBody] CredentialsDto credentialsDto)
     {
-        var result = await _authenticationService.SendPasswordlessLogin(email);
+        var result = await _authenticationService.SendPasswordlessLogin(credentialsDto.Username);
         if (result == null)
             return BadRequest(result);
         return Ok(result);
     }
 
     [HttpPost("authenticatePasswordlessLogin")]
-    public async Task<ActionResult<TokensDto>> AuthenticatePasswordlessToken([FromQuery] string token)
+    [AllowAnonymous]
+    public async Task<ActionResult<TokensDto>> AuthenticatePasswordlessToken([FromBody] PasswordlessTokenDto token)
     {
-        var result = await _authenticationService.AuthenticatePasswordlessTokenAsync(token);
+        var result = await _authenticationService.AuthenticatePasswordlessTokenAsync(token.Token);
         if (result == null)
             return BadRequest(result);
         return Ok(result);
     }
+
     [HttpGet("getUser/{id:int}")]
     public async Task<ActionResult<UserDto>> GetUser(int id)
     {

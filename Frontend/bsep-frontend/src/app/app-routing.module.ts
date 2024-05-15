@@ -11,21 +11,48 @@ import { LoginComponent } from 'src/features/user/login/login.component';
 import { RegisterComponent } from 'src/features/user/register/register.component';
 import { RoleManagementComponent } from 'src/features/user/role-management/role-management.component';
 import { PermissionManagementComponent } from 'src/features/user/permission-management/permission-management.component';
+import { LoginPasswordlessComponent } from 'src/features/user/login-passwordless/login-passwordless.component';
+import { LoginPasswordlessAuthenticateComponent } from 'src/features/user/login-passwordless-authenticate/login-passwordless-authenticate.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: 'login-passwordless', component: LoginPasswordlessComponent },
+  {
+    path: 'authenticate-passwordless',
+    component: LoginPasswordlessAuthenticateComponent,
+  },
   { path: 'register', component: RegisterComponent },
   { path: 'home', component: HomeComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: 'employee-profile', component:EmployeeProfileComponent,canActivate:[EmployeeGuard]},
-  { path: 'admin-profile', component:AdminProfileComponent,canActivate:[AdminGuard]},
-  { path: 'role-management/:userId', component:RoleManagementComponent,canActivate:[AdminGuard]},
-  { path: 'permission-management/:permissionId', component:PermissionManagementComponent,canActivate:[AdminGuard]},
-  { path: 'client-profile', component:ClientProfileComponent,canActivate:[ClientGuard]}
+  {
+    path: 'employee-profile',
+    component: EmployeeProfileComponent,
+    canActivate: [EmployeeGuard],
+  },
+  {
+    path: 'admin-profile',
+    component: AdminProfileComponent,
+    canActivate: [AdminGuard],
+  },
+  {
+    path: 'role-management/:userId',
+    component: RoleManagementComponent,
+    canActivate: [AdminGuard],
+  },
+  {
+    path: 'permission-management/:permissionId',
+    component: PermissionManagementComponent,
+    canActivate: [AdminGuard],
+  },
+  {
+    path: 'client-profile',
+    component: ClientProfileComponent,
+    canActivate: [ClientGuard],
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

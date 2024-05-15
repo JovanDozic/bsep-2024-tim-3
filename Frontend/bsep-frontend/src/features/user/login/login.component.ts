@@ -7,36 +7,42 @@ import { Login } from '../model/login.model';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
-
   loginForm: FormGroup;
 
-  constructor(private router: Router, private userService: UserService, private fb: FormBuilder) {
+  constructor(
+    private router: Router,
+    private userService: UserService,
+    private fb: FormBuilder
+  ) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
     });
   }
 
-  login() : void {
+  login(): void {
     const login: Login = {
       username: this.loginForm.value.username || '',
-      password: this.loginForm.value.password || ''
+      password: this.loginForm.value.password || '',
     };
     if (this.loginForm.valid) {
       this.userService.login(login).subscribe({
         next: () => {
           const user = this.userService.user$.getValue();
-          console.log(user)
+          console.log(user);
         },
       });
     }
   }
 
-  register() : void {
+  register(): void {
     this.router.navigate(['/register']);
   }
 
+  passwordless(): void {
+    this.router.navigate(['/login-passwordless']);
+  }
 }
