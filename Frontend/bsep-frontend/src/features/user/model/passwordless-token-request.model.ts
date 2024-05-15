@@ -1,3 +1,3 @@
-export interface PasswordlessTokenRequest {
+export interface EmailTokenRequest {
   token: string;
 }

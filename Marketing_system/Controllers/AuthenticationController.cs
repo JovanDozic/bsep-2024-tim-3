@@ -17,21 +17,19 @@ public class AuthenticationController : Controller
     [AllowAnonymous]
     public async Task<ActionResult<bool>> RegisterUser([FromBody] UserDto user)
     {
+        bool isRegistered;
         if (user.Role == 0)
         {
-            var isRegistered = await _authenticationService.RegisterUser(user);
-            if (isRegistered)
-                return Ok(isRegistered);
-            return BadRequest(!isRegistered);
+            isRegistered = await _authenticationService.RegisterUser(user);
         }
         else
         {
-            var isRegistered = await _authenticationService.RegisterAdminOrEmployee(user);
-            if (isRegistered)
-                return Ok(isRegistered);
-            return BadRequest(!isRegistered);
+            isRegistered = await _authenticationService.RegisterAdminOrEmployee(user);
         }
 
+        if (isRegistered) await _authenticationService.CreateRegistrationRequestAsync(user);
+
+        return isRegistered ? Ok(isRegistered) : BadRequest(!isRegistered);
     }
 
     [HttpPost("login")]
@@ -85,7 +83,7 @@ public class AuthenticationController : Controller
 
     [HttpPost("authenticatePasswordlessLogin")]
     [AllowAnonymous]
-    public async Task<ActionResult<TokensDto>> AuthenticatePasswordlessToken([FromBody] PasswordlessTokenDto token)
+    public async Task<ActionResult<TokensDto>> AuthenticatePasswordlessToken([FromBody] EmailTokenDto token)
     {
         var result = await _authenticationService.AuthenticatePasswordlessTokenAsync(token.Token);
         if (result == null)
@@ -102,12 +100,14 @@ public class AuthenticationController : Controller
 
         return Ok(user);
     }
+
     [HttpGet("getAllUsers")]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
     {
         var users = await _authenticationService.GetAllUsers();
         return Ok(users);
     }
+
     [HttpPost("updateUser")]
     public async Task<ActionResult<bool>> UpdateUser([FromBody] UserDto user)
     {
@@ -117,5 +117,49 @@ public class AuthenticationController : Controller
             return Ok(isUpdated);
         }
         return NotFound(); // Return appropriate status code if user not found
+    }
+
+    [HttpPost("activateAccount")]
+    [AllowAnonymous]
+    public async Task<ActionResult<bool>> ActivateAccount([FromBody] EmailTokenDto token)
+    {
+        var isActivated = await _authenticationService.ActivateAccount(token.Token.Replace(" ", ""));
+        if (isActivated)
+        {
+            return Ok(isActivated);
+        }
+        return BadRequest();
+    }
+
+    [HttpPost("approveRequest")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<bool>> ApproveRegistrationRequest([FromBody] RegistrationRequestUpdateDto dto)
+    {
+        var isApproved = await _authenticationService.ApproveRegisterRequestAsync(dto.Id);
+        if (isApproved)
+        {
+            return Ok(isApproved);
+        }
+        return BadRequest();
+    }
+
+    [HttpPost("rejectRequest")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<bool>> RejectRegistrationRequest([FromBody] RegistrationRequestUpdateDto dto)
+    {
+        var isRejected = await _authenticationService.RejectRegisterRequestAsync(dto.Id, dto.Reason ?? string.Empty);
+        if (isRejected)
+        {
+            return Ok(isRejected);
+        }
+        return BadRequest();
+    }
+
+    [HttpGet("getAllRegistrationRequests")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<IEnumerable<RegistrationRequestDto>>> GetAllRegistrationRequests()
+    {
+        var requests = await _authenticationService.GetAllRegistrationRequestsAsync();
+        return Ok(requests);
     }
 }

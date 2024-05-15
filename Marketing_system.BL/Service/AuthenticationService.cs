@@ -11,8 +11,6 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-
-
 namespace Marketing_system.BL.Service
 {
     public class AuthenticationService : IAuthenticationService
@@ -58,6 +56,18 @@ namespace Marketing_system.BL.Service
                 return false;
             }
 
+            var registrationRequests = _unitOfWork.GetRegistrationRequestRepository().GetAllByEmailAsync(userDto.Email);
+            if (registrationRequests.Any(req => req.Status == DA.Contracts.Model.RegistrationRequestStatus.Pending))
+            {
+                // If there is a pending registration request for the same email, return false
+                return false;
+            }
+            else if (registrationRequests.Where(req => req.Status == DA.Contracts.Model.RegistrationRequestStatus.Rejected).Any(req => req.RegistrationDate >= DateTime.UtcNow.AddHours(-24)))
+            {
+                // If there is a rejected registration request for the same email in the last 24 hours, return false
+                return false;
+            }
+
             var password = _unitOfWork.GetPasswordHasher().HashPassword(userDto.Password);
 
             if ((ClientType)userDto.ClientType == ClientType.Individual)
@@ -69,7 +79,6 @@ namespace Marketing_system.BL.Service
                 await _unitOfWork.GetUserRepository().Add(new User(userDto.Email, password, null, null, userDto.Address, userDto.City, userDto.Country, userDto.Phone, (UserRole)userDto.Role, (ClientType)userDto.ClientType, (PackageType)userDto.PackageType, AccountStatus.Requested, userDto.CompanyName, userDto.TaxId));
             }
 
-            await _unitOfWork.GetRegistrationRequestRepository().Add(new RegistrationRequest(userDto.Firstname, userDto.Lastname, userDto.Email, DateTime.Now.ToUniversalTime(), (PackageType)userDto.PackageType));
             await _unitOfWork.Save();
             return true;
         }
@@ -89,6 +98,7 @@ namespace Marketing_system.BL.Service
             await _unitOfWork.Save();
             return true;
         }
+
         public async Task<string> UpdateAccessToken(int userId)
         {
             var user = await _unitOfWork.GetUserRepository().GetByIdAsync(userId);
@@ -126,7 +136,6 @@ namespace Marketing_system.BL.Service
             return await _unitOfWork.GetTokenGeneratorRepository().ValidateAccessToken(accessToken);
         }
 
-
         public async Task<bool?> SendPasswordlessLogin(string email)
         {
             var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(email);
@@ -139,7 +148,7 @@ namespace Marketing_system.BL.Service
                 return null;
             }
 
-            var token = GeneratePasswordlessToken(email);
+            var token = GenerateTempEmailToken(email);
             var link = $"http://localhost:4200/authenticate-passwordless?token={token}";
 
             await _unitOfWork.GetPasswordlessTokenRepository().Add(
@@ -152,7 +161,7 @@ namespace Marketing_system.BL.Service
                 });
             await _unitOfWork.Save();
 
-            return await _emailHandler.SendPasswordlessLink(email, link);
+            return await _emailHandler.SendLinkToEmail(email, link, "Passwordless Login");
         }
 
         public async Task<TokensDto?> AuthenticatePasswordlessTokenAsync(string token)
@@ -179,34 +188,22 @@ namespace Marketing_system.BL.Service
             return tokens;
         }
 
-        private string GeneratePasswordlessToken(string email)
+        private string GenerateTempEmailToken(string email, string? timestamp = null)
         {
-            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+            if (timestamp is null)
+            {
+                timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+            }
             var payload = $"{email}:{timestamp}";
 
             using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_hmacConfig.Secret));
             var tokenBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(payload));
             var token = Convert.ToBase64String(tokenBytes);
+            var urlSafeToken = token.Replace('+', '-').Replace('/', '_').TrimEnd('=');
 
-            return token;
+            return urlSafeToken;
         }
 
-        private bool ValidatePasswordlessToken(string token)
-        {
-            var parts = token.Split(':');
-            if (parts.Length != 2)
-            {
-                return false;
-            }
-
-            var email = parts[0];
-            var timestamp = parts[1];
-
-            var payload = $"{email}:{timestamp}";
-            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_hmacConfig.Secret));
-            var computedToken = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(payload)));
-            return token == computedToken;
-        }
         public async Task<UserDto> GetUserById(int userId)
         {
             var user = await _unitOfWork.GetUserRepository().GetByIdAsync(userId);
@@ -236,6 +233,7 @@ namespace Marketing_system.BL.Service
 
             return userDto;
         }
+
         public async Task<IEnumerable<UserDto>> GetAllUsers()
         {
             var users = await _unitOfWork.GetUserRepository().GetAll();
@@ -301,6 +299,127 @@ namespace Marketing_system.BL.Service
 
             response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
+
+        public async Task<bool?> CreateRegistrationRequestAsync(UserDto user)
+        {
+            user.Id = (await _unitOfWork.GetUserRepository().GetByEmailAsync(user.Email)).Id;
+
+            var request = new RegistrationRequest
+            {
+                UserId = user.Id,
+                Email = user.Email,
+                RegistrationDate = DateTime.UtcNow,
+                Status = DA.Contracts.Model.RegistrationRequestStatus.Pending,
+                Token = null,
+                TokenExpirationDate = null
+            };
+            await _unitOfWork.GetRegistrationRequestRepository().Add(request);
+            await _unitOfWork.Save();
+
+            return true;
+        }
+
+        public async Task<bool> ActivateAccount(string token)
+        {
+            //RxiyYwhZ/yYXLX9tPd3cQnLRD/lBj++zX4w8krdpoec=
+            //RxiyYwhZ/yYXLX9tPd3cQnLRD/lBjzX4w8krdpoec=
+            var registrationRequest = await _unitOfWork.GetRegistrationRequestRepository().GetByTokenAsync(token);
+            if (registrationRequest is null ||
+                registrationRequest.Status != DA.Contracts.Model.RegistrationRequestStatus.Approved ||
+                registrationRequest.TokenExpirationDate < DateTime.UtcNow ||
+                registrationRequest.UserId is null)
+            {
+                return false;
+            }
+
+            try
+            {
+                var user = await _unitOfWork.GetUserRepository().GetByIdAsync(registrationRequest.UserId ?? throw new Exception("User for this registration request does not exist."));
+                user.AccountStatus = AccountStatus.Active;
+                _unitOfWork.GetUserRepository().Update(user);
+                await _unitOfWork.Save();
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> ApproveRegisterRequestAsync(int requestId)
+        {
+            var request = await _unitOfWork.GetRegistrationRequestRepository().GetByIdAsync(requestId);
+            if (request is null)
+            {
+                return false;
+            }
+
+            var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(request.Email);
+            if (user is null)
+            {
+                return false;
+            }
+
+            var token = GenerateTempEmailToken(user.Email);
+            // HERE
+            var link = $"http://localhost:4200/authenticate-registration-request?token={token}"; // TODO: Adjust the link
+
+            request.Status = DA.Contracts.Model.RegistrationRequestStatus.Approved;
+            request.Token = token;
+            request.TokenExpirationDate = DateTime.UtcNow.AddHours(24);
+
+            _unitOfWork.GetRegistrationRequestRepository().Update(request);
+            await _unitOfWork.Save();
+
+            return await _emailHandler.SendLinkToEmail(user.Email, $"<p>Please verify your account using the following <a href=\"{link}\">link</a>.</p>", "Registration Approved!");
+        }
+
+        public async Task<bool> RejectRegisterRequestAsync(int requestId, string reason)
+        {
+            var request = await _unitOfWork.GetRegistrationRequestRepository().GetByIdAsync(requestId);
+            if (request is null)
+            {
+                return false;
+            }
+
+            var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(request.Email);
+            if (user is null)
+            {
+                return false;
+            }
+
+            request.Status = DA.Contracts.Model.RegistrationRequestStatus.Rejected;
+            request.Reason = reason;
+            request.Token = null;
+            request.TokenExpirationDate = null;
+            request.UserId = null;
+
+            _unitOfWork.GetRegistrationRequestRepository().Update(request);
+            _unitOfWork.GetUserRepository().Delete(user.Id);
+
+            await _unitOfWork.Save();
+
+            return await _emailHandler.SendLinkToEmail(user.Email, $"<p>Administrator decided to reject your registration request.</p> {(request.Reason is null ? "" : $"Reason: {request.Reason}")}", "Registration Rejected");
+        }
+
+        public async Task<IEnumerable<RegistrationRequestDto>> GetAllRegistrationRequestsAsync()
+        {
+            var requests = await _unitOfWork.GetRegistrationRequestRepository().GetAll();
+
+            var requestDtos = requests.ToList().Select(req => new RegistrationRequestDto
+            {
+                Id = req.Id,
+                UserId = req.UserId,
+                Email = req.Email,
+                RegistrationDate = req.RegistrationDate,
+                Status = (Contracts.DTO.RegistrationRequestStatus)req.Status,
+                Reason = req.Reason
+            });
+
+            return requestDtos;
+        }
+
 
     }
 }

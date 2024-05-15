@@ -4,11 +4,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EmailTokenRequest } from '../model/passwordless-token-request.model';
 
 @Component({
-  selector: 'app-login-passwordless-authenticate',
-  templateUrl: './login-passwordless-authenticate.component.html',
-  styleUrls: ['./login-passwordless-authenticate.component.css'],
+  selector: 'app-email-verification',
+  templateUrl: './email-verification.component.html',
+  styleUrls: ['./email-verification.component.css'],
 })
-export class LoginPasswordlessAuthenticateComponent implements OnInit {
+export class EmailVerificationComponent implements OnInit {
   isLoading: boolean = false;
   constructor(
     private userService: UserService,
@@ -26,14 +26,14 @@ export class LoginPasswordlessAuthenticateComponent implements OnInit {
       if (token) {
         token.token = decodeURIComponent(token.token);
 
-        this.userService.authenticatePasswordlessToken(token).subscribe({
+        this.userService.authenticateEmailActivationToken(token).subscribe({
           next: (response) => {
             this.isLoading = false;
           },
           error: (error) => {
             this.isLoading = false;
             alert(
-              'Oops! Something went wrong with passwordless token! Please try again!'
+              'Oops! Something went wrong with your email token! Please try again!'
             );
             this.router.navigate(['/login']);
           },

@@ -2,6 +2,6 @@
 {
     public interface IEmailHandler
     {
-        Task<bool> SendPasswordlessLink(string email, string link);
+        Task<bool> SendLinkToEmail(string email, string body, string subject);
     }
 }

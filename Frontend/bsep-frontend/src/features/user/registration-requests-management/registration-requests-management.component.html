@@ -1,0 +1,31 @@
+<div class="row">
+    <h1>Rikvests!</h1>
+</div>
+
+<div class="row">
+
+    <div class="row mt-1" *ngFor="let req of requests">
+        <p class="nowrap">
+            {{req.id}} |
+            {{req.userId ?? "no user"}} |
+            {{req.email}} |
+            {{req.registrationDate | date:'short'}} |
+            {{req.status}} |
+            {{req.tokenExpirationDate | date:'short' ?? "no token"}} |
+
+            <span *ngIf="req.status == 0" class="nowrap">
+                <a class="text-danger" (click)="rejectRequest(req)">Reject</a> |
+                <a class="text-success" (click)="approveRequest(req)">Approve</a>
+            </span>
+
+            <span *ngIf="req.status != 0" class="nowrap">
+                <b>
+                    <span class="text-danger" *ngIf="req.status == 2">Rejected</span>
+                    <span class="text-success" *ngIf="req.status == 1">Approved</span>
+                </b>
+            </span>
+        </p>
+    </div>
+
+
+</div>

@@ -13,10 +13,16 @@ import { RoleManagementComponent } from 'src/features/user/role-management/role-
 import { PermissionManagementComponent } from 'src/features/user/permission-management/permission-management.component';
 import { LoginPasswordlessComponent } from 'src/features/user/login-passwordless/login-passwordless.component';
 import { LoginPasswordlessAuthenticateComponent } from 'src/features/user/login-passwordless-authenticate/login-passwordless-authenticate.component';
+import { RegistrationRequestsManagementComponent } from 'src/features/user/registration-requests-management/registration-requests-management.component';
+import { EmailVerificationComponent } from 'src/features/user/email-verification/email-verification.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'login-passwordless', component: LoginPasswordlessComponent },
+  {
+    path: 'authenticate-registration-request',
+    component: EmailVerificationComponent,
+  },
   {
     path: 'authenticate-passwordless',
     component: LoginPasswordlessAuthenticateComponent,
@@ -48,6 +54,11 @@ const routes: Routes = [
     path: 'client-profile',
     component: ClientProfileComponent,
     canActivate: [ClientGuard],
+  },
+  {
+    path: 'registration-requests',
+    component: RegistrationRequestsManagementComponent,
+    canActivate: [AdminGuard],
   },
 ];
 
