@@ -200,8 +200,9 @@ namespace Marketing_system.BL.Service
             using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_hmacConfig.Secret));
             var tokenBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(payload));
             var token = Convert.ToBase64String(tokenBytes);
+            var urlSafeToken = token.Replace('+', '-').Replace('/', '_').TrimEnd('=');
 
-            return token;
+            return urlSafeToken;
         }
 
         public async Task<UserDto> GetUserById(int userId)
@@ -321,6 +322,8 @@ namespace Marketing_system.BL.Service
 
         public async Task<bool> ActivateAccount(string token)
         {
+            //RxiyYwhZ/yYXLX9tPd3cQnLRD/lBj++zX4w8krdpoec=
+            //RxiyYwhZ/yYXLX9tPd3cQnLRD/lBjzX4w8krdpoec=
             var registrationRequest = await _unitOfWork.GetRegistrationRequestRepository().GetByTokenAsync(token);
             if (registrationRequest is null ||
                 registrationRequest.Status != DA.Contracts.Model.RegistrationRequestStatus.Approved ||
@@ -360,6 +363,7 @@ namespace Marketing_system.BL.Service
             }
 
             var token = GenerateTempEmailToken(user.Email);
+            // HERE
             var link = $"http://localhost:4200/authenticate-registration-request?token={token}"; // TODO: Adjust the link
 
             request.Status = DA.Contracts.Model.RegistrationRequestStatus.Approved;
@@ -416,5 +420,7 @@ namespace Marketing_system.BL.Service
 
             return requestDtos;
         }
+
+
     }
 }

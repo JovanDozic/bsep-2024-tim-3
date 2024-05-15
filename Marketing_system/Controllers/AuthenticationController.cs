@@ -123,7 +123,7 @@ public class AuthenticationController : Controller
     [AllowAnonymous]
     public async Task<ActionResult<bool>> ActivateAccount([FromBody] EmailTokenDto token)
     {
-        var isActivated = await _authenticationService.ActivateAccount(token.Token);
+        var isActivated = await _authenticationService.ActivateAccount(token.Token.Replace(" ", ""));
         if (isActivated)
         {
             return Ok(isActivated);

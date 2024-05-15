@@ -8,7 +8,7 @@ import { Login } from './model/login.model';
 import { AuthenticationResponse } from './model/authentication-response.model';
 import { TokenStorage } from './jwt/token.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { PasswordlessTokenRequest } from './model/passwordless-token-request.model';
+import { EmailTokenRequest } from './model/passwordless-token-request.model';
 import { RegistrationRequest } from './model/registration-request.model';
 import { RegistrationRequestUpdate } from './model/registration-request-update.model';
 
@@ -153,7 +153,7 @@ export class UserService {
   }
 
   authenticatePasswordlessToken(
-    token: PasswordlessTokenRequest
+    token: EmailTokenRequest
   ): Observable<AuthenticationResponse> {
     return this.http
       .post<AuthenticationResponse>(
@@ -169,6 +169,30 @@ export class UserService {
           },
           (error) => {
             console.error('Passwordless login failed:', error);
+            return error;
+          }
+        )
+      );
+  }
+
+  authenticateEmailActivationToken(
+    token: EmailTokenRequest
+  ): Observable<AuthenticationResponse> {
+    return this.http
+      .post<AuthenticationResponse>(
+        environment.apiHost + 'authentication/activateAccount',
+        token
+      )
+      .pipe(
+        tap(
+          (response) => {
+            if (response) {
+              alert('Account activated! You can now login!');
+            }
+            this.router.navigate(['/home']);
+          },
+          (error) => {
+            console.error('Email activation failed:', error);
             return error;
           }
         )

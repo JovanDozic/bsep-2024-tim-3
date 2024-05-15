@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../user.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PasswordlessTokenRequest } from '../model/passwordless-token-request.model';
+import { EmailTokenRequest } from '../model/passwordless-token-request.model';
 
 @Component({
   selector: 'app-login-passwordless-authenticate',
@@ -19,7 +19,7 @@ export class LoginPasswordlessAuthenticateComponent implements OnInit {
   ngOnInit(): void {
     this.isLoading = true;
     this.route.queryParams.subscribe((params) => {
-      var token: PasswordlessTokenRequest = {
+      var token: EmailTokenRequest = {
         token: params['token'],
       };
 
