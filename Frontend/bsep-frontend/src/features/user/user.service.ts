@@ -173,17 +173,22 @@ export class UserService {
 
   authenticatePasswordlessToken(
     token: EmailTokenRequest
-  ): Observable<AuthenticationResponse> {
+  ): Observable<any> {
     return this.http
       .post<AuthenticationResponse>(
         environment.apiHost + 'authentication/authenticatePasswordlessLogin',
-        token
+        token,
+        { observe: 'response' }
       )
       .pipe(
         tap(
           (response) => {
-            this.tokenStorage.saveAccessToken(response);
-            this.setUser(this.getRefreshTokenFromCookie());
+            this.tokenStorage.saveAccessToken(response.body);
+  
+            const refreshToken = response.body.refreshToken;
+            this.tokenStorage.saveRefreshToken(refreshToken);
+  
+            this.setUser(refreshToken);
             this.router.navigate(['/home']);
           },
           (error) => {

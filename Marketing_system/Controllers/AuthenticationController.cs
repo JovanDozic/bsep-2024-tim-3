@@ -53,6 +53,7 @@ public class AuthenticationController : Controller
     }
 
     [HttpPost("validateRefresh")]
+    [Authorize]
     public async Task<ActionResult<bool>> ValidateRefreshToken([FromBody] int userId, string refreshToken)
     {
         var token = await _authenticationService.ValidateRefreshToken(userId, refreshToken);
@@ -92,6 +93,7 @@ public class AuthenticationController : Controller
     }
 
     [HttpGet("getUser/{id:int}")]
+    [Authorize]
     public async Task<ActionResult<UserDto>> GetUser(int id)
     {
         var user = await _authenticationService.GetUserById(id);
@@ -102,6 +104,7 @@ public class AuthenticationController : Controller
     }
 
     [HttpGet("getAllUsers")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
     {
         var users = await _authenticationService.GetAllUsers();
@@ -109,6 +112,7 @@ public class AuthenticationController : Controller
     }
 
     [HttpPost("updateUser")]
+    [Authorize]
     public async Task<ActionResult<bool>> UpdateUser([FromBody] UserDto user)
     {
         var isUpdated = await _authenticationService.UpdateUser(user);
