@@ -80,6 +80,21 @@ export class UserService {
     return this.http.post<boolean>(environment.apiHost + 'authentication/register', user)
   }
 
+  deleteData(id: number): Observable<boolean> {
+    return this.http.delete<boolean>(`${environment.apiHost}authentication/delete-data/${id}`)
+      .pipe(
+        tap(
+          (response: boolean) => {
+            if (response) {
+              console.log('User data deleted successfully');
+            } else {
+              console.log('Failed to delete user data');
+            }
+          }
+        )
+      );
+  }
+
   login(login: Login): Observable<any> {
     return this.http
       .post<AuthenticationResponse>(

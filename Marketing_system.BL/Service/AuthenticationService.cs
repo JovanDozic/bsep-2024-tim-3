@@ -135,6 +135,10 @@ namespace Marketing_system.BL.Service
         {
             return await _unitOfWork.GetTokenGeneratorRepository().ValidateAccessToken(accessToken);
         }
+        public async Task<bool> DeleteDataAsync(long id)
+        {
+            return true;
+        }
 
         public async Task<bool?> SendPasswordlessLogin(string email)
         {

@@ -15,7 +15,7 @@ public class AdvertisementController : Controller
     }
 
     [HttpPost("create")]
-    [Authorize(Roles = "Client")]
+    //[Authorize(Roles = "Client")]
     public async Task<ActionResult<bool>> CreateAdvertisement([FromBody] AdvertisementDto advertisementDTO)
     {
        var isCreated = await _advertisementService.CreateAdvertisement(advertisementDTO);
