@@ -65,5 +65,9 @@ namespace Marketing_system.BL.Service
 
             return true;
         }
+        public async Task<bool> DeleteAdsByClientId(long id)
+        {
+            return await _unitOfWork.GetAdvertisementRepository().DeleteAdsByClientIdAsync(id);
+        }
     }
 }

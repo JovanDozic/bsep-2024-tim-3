@@ -1,6 +1,7 @@
 ﻿using Marketing_system.DA.Contexts;
 using Marketing_system.DA.Contracts.IRepository;
 using Marketing_system.DA.Contracts.Model;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,27 @@ namespace Marketing_system.DA.Repository
         public AdvertisementRepository(DataContext context) : base(context)
         {
 
+        }
+        public async Task<bool> DeleteAdsByClientIdAsync(long id)
+        {
+            var adsToRemove = await _dbContext.Set<Advertisement>().Where(a => a.ClientId == id).ToListAsync();
+            if (adsToRemove != null)
+            {
+                try
+                {
+                    foreach(var ad in adsToRemove)
+                    {
+                        _dbContext.Set<Advertisement>().Remove(ad);
+                    }
+                    await _dbContext.SaveChangesAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

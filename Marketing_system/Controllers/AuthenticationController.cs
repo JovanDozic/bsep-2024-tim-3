@@ -161,7 +161,7 @@ public class AuthenticationController : Controller
 
     [HttpDelete("delete-data/{idUser}")]
     [Authorize]
-    public async Task<ActionResult<bool>> DeleteData([FromQuery] long idUser)
+    public async Task<ActionResult<bool>> DeleteData([FromRoute] int idUser)
     {
         var isDeleted = await _authenticationService.DeleteDataAsync(idUser);
         if (isDeleted)

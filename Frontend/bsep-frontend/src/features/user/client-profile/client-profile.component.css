@@ -130,11 +130,11 @@
 }
 
 .popUpDelete {
-    background-color: #f8f9fa; /* Light gray background */
+    background-color: #f8f9fa;
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Darker shadow */
-    width: 60%; /* Adjust width as needed */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    width: 60%;
     max-width: 800px;
 }
 

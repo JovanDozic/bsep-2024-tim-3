@@ -12,6 +12,7 @@ namespace Marketing_system.BL.Contracts.IService
         Task<bool> CreateAdvertisement(AdvertisementDto ad);
         Task<IEnumerable<AdvertisementDto>> GetAllAdvertisements();
         Task<bool> UpdateAdvertisement(AdvertisementDto ad);
+        Task<bool> DeleteAdsByClientId(long id);
 
     }
 }

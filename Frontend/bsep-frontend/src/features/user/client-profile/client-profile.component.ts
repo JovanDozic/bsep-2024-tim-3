@@ -49,7 +49,7 @@ export class ClientProfileComponent implements OnInit {
 
     this.adservis.getAllAdvertisements().subscribe(ads => {
       this.advertisements = ads;
-      this.adsForClient = this.advertisements.filter(ad => ad.clientId === 2 && ad.status === 1);
+      this.adsForClient = this.advertisements.filter(ad => ad.clientId === this.client.id && ad.status === 1);
     });
 
   }
@@ -61,10 +61,8 @@ export class ClientProfileComponent implements OnInit {
   
     if (deadline && startDate && endDate) {
       if (new Date(deadline) < new Date(startDate) && new Date(startDate) < new Date(endDate)) {
-        console.log('Usao gde ne treba');
         return null;
       } else {
-        console.log('Usao gde treba');
         return { endDateAfterStartDateAndDeadline: true };
       }
     }
@@ -76,9 +74,8 @@ export class ClientProfileComponent implements OnInit {
   }
   optionYes() : void {
     this.deleted = false
-    this.userService.deleteData(2).subscribe(result => {
+    this.userService.deleteData(this.client.id).subscribe(result => {
       if (result) {
-        this.deleted = true;
         console.log("Your data deleted successfully");
       } else {
 
@@ -101,7 +98,7 @@ export class ClientProfileComponent implements OnInit {
         startDate: formData.startDate,
         endDate: formData.endDate,
         description: formData.description,
-        clientId: 2, // Update this with actual client ID
+        clientId: this.client.id, // Update this with actual client ID
         deadline: formData.deadline,
         status: 0
       };

@@ -28,5 +28,28 @@ namespace Marketing_system.DA.Repository
         {
             return _dbContext.Set<RegistrationRequest>().Where(x => x.Email == email).ToList();
         }
+
+        public async Task<bool> DeleteRegistrationRequestByUserIdAsync(long id)
+        {
+            var request = await _dbContext.Set<RegistrationRequest>().FirstOrDefaultAsync(x => x.UserId == id);
+            if (request != null)
+            {
+                try
+                {
+                    _dbContext.Set<RegistrationRequest>().Remove(request);
+                    await _dbContext.SaveChangesAsync();
+                    return true;
+
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }

@@ -20,5 +20,6 @@ namespace Marketing_system.BL.Contracts.IService
         public Task<bool> ApproveRegisterRequestAsync(int requestId);
         public Task<bool> RejectRegisterRequestAsync(int requestId, string reason);
         public Task<IEnumerable<RegistrationRequestDto>> GetAllRegistrationRequestsAsync();
+        public Task<bool> DeleteDataAsync(long id);
     }
 }

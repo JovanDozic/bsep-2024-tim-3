@@ -137,7 +137,14 @@ namespace Marketing_system.BL.Service
         }
         public async Task<bool> DeleteDataAsync(long id)
         {
-            return true;
+            var adsDeleted = await _unitOfWork.GetAdvertisementRepository().DeleteAdsByClientIdAsync(id);
+            var tokenDeleted = await _unitOfWork.GetPasswordlessTokenRepository().DeleteTokenByUserIdAsync(id);
+            var requestDeleted = await _unitOfWork.GetRegistrationRequestRepository().DeleteRegistrationRequestByUserIdAsync(id);
+            if (adsDeleted && tokenDeleted && requestDeleted)
+            {
+                return true;
+            }
+            return false;
         }
 
         public async Task<bool?> SendPasswordlessLogin(string email)
@@ -322,7 +329,6 @@ namespace Marketing_system.BL.Service
 
             return true;
         }
-
         public async Task<bool> ActivateAccount(string token)
         {
             //RxiyYwhZ/yYXLX9tPd3cQnLRD/lBj++zX4w8krdpoec=
