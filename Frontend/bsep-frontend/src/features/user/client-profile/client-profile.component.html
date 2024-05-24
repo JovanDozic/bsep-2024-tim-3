@@ -1,5 +1,8 @@
 <div class="client-profile">
-    <h2>Client Profile</h2>
+    <div class="delete-button">
+      <h2>Client Profile</h2>
+      <button class="delete-data-button" (click)="deleteData()" *ngIf="isGolden">Delete my data</button>
+  </div>
     <div class="personal-info">
         <h3>Personal Information</h3>
         <form>
@@ -79,4 +82,14 @@
           <button type="submit" class="btn btn-primary rounded-pill btn-lg">Submit</button>
       </form>
     </div>
+</div>
+
+<div class="popup-container" *ngIf="deleted">
+  <div class="popUpDelete">
+      <h4>Are you sure that you want to delete all advertisements, requests, tokens and other data connected with you?</h4>
+      <div class="deletePopUp">
+        <button class="delete-data-button" (click)="optionYes()">Yes</button>
+        <button class="delete-data-button" (click)="optionNo()">No</button>
+      </div>
+  </div>
 </div>

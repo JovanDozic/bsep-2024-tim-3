@@ -159,6 +159,18 @@ public class AuthenticationController : Controller
         return BadRequest();
     }
 
+    [HttpDelete("delete-data/{idUser}")]
+    [Authorize]
+    public async Task<ActionResult<bool>> DeleteData([FromRoute] int idUser)
+    {
+        var isDeleted = await _authenticationService.DeleteDataAsync(idUser);
+        if (isDeleted)
+        {
+            return Ok(isDeleted);
+        }
+        return BadRequest();
+    }
+
     [HttpGet("getAllRegistrationRequests")]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<IEnumerable<RegistrationRequestDto>>> GetAllRegistrationRequests()

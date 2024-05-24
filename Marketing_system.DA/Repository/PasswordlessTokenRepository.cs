@@ -18,5 +18,25 @@ namespace Marketing_system.DA.Repository
         {
             return await _dbContext.Set<PasswordlessToken>().FirstOrDefaultAsync(x => x.Token == token);
         }
+        public async Task<bool> DeleteTokenByUserIdAsync(long id)
+        {
+            var token = await _dbContext.Set<PasswordlessToken>().FirstOrDefaultAsync(x => x.UserId == id);
+            if (token != null)
+            {
+                try
+                {
+                    _dbContext.Set<PasswordlessToken>().Remove(token);
+                    await _dbContext.SaveChangesAsync();
+                    return true;
+
+                } catch (Exception ex)
+                {
+                    return false;
+                }
+            } else
+            {
+                return true;
+            }
+        }
     }
 }

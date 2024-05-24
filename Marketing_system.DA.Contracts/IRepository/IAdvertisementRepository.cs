@@ -9,6 +9,6 @@ namespace Marketing_system.DA.Contracts.IRepository
 {
     public interface IAdvertisementRepository : IRepository<Advertisement>
     {
-
+        Task<bool> DeleteAdsByClientIdAsync(long id);
     }
 }

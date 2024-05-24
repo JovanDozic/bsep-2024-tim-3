@@ -19,6 +19,8 @@ export class ClientProfileComponent implements OnInit {
   showPopup = false;
   id:number;
   adRequestForm: FormGroup;
+  isGolden: boolean = false;
+  deleted: boolean = false;
 
   constructor(private formBuilder: FormBuilder,private userService: UserService, private adservis: AdvertisementService, private tokenStorage: TokenStorage) { }
   
@@ -28,7 +30,9 @@ export class ClientProfileComponent implements OnInit {
       (user: User) => {
         this.client = user;
         console.log('User Details:', this.client);
-
+        if(this.client.packageType == 2){
+          this.isGolden = true
+        }
       },
       error => {
         console.error('Error fetching user:', error);
@@ -45,10 +49,11 @@ export class ClientProfileComponent implements OnInit {
 
     this.adservis.getAllAdvertisements().subscribe(ads => {
       this.advertisements = ads;
-      this.adsForClient = this.advertisements.filter(ad => ad.clientId === 6 && ad.status === 1);
+      this.adsForClient = this.advertisements.filter(ad => ad.clientId === this.client.id && ad.status === 1);
     });
 
   }
+
   endDateAfterStartDateAndDeadlineValidator(formGroup: FormGroup) {
     const startDate = formGroup.get('startDate').value;
     const endDate = formGroup.get('endDate').value;
@@ -64,6 +69,23 @@ export class ClientProfileComponent implements OnInit {
   
     return null;
   }
+  deleteData() : void {
+    this.deleted = true
+  }
+  optionYes() : void {
+    this.deleted = false
+    this.userService.deleteData(this.client.id).subscribe(result => {
+      if (result) {
+        console.log("Your data deleted successfully");
+      } else {
+
+        console.log("Error in deleting data");
+      }
+    })
+  }
+  optionNo() : void {
+    this.deleted = false
+  }
   openPopup(): void {
     this.showPopup = true;
   }
@@ -76,7 +98,7 @@ export class ClientProfileComponent implements OnInit {
         startDate: formData.startDate,
         endDate: formData.endDate,
         description: formData.description,
-        clientId: 6, // Update this with actual client ID
+        clientId: this.client.id, // Update this with actual client ID
         deadline: formData.deadline,
         status: 0
       };
