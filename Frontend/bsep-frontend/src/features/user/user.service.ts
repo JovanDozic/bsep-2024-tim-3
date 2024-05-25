@@ -11,6 +11,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { EmailTokenRequest } from './model/passwordless-token-request.model';
 import { RegistrationRequest } from './model/registration-request.model';
 import { RegistrationRequestUpdate } from './model/registration-request-update.model';
+import { ChangePasswordRequest } from './model/change-password-request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -39,11 +40,10 @@ export class UserService {
     private tokenStorage: TokenStorage
   ) {}
 
-  changePassword(userId: number, oldPassword: string, newPassword: string): Observable<boolean> {
-    const requestData = { userId, oldPassword, newPassword };
+  changePassword(request: ChangePasswordRequest): Observable<boolean> {
     return this.http.post<boolean>(
       `${environment.apiHost}authentication/changePassword`,
-      requestData
+      request
     );
   }
   getUserById(userId: number): Observable<User> {
