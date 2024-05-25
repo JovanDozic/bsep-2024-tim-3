@@ -18,6 +18,9 @@ export class AdminProfileComponent implements OnInit {
   id:number;
   showPopup = false;
   registerForm: FormGroup;
+  blockedUser: User;
+  showPopupPassword = false;
+  changePasswordForm: FormGroup;
 
   constructor(private formBuilder: FormBuilder,private userService: UserService, private tokenStorage: TokenStorage) { }
 
@@ -34,6 +37,11 @@ export class AdminProfileComponent implements OnInit {
       }
     )
     this.loadUsers();
+
+    this.changePasswordForm = this.formBuilder.group({
+      currentPassword: ['', [Validators.required]],
+      newPassword: ['', [Validators.required]]
+    });
     
 
     this.registerForm = this.formBuilder.group({
@@ -50,7 +58,7 @@ export class AdminProfileComponent implements OnInit {
   
   }
   loadUsers() {
-    this.userService.getAllUsers().subscribe(users => {
+    this.userService.getUnblocked().subscribe(users => {
       this.allUsers = users;
       this.allClients = this.allUsers.filter(user => user.role === 0);
       this.allEmployees = this.allUsers.filter(user => user.role === 1);
@@ -58,6 +66,50 @@ export class AdminProfileComponent implements OnInit {
   }
   openPopup(): void {
     this.showPopup = true;
+  }
+  openPopupPassword(): void {
+    this.showPopupPassword = true;
+  }
+  changePassword() {
+    this.showPopupPassword = false;
+  }
+
+  togglePasswordVisibility(fieldId: string): void {
+    const passwordField = document.getElementById(fieldId) as HTMLInputElement;
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text'; // Show password
+        // Update button text to "Hide"
+        const button = document.querySelector(`button[data-field="${fieldId}"]`) as HTMLButtonElement;
+        if (button) {
+            button.innerText = 'Hide';
+        }
+    } else {
+        passwordField.type = 'password'; // Hide password
+        // Update button text to "Show"
+        const button = document.querySelector(`button[data-field="${fieldId}"]`) as HTMLButtonElement;
+        if (button) {
+            button.innerText = 'Show';
+        }
+    }
+}
+
+
+  blockUser(user: User) {
+    this.blockedUser = user;
+    this.userService.blockUser(this.blockedUser).subscribe(
+      (updated: boolean) => {
+          if (updated) {
+            this.loadUsers();
+              console.log('User blocked successfully');
+          } else {
+              console.error('Failed to block user');
+          }
+      },
+      error => {
+          console.error('Error blocking user:', error);
+      }
+  );
+  
   }
 
   submitForm() {

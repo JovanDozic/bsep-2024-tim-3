@@ -55,7 +55,7 @@ namespace Marketing_system.BL.Service
             {
                 return false;
             }
-
+            /*
             var registrationRequests = _unitOfWork.GetRegistrationRequestRepository().GetAllByEmailAsync(userDto.Email);
             if (registrationRequests.Any(req => req.Status == DA.Contracts.Model.RegistrationRequestStatus.Pending))
             {
@@ -66,7 +66,7 @@ namespace Marketing_system.BL.Service
             {
                 // If there is a rejected registration request for the same email in the last 24 hours, return false
                 return false;
-            }
+            }*/
 
             var password = _unitOfWork.GetPasswordHasher().HashPassword(userDto.Password);
 
@@ -268,6 +268,32 @@ namespace Marketing_system.BL.Service
             return userDtos;
         }
 
+        public async Task<IEnumerable<UserDto>> GetUnblocked()
+        {
+            var users = await _unitOfWork.GetUserRepository().GetAll();
+
+            var userDtos = users
+                .Where(user => user.AccountStatus != AccountStatus.Blocked) // Filter by AccountStatus
+                .Select(user => new UserDto
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    Firstname = user.Firstname,
+                    Lastname = user.Lastname,
+                    Address = user.Address,
+                    City = user.City,
+                    Country = user.Country,
+                    Phone = user.Phone,
+                    CompanyName = user.CompanyName,
+                    TaxId = user.TaxId,
+                    PackageType = (int)user.PackageType,
+                    ClientType = (int)user.ClientType,
+                    Role = (int)user.Role
+                });
+            return userDtos; // ToList() materializes the query and returns a List<UserDto>
+
+        }
+
         public async Task<bool> UpdateUser(UserDto user)
         {
             var userToUpdate = await _unitOfWork.GetUserRepository().GetByIdAsync(user.Id);
@@ -296,6 +322,44 @@ namespace Marketing_system.BL.Service
             return true;
         }
 
+        public async Task<bool> ChangePassword(ChangePasswordRequestDto request)
+        {
+            var userToUpdate = await _unitOfWork.GetUserRepository().GetByIdAsync(request.UserId);
+            if (userToUpdate == null)
+            {
+                return false; // User not found
+            }
+
+            var oldPasswordHashed = _unitOfWork.GetPasswordHasher().HashPassword(request.OldPassword);
+
+            if (!_unitOfWork.GetPasswordHasher().VerifyPassword(request.OldPassword, userToUpdate.Password))
+            {
+                return false;
+            }
+
+
+            userToUpdate.Password = _unitOfWork.GetPasswordHasher().HashPassword(request.NewPassword);
+
+            _unitOfWork.GetUserRepository().Update(userToUpdate);
+            await _unitOfWork.Save();
+
+            return true;
+        }
+        public async Task<bool> BlockUser(UserDto user)
+        {
+            var userToUpdate = await _unitOfWork.GetUserRepository().GetByIdAsync(user.Id);
+            if (userToUpdate == null)
+            {
+                return false; // User not found
+            }
+
+            userToUpdate.AccountStatus = AccountStatus.Blocked;
+
+            _unitOfWork.GetUserRepository().Update(userToUpdate);
+            await _unitOfWork.Save();
+
+            return true;
+        }
         private void SetRefreshTokenCookie(string refreshToken)
         {
             var response = _httpContextAccessor.HttpContext.Response;

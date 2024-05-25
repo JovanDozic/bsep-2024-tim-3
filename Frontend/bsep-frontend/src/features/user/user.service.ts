@@ -39,6 +39,13 @@ export class UserService {
     private tokenStorage: TokenStorage
   ) {}
 
+  changePassword(userId: number, oldPassword: string, newPassword: string): Observable<boolean> {
+    const requestData = { userId, oldPassword, newPassword };
+    return this.http.post<boolean>(
+      `${environment.apiHost}authentication/changePassword`,
+      requestData
+    );
+  }
   getUserById(userId: number): Observable<User> {
     return this.http.get<User>(
       environment.apiHost + 'authentication/getUser/' + userId
@@ -50,9 +57,22 @@ export class UserService {
     );
   }
 
+  getUnblocked(): Observable<User[]> {
+    return this.http.get<User[]>(
+      environment.apiHost + 'authentication/getUnblocked'
+    );
+  }
+
   updateUser(user: User): Observable<boolean> {
     return this.http.post<boolean>(
       `${environment.apiHost}authentication/updateUser`,
+      user
+    );
+  }
+
+  blockUser(user: User): Observable<boolean> {
+    return this.http.post<boolean>(
+      `${environment.apiHost}authentication/blockUser`,
       user
     );
   }

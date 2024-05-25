@@ -53,7 +53,6 @@ const routes: Routes = [
   {
     path: 'client-profile',
     component: ClientProfileComponent,
-    canActivate: [ClientGuard],
   },
   {
     path: 'registration-requests',

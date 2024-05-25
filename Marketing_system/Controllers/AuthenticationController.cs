@@ -93,7 +93,7 @@ public class AuthenticationController : Controller
     }
 
     [HttpGet("getUser/{id:int}")]
-    [Authorize]
+    //[Authorize]
     public async Task<ActionResult<UserDto>> GetUser(int id)
     {
         var user = await _authenticationService.GetUserById(id);
@@ -104,18 +104,50 @@ public class AuthenticationController : Controller
     }
 
     [HttpGet("getAllUsers")]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
     {
         var users = await _authenticationService.GetAllUsers();
         return Ok(users);
     }
 
+    [HttpGet("getUnblocked")]
+    //[Authorize(Roles = "Admin")]
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetUnblocked()
+    {
+        var users = await _authenticationService.GetUnblocked();
+        return Ok(users);
+    }
+
     [HttpPost("updateUser")]
-    [Authorize]
+    //[Authorize]
     public async Task<ActionResult<bool>> UpdateUser([FromBody] UserDto user)
     {
         var isUpdated = await _authenticationService.UpdateUser(user);
+        if (isUpdated)
+        {
+            return Ok(isUpdated);
+        }
+        return NotFound(); // Return appropriate status code if user not found
+    }
+
+    [HttpPost("changePassword")]
+    //[Authorize]
+    public async Task<ActionResult<bool>> ChangePassword([FromBody] ChangePasswordRequestDto requestData)
+    {
+        var isChanged = await _authenticationService.ChangePassword(requestData);
+        if (isChanged)
+        {
+            return Ok(isChanged);
+        }
+        return NotFound();
+    }
+
+    [HttpPost("blockUser")]
+    //[Authorize]
+    public async Task<ActionResult<bool>> BlockUser([FromBody] UserDto user)
+    {
+        var isUpdated = await _authenticationService.BlockUser(user);
         if (isUpdated)
         {
             return Ok(isUpdated);
