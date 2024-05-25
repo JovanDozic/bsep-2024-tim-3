@@ -6,6 +6,7 @@ import { Advertisement } from 'src/features/advertisement/model/advertisement.mo
 import { AdvertisementService } from 'src/features/advertisement/advertisement.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TokenStorage } from '../jwt/token.service';
+import { ChangePasswordRequest } from '../model/change-password-request.model';
 
 @Component({
   selector: 'app-employee-profile',
@@ -21,6 +22,8 @@ export class EmployeeProfileComponent implements OnInit {
   showPopup = false;
   addSloganForm: FormGroup;
   updatedAd: Advertisement;
+  showPopupPassword = false;
+  changePasswordForm: FormGroup;
 
   constructor(private formBuilder: FormBuilder,private userService: UserService, private adService: AdvertisementService, private tokenStorage: TokenStorage) { }
 
@@ -37,7 +40,10 @@ export class EmployeeProfileComponent implements OnInit {
       }
     );
     this.loadAdvertisements();
-
+    this.changePasswordForm = this.formBuilder.group({
+      currentPassword: ['', [Validators.required]],
+      newPassword: ['', [Validators.required]]
+    });
     this.addSloganForm = this.formBuilder.group({
       slogan: ['', Validators.required]
     })
@@ -99,5 +105,52 @@ export class EmployeeProfileComponent implements OnInit {
         }
     );
 }
+openPopupPassword(): void {
+  this.showPopupPassword = true;
+}
+changePassword() {
+  if (this.changePasswordForm.valid) {
+    const changePasswordRequest: ChangePasswordRequest = {
+      userId: this.tokenStorage.getUserId(),
+      oldPassword: this.changePasswordForm.value.currentPassword,
+      newPassword: this.changePasswordForm.value.newPassword
+    };
 
+    this.userService.changePassword(changePasswordRequest).subscribe(
+      (response: boolean) => { 
+        if(response) {
+        console.log("Password changed successfully");
+      } else {
+        console.error("Failed to change password");
+      }
+      this.showPopupPassword = false;
+    },
+    error => {
+      console.error("Error changing password:", error);
+      this.showPopupPassword = false;
+    }
+    );
+  } else {
+    console.log("Form is invalid");
+  }
+}
+
+togglePasswordVisibility(fieldId: string): void {
+  const passwordField = document.getElementById(fieldId) as HTMLInputElement;
+  if (passwordField.type === 'password') {
+      passwordField.type = 'text'; // Show password
+      // Update button text to "Hide"
+      const button = document.querySelector(`button[data-field="${fieldId}"]`) as HTMLButtonElement;
+      if (button) {
+          button.innerText = 'Hide';
+      }
+  } else {
+      passwordField.type = 'password'; // Hide password
+      // Update button text to "Show"
+      const button = document.querySelector(`button[data-field="${fieldId}"]`) as HTMLButtonElement;
+      if (button) {
+          button.innerText = 'Show';
+      }
+  }
+}
 }
