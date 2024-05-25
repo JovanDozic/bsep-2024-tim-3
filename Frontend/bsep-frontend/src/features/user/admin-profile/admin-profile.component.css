@@ -161,3 +161,19 @@ cursor: pointer;
 .popup button:hover {
 background-color: #0056b3; /* Darker blue on hover */
 }
+
+.password-field {
+  display: flex; /* Align input field and button horizontally */
+  align-items: center; /* Align items vertically */
+  gap: 10px; /* Add space between input field and button */
+}
+
+.password-field input[type="password"] {
+  width: 150px; /* Set a fixed width for the input field */
+}
+
+.password-field button {
+  background-color: transparent; /* Remove button background color */
+  border: none; /* Remove button border */
+  cursor: pointer; /* Change cursor to pointer */
+}

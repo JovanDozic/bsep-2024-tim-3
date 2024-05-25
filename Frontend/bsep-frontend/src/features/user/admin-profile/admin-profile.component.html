@@ -2,6 +2,13 @@
   <h2>ADMIN PROFILE</h2>
   <hr style="border-top: 2px solid black;"> <!-- Black line -->
   <div class="register-section">
+    <label for="firstname" class="register-text" >To change your password click here</label>
+    <div class="register-button">
+    <button (click)="openPopupPassword()">CHANGE PASSWORD</button>
+    </div>
+</div>
+  <hr style="border-top: 2px solid black;"> <!-- Black line -->
+  <div class="register-section">
     <label for="firstname" class="register-text" >To register new admin or employee click here </label>
     <div class="register-button">
     <button (click)="openPopup()">REGISTER</button>
@@ -53,7 +60,8 @@
                 <p>Name: {{ e.firstname }}</p>
                 <p>Surname: {{ e.lastname }}</p>
                 <p>Email: {{ e.email }}</p>
-            </div>
+                <button class="btn btn-danger" (click)="blockUser(e)">BLOCK</button>
+              </div>
         </div>
     </div>
     <hr style="border-top: 2px solid black;"> <!-- Black line -->
@@ -64,6 +72,7 @@
               <p>Name: {{ c.firstname }}</p>
               <p>Surname: {{ c.lastname }}</p>
               <p>Email: {{ c.email }}</p>
+              <button class="btn btn-danger" (click)="blockUser(c)">BLOCK</button>
             </div>
         </div>
     </div>
@@ -111,4 +120,31 @@
       <button type="submit" class="btn btn-primary rounded-pill btn-lg">Submit</button>
   </form>
 </div>
+</div>
+
+
+
+<div class="popup-container" *ngIf="showPopupPassword">
+  <div class="popup">
+      <h2>Change password</h2>
+      <form [formGroup]="changePasswordForm" (ngSubmit)="changePassword()">
+        <div class="form-group">
+            <label for="currentPassword">Enter current password:</label>
+            <div class="password-field">
+                <input type="password" formControlName="currentPassword" id="currentPassword" required>
+                <!-- Button to toggle password visibility -->
+                <button type="button" data-field="currentPassword" (click)="togglePasswordVisibility('currentPassword')">Show</button>
+            </div>
+        </div>
+        <div class="form-group">
+          <label for="newPassword">Enter new password:</label>
+          <div class="password-field">
+              <input type="password" formControlName="newPassword" id="newPassword" required>
+              <!-- Button to toggle password visibility -->
+              <button type="button" data-field="newPassword" (click)="togglePasswordVisibility('newPassword')">Show</button>
+          </div>
+      </div>
+        <button type="submit" class="btn btn-primary rounded-pill btn-lg">Submit</button>
+    </form>
+  </div>
 </div>

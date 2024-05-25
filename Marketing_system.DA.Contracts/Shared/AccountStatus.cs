@@ -4,6 +4,7 @@
     {
         Requested,
         Active,
-        Declined
+        Declined,
+        Blocked
     }
 }

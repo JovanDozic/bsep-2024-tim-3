@@ -21,5 +21,9 @@ namespace Marketing_system.BL.Contracts.IService
         public Task<bool> RejectRegisterRequestAsync(int requestId, string reason);
         public Task<IEnumerable<RegistrationRequestDto>> GetAllRegistrationRequestsAsync();
         public Task<bool> DeleteDataAsync(long id);
+        Task<bool> BlockUser(UserDto user);
+        Task<IEnumerable<UserDto>> GetUnblocked();
+        Task<bool> ChangePassword(ChangePasswordRequestDto request);
+
     }
 }
