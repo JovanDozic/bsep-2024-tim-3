@@ -45,4 +45,17 @@ export class NavbarComponent implements OnInit {
   logs(): void {
     this.router.navigate(['/logs']);
   }
+
+  rateLimiterTest(packageType: string, quantity: number) : void {
+    for(var i = 0; i < quantity; ++i) {
+      this.service.testRateLimiter(packageType).subscribe(
+        (data) => {
+          console.log("Request OK")
+        },
+        (error) => {
+          alert('Limit achieved!')
+        }
+      )
+    }
+  }
 }

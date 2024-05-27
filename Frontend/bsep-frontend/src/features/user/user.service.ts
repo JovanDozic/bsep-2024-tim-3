@@ -358,6 +358,23 @@ export class UserService {
     );
   }
 
+  testRateLimiter(type: string) : Observable<any> {
+    return this.http.get<any>(`${environment.apiHost}authentication/basic`)
+    .pipe(
+      tap(
+        (response) => {
+          if (response) {
+            return response
+          }
+        },
+        (error) => {
+          console.error('Limit achieved!', error);
+          return error;
+        }
+      )
+    );
+  }
+
   approveRegistrationRequest(
     update: RegistrationRequestUpdate
   ): Observable<any> {

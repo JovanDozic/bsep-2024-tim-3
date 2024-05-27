@@ -4,17 +4,31 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
-namespace Marketing_system.Controllers
-{
-    [Route("api/advertisements")]
-    public class AdvertisementController : Controller
-    {
-        private readonly IAdvertisementService _advertisementService;
+namespace Marketing_system.Controllers;
 
-        public AdvertisementController(IAdvertisementService advertisementService)
-        {
-            _advertisementService = advertisementService;
-        }
+[Route("api/advertisements")]
+public class AdvertisementController : Controller
+{
+    private readonly IAdvertisementService _advertisementService;
+    public AdvertisementController(IAdvertisementService advertisementService)
+    {
+        _advertisementService = advertisementService;
+    }
+    [HttpGet("basic")]
+    public async Task<ActionResult<bool>> AdClickSimulationBasic()
+    {
+        return Ok(true);
+    }
+    [HttpGet("standard")]
+    public async Task<ActionResult<bool>> AdClickSimulationStandard()
+    {
+        return Ok(true);
+    }
+    [HttpGet("gold")]
+    public async Task<ActionResult<bool>> AdClickSimulationGold()
+    {
+        return Ok(true);
+    }
 
         [HttpPost("create")]
         [Authorize(Roles = "Client")]
