@@ -15,22 +15,49 @@ public class AuthenticationController : Controller
 
     [HttpPost("register")]
     [AllowAnonymous]
-    public async Task<ActionResult<bool>> RegisterUser([FromBody] UserDto user)
+    public async Task<ActionResult<RegistrationResponseDto>> RegisterUser([FromBody] UserDto user)
     {
-        bool isRegistered;
+        // Specification states: `Potrebno je mogućiti dvofaktorsku prijavu na sistem, gde bi se od klijenta pored lozinke zahtevalo još nešto što “klijent zna ili poseduje.`
+
+        RegistrationResponseDto response;
         if (user.Role == 0)
         {
-            isRegistered = await _authenticationService.RegisterUser(user);
+            response = await _authenticationService.RegisterUser(user);
         }
         else
         {
-            isRegistered = await _authenticationService.RegisterAdminOrEmployee(user);
+            var isRegistered = await _authenticationService.RegisterAdminOrEmployee(user);
+            response = new RegistrationResponseDto()
+            {
+                IsSuccess = isRegistered
+            };
         }
 
-        if (isRegistered) await _authenticationService.CreateRegistrationRequestAsync(user);
+        if (response.IsSuccess)
+        {
+            // TODO: Uncomment this:
+            // await _authenticationService.CreateRegistrationRequestAsync(user);
+            return Ok(response);
+        }
 
-        return isRegistered ? Ok(isRegistered) : BadRequest(!isRegistered);
+        return BadRequest(response);
     }
+
+    [HttpPost("register/verify2fa")]
+    [AllowAnonymous]
+    public async Task<ActionResult<RegistrationResponseDto>> RegisterVerify2fa([FromBody] Verify2faDto verifyDto)
+    {
+        var isSuccess = await _authenticationService.RegisterVerify2fa(verifyDto);
+        if (isSuccess)
+        {
+            return Ok(isSuccess);
+        }
+        return BadRequest("Two factor code is not correct.");
+    }
+
+
+
+
 
     [HttpPost("login")]
     [AllowAnonymous]
@@ -40,6 +67,17 @@ public class AuthenticationController : Controller
         if (token == null)
             return BadRequest(token);
         return Ok(token);
+    }
+
+    [HttpPost("login/verify2fa")]
+    [AllowAnonymous]
+    public async Task<ActionResult<TokensDto>> VerifyLogin()
+    {
+        throw new NotImplementedException();
+        //var token = await _authenticationService.VerifyLogin(verifyLoginDto);
+        //if (token == null)
+        //    return BadRequest(token);
+        //return Ok(token);
     }
 
     [HttpPost("updateAccess")]
@@ -128,7 +166,7 @@ public class AuthenticationController : Controller
         {
             return Ok(isUpdated);
         }
-        return NotFound(); // Return appropriate status code if user not found
+        return NotFound();
     }
 
     [HttpPost("changePassword")]
