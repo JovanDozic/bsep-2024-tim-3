@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable, switchMap, tap, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from 'src/app/env/environment';
-import { Login } from './model/login.model';
+import { Credentials } from './model/login.model';
 import { AuthenticationResponse } from './model/authentication-response.model';
 import { TokenStorage } from './jwt/token.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
@@ -13,6 +13,7 @@ import { RegistrationRequest } from './model/registration-request.model';
 import { RegistrationRequestUpdate } from './model/registration-request-update.model';
 import { RegistrationResponse } from './model/registration-response.model';
 import { Verify2faRequest } from './model/verify-2fa.model';
+import { Tokens } from './model/tokens.model';
 
 @Injectable({
   providedIn: 'root',
@@ -146,7 +147,7 @@ export class UserService {
       );
   }
 
-  login(login: Login): Observable<any> {
+  login_old(login: Credentials): Observable<any> {
     return this.http
       .post<AuthenticationResponse>(
         environment.apiHost + 'authentication/login',
@@ -171,6 +172,62 @@ export class UserService {
         )
       );
   }
+
+  login(credentials: Credentials): Observable<Tokens> {
+    return this.http
+      .post<Tokens>(environment.apiHost + 'authentication/login', credentials)
+      .pipe(
+        tap(
+          (tokens: Tokens) => {
+            if (tokens && !tokens.isTwoFactorEnabled) {
+              this.tokenStorage.saveAccessToken({
+                accessToken: tokens.accessToken,
+                id: tokens.id,
+              });
+              this.tokenStorage.saveRefreshToken(tokens.refreshToken);
+              this.setUser(tokens.refreshToken);
+              this.router.navigate(['/home']);
+            } else if (tokens && tokens.isTwoFactorEnabled) {
+              const code = prompt('Please enter the verification code:');
+              if (code) {
+                this.http
+                  .post<Tokens>(
+                    environment.apiHost + 'authentication/login/verify2fa',
+                    { code, userId: tokens.id, tempToken: tokens.tempToken }
+                  )
+                  .subscribe(
+                    (response) => {
+                      if (response) {
+                        this.tokenStorage.saveAccessToken({
+                          accessToken: response.accessToken,
+                          id: response.id,
+                        });
+                        this.tokenStorage.saveRefreshToken(
+                          response.refreshToken
+                        );
+                        alert('Successfully logged in!');
+                        this.setUser(response.refreshToken);
+                        this.router.navigate(['/home']);
+                      }
+                    },
+                    (error) => {
+                      alert('Invalid two factor code.');
+                      console.error('Invalid code:', error);
+                    }
+                  );
+              } else {
+                alert('You must enter the code to login. Try again.');
+              }
+            }
+          },
+          (error) => {
+            alert('Invalid credentials or account not activated.');
+            console.error('Login failed:', error);
+          }
+        )
+      );
+  }
+
   getRefreshTokenFromCookie(): string | null {
     const cookie = document.cookie;
     const cookies = cookie.split('; ');
@@ -230,7 +287,7 @@ export class UserService {
     this.tokenStorage.saveRefreshToken(null);
   }
 
-  sendPasswordlessLink(login: Login): Observable<any> {
+  sendPasswordlessLink(login: Credentials): Observable<any> {
     login.password = '';
     return this.http.post<any>(
       environment.apiHost + 'authentication/requestPasswordlessLogin',

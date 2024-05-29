@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../user.service';
-import { Login } from '../model/login.model';
+import { Credentials } from '../model/login.model';
 
 @Component({
   selector: 'app-login',
@@ -24,7 +24,7 @@ export class LoginComponent {
   }
 
   login(): void {
-    const login: Login = {
+    const login: Credentials = {
       username: this.loginForm.value.username || '',
       password: this.loginForm.value.password || '',
     };
