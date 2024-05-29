@@ -15,6 +15,7 @@ import { RegistrationResponse } from './model/registration-response.model';
 import { Verify2faRequest } from './model/verify-2fa.model';
 import { Tokens } from './model/tokens.model';
 import { ChangePasswordRequest } from './model/change-password-request.model';
+import { ResetPassword } from './model/resetPassword.model';
 
 @Injectable({
   providedIn: 'root',
@@ -61,6 +62,13 @@ export class UserService {
     );
   }
 
+  requestPasswordReset(email: string) : Observable<boolean> {
+    return this.http.post<boolean>(
+      `${environment.apiHost}authentication/requestPasswordReset`,
+      email
+    );
+  }
+
   getUnblocked(): Observable<User[]> {
     return this.http.get<User[]>(
       environment.apiHost + 'authentication/getUnblocked'
@@ -81,16 +89,14 @@ export class UserService {
     );
   }
 
-  updateAccessToken(
-    accessToken: string,
-    refreshToken: string,
-    userId: number
-  ): Observable<string | null> {
-    return this.http
-      .post<boolean>(`${environment.apiHost}authentication/validateRefresh`, {
-        userId,
-        refreshToken,
-      })
+  resetPassword(resetPassword: ResetPassword): Observable<boolean> {
+    return this.http.post<boolean>(
+      `${environment.apiHost}authentication/resetPassword`,
+      resetPassword
+    );
+  }
+  updateAccessToken(accessToken: string, refreshToken: string, userId: number): Observable<string | null> {
+    return this.http.post<boolean>(`${environment.apiHost}authentication/validateRefresh`, { userId, refreshToken })
       .pipe(
         switchMap((refreshValid: boolean) => {
           if (refreshValid) {
