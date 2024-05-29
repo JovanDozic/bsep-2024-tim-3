@@ -1,4 +1,5 @@
-﻿using Marketing_system.BL.Contracts.DTO;
+﻿using Google.Authenticator;
+using Marketing_system.BL.Contracts.DTO;
 using Marketing_system.BL.Contracts.IService;
 using Marketing_system.DA.Contracts;
 using Marketing_system.DA.Contracts.IRepository;
@@ -20,68 +21,181 @@ namespace Marketing_system.BL.Service
         private readonly SMTPConfig _smtpConfig;
         private readonly IEmailHandler _emailHandler;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ITempTokenManagerService _tempTokens;
 
-        public AuthenticationService(IUnitOfWork unitOfWork, IOptions<HMACConfig> hmacConfig, IOptions<SMTPConfig> smtpConfig, IEmailHandler emailHandler, IHttpContextAccessor httpContextAccessor)
+        public AuthenticationService(IUnitOfWork unitOfWork, IOptions<HMACConfig> hmacConfig, IOptions<SMTPConfig> smtpConfig, IEmailHandler emailHandler, IHttpContextAccessor httpContextAccessor, ITempTokenManagerService tempTokens)
         {
             _unitOfWork = unitOfWork;
             _hmacConfig = hmacConfig.Value;
             _smtpConfig = smtpConfig.Value;
             _emailHandler = emailHandler;
             _httpContextAccessor = httpContextAccessor;
+            _tempTokens = tempTokens;
         }
 
         public async Task<TokensDto?> Login(string email, string password)
         {
             var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(email);
-            if (user != null)
-            {
-                if (user.AccountStatus != AccountStatus.Active) return null;
 
-                var hashedPassword = _unitOfWork.GetUserRepository().GetPasswordByEmail(email);
-                if (_unitOfWork.GetPasswordHasher().VerifyPassword(password, hashedPassword))
-                {
-                    var tokens = await _unitOfWork.GetTokenGeneratorRepository().GenerateTokens(user);
-                    SetRefreshTokenCookie(tokens.RefreshToken);
-                    return tokens;
-                }
+            if (user is null ||
+                user.AccountStatus != AccountStatus.Active ||
+                !_unitOfWork.GetPasswordHasher().VerifyPassword(password, user.Password))
+            {
+                return null;
             }
+
+            if (!user.IsTwoFactorEnabled)
+            {
+                var tokens = await _unitOfWork.GetTokenGeneratorRepository().GenerateTokens(user);
+                SetRefreshTokenCookie(tokens.RefreshToken);
+                return tokens;
+            }
+
+            var response = new TokensDto
+            {
+                Id = user.Id,
+                AccessToken = string.Empty,
+                RefreshToken = string.Empty,
+                IsTwoFactorEnabled = true,
+                TempToken = _unitOfWork.GetTokenGeneratorRepository().GenerateTempToken(user.Email)
+            };
+
+            _tempTokens.AddToken(response.TempToken, user.Email);
+
+            return response;
+        }
+
+        public async Task<TokensDto?> LoginVerify2fa(Verify2faDto verifyDto)
+        {
+            if (string.IsNullOrEmpty(verifyDto.TempToken) || string.IsNullOrEmpty(verifyDto.Code))
+            {
+                return null;
+            }
+
+            if (!_tempTokens.TryGetEmail(verifyDto.TempToken, out string? email) || email is null)
+            {
+                return null;
+            }
+
+            var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(email);
+            if (user is null) return null;
+
+            TwoFactorAuthenticator tfa = new();
+            if (tfa.ValidateTwoFactorPIN(user.TwoFactorSecret, verifyDto.Code, true))
+            {
+                var tokens = await _unitOfWork.GetTokenGeneratorRepository().GenerateTokens(user);
+                SetRefreshTokenCookie(tokens.RefreshToken);
+                _tempTokens.RemoveTokenByEmail(email);
+                return tokens;
+            }
+
             return null;
         }
 
-        public async Task<bool> RegisterUser(UserDto userDto)
+
+
+
+
+        public async Task<RegistrationResponseDto> RegisterUser(UserDto userDto)
         {
-            var userdb = await _unitOfWork.GetUserRepository().GetByEmailAsync(userDto.Email);
-            if (userdb != null)
+            // Check if there is a user with the same email in the database.
+            var userDb = await _unitOfWork.GetUserRepository().GetByEmailAsync(userDto.Email);
+            if (userDb != null)
             {
-                return false;
+                return new() { IsSuccess = false, Message = "User with provided email already exists." };
             }
-            /*
+
+            // Check if there is a pending registration request for the same email.
             var registrationRequests = _unitOfWork.GetRegistrationRequestRepository().GetAllByEmailAsync(userDto.Email);
             if (registrationRequests.Any(req => req.Status == DA.Contracts.Model.RegistrationRequestStatus.Pending))
             {
                 // If there is a pending registration request for the same email, return false
-                return false;
+                return new() { IsSuccess = false, Message = "Account with provided email already has a pending registration request." };
             }
-            else if (registrationRequests.Where(req => req.Status == DA.Contracts.Model.RegistrationRequestStatus.Rejected).Any(req => req.RegistrationDate >= DateTime.UtcNow.AddHours(-24)))
+            else if (registrationRequests.Where(req => req.Status == DA.Contracts.Model.RegistrationRequestStatus.Rejected)
+                                         .Any(req => req.RegistrationDate >= DateTime.UtcNow.AddHours(-24)))
             {
                 // If there is a rejected registration request for the same email in the last 24 hours, return false
-                return false;
-            }*/
-
-            var password = _unitOfWork.GetPasswordHasher().HashPassword(userDto.Password);
-
-            if ((ClientType)userDto.ClientType == ClientType.Individual)
-            {
-                await _unitOfWork.GetUserRepository().Add(new User(userDto.Email, password, userDto.Firstname, userDto.Lastname, userDto.Address, userDto.City, userDto.Country, userDto.Phone, (UserRole)userDto.Role, ClientType.Individual, (PackageType)userDto.PackageType, AccountStatus.Requested, null, null));
-            }
-            else
-            {
-                await _unitOfWork.GetUserRepository().Add(new User(userDto.Email, password, null, null, userDto.Address, userDto.City, userDto.Country, userDto.Phone, (UserRole)userDto.Role, (ClientType)userDto.ClientType, (PackageType)userDto.PackageType, AccountStatus.Requested, userDto.CompanyName, userDto.TaxId));
+                return new() { IsSuccess = false, Message = "Account with provided email was recently rejected. Please try again soon." };
             }
 
+            var user = new User // Mili zasto nismo mapper koristili?
+            {
+                Email = userDto.Email,
+                Password = _unitOfWork.GetPasswordHasher().HashPassword(userDto.Password),
+                Firstname = ((ClientType)userDto.ClientType == ClientType.Legal_entity) ? null : userDto.Firstname,
+                Lastname = ((ClientType)userDto.ClientType == ClientType.Legal_entity) ? null : userDto.Lastname,
+                Address = userDto.Address,
+                City = userDto.City,
+                Country = userDto.Country,
+                Phone = userDto.Phone,
+                Role = (UserRole)userDto.Role,
+                ClientType = (ClientType)userDto.ClientType,
+                PackageType = (PackageType)userDto.PackageType,
+                AccountStatus = AccountStatus.Requested,
+                CompanyName = ((ClientType)userDto.ClientType == ClientType.Individual) ? null : userDto.CompanyName,
+                TaxId = ((ClientType)userDto.ClientType == ClientType.Individual) ? null : userDto.TaxId,
+                IsTwoFactorEnabled = userDto.IsTwoFactorEnabled,
+            };
+
+            // 2FA setup
+            string? qrCode = null;
+            if (user.IsTwoFactorEnabled)
+            {
+                TwoFactorAuthenticator tfa = new();
+                user.TwoFactorSecret = SecretGenerator.GenerateSecretKey();
+                user.IsTwoFactorReady = false;
+
+                var setupInfo = tfa.GenerateSetupCode(
+                    "Marketing System",
+                    user.Email,
+                    user.TwoFactorSecret,
+                    true,
+                    3);
+
+                qrCode = setupInfo.QrCodeSetupImageUrl;
+            }
+
+            await _unitOfWork.GetUserRepository().Add(user);
             await _unitOfWork.Save();
-            return true;
+
+            return new()
+            {
+                Email = user.Email,
+                IsSuccess = true,
+                IsTwoFactorEnabled = user.IsTwoFactorEnabled,
+                TwoFactorQrCode = qrCode
+            };
         }
+
+
+
+        public async Task<bool> RegisterVerify2fa(Verify2faDto verifyDto)
+        {
+            if (verifyDto.Email is null) return false;
+
+            var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(verifyDto.Email);
+            if (user is null) return false;
+
+            TwoFactorAuthenticator tfa = new();
+            if (tfa.ValidateTwoFactorPIN(user.TwoFactorSecret, verifyDto.Code, true))
+            {
+                user.IsTwoFactorReady = true;
+                _unitOfWork.GetUserRepository().Update(user);
+                await _unitOfWork.Save();
+                return true;
+            }
+
+            return false;
+        }
+
+
+
+
+
+
+
+
 
         public async Task<bool> RegisterAdminOrEmployee(UserDto userDto)
         {

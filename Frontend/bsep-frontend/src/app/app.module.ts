@@ -8,6 +8,7 @@ import { UserModule } from 'src/features/user/user.module';
 import { LayoutModule } from 'src/features/layout/layout.module';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { JwtInterceptor } from 'src/features/user/jwt/jwt.interceptor';
+import { RecaptchaModule } from 'ng-recaptcha';
 
 @NgModule({
   declarations: [AppComponent],
@@ -18,11 +19,11 @@ import { JwtInterceptor } from 'src/features/user/jwt/jwt.interceptor';
     UserModule,
     AppRoutingModule,
     HttpClientModule,
+    RecaptchaModule,
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true } // Opciono, možete registrovati interceptor kao HTTP_INTERCEPTOR
-  
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }, // Opciono, možete registrovati interceptor kao HTTP_INTERCEPTOR
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {}

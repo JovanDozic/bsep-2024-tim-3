@@ -13,4 +13,5 @@ export interface User {
   packageType: number;
   clientType: number;
   role: number; // Change type to number
+  isTwoFactorEnabled?: boolean;
 }

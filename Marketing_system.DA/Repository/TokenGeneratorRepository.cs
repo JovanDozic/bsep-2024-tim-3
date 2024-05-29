@@ -111,6 +111,26 @@ namespace Marketing_system.DA.Repository
             return Convert.ToBase64String(keyBytes);
         }
 
+        // Used for generating temporary token that validate user while Two factor authentication.
+        public string GenerateTempToken(string email)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Convert.FromBase64String("BLEEna7sSymrSkmlHU2ceApML6q7aFmIEDcXjvYzXW4=");
+            var securityKey = new SymmetricSecurityKey(key);
 
+            var claims = new List<Claim>
+            {
+                new("email", email)
+            };
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(5),
+                SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
     }
 }

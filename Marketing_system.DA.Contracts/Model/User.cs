@@ -1,5 +1,4 @@
 ﻿using Marketing_system.DA.Contracts.Shared;
-using Microsoft.AspNetCore.Identity;
 
 namespace Marketing_system.DA.Contracts.Model
 {
@@ -19,6 +18,15 @@ namespace Marketing_system.DA.Contracts.Model
         public ClientType? ClientType { get; set; }
         public PackageType? PackageType { get; set; }
         public AccountStatus AccountStatus { get; set; }
+        public bool IsTwoFactorEnabled { get; set; } = false;
+        public string? TwoFactorSecret { get; set; }
+        public bool IsTwoFactorReady { get; set; } = false;
+
+        public User()
+        {
+
+        }
+
         public User(string email, string password, string firstname, string lastname, string address, string city, string country, string phone, UserRole role, ClientType? clientType, PackageType? packageType, AccountStatus accountStatus, string? companyName, string? taxId)
         {
             Email = email;
@@ -36,7 +44,6 @@ namespace Marketing_system.DA.Contracts.Model
             CompanyName = companyName;
             TaxId = taxId;
         }
-
 
         public string GetPrimaryRoleName()
         {

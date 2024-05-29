@@ -4,13 +4,16 @@ import { BehaviorSubject, Observable, switchMap, tap, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from 'src/app/env/environment';
-import { Login } from './model/login.model';
+import { Credentials } from './model/login.model';
 import { AuthenticationResponse } from './model/authentication-response.model';
 import { TokenStorage } from './jwt/token.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { EmailTokenRequest } from './model/passwordless-token-request.model';
 import { RegistrationRequest } from './model/registration-request.model';
 import { RegistrationRequestUpdate } from './model/registration-request-update.model';
+import { RegistrationResponse } from './model/registration-response.model';
+import { Verify2faRequest } from './model/verify-2fa.model';
+import { Tokens } from './model/tokens.model';
 
 @Injectable({
   providedIn: 'root',
@@ -31,6 +34,7 @@ export class UserService {
     packageType: 0,
     clientType: 0,
     role: 0,
+    isTwoFactorEnabled: false,
   });
 
   constructor(
@@ -39,7 +43,11 @@ export class UserService {
     private tokenStorage: TokenStorage
   ) {}
 
-  changePassword(userId: number, oldPassword: string, newPassword: string): Observable<boolean> {
+  changePassword(
+    userId: number,
+    oldPassword: string,
+    newPassword: string
+  ): Observable<boolean> {
     const requestData = { userId, oldPassword, newPassword };
     return this.http.post<boolean>(
       `${environment.apiHost}authentication/changePassword`,
@@ -77,45 +85,69 @@ export class UserService {
     );
   }
 
-  updateAccessToken(accessToken: string, refreshToken: string, userId: number): Observable<string | null> {
-    return this.http.post<boolean>(`${environment.apiHost}authentication/validateRefresh`, { userId, refreshToken })
+  updateAccessToken(
+    accessToken: string,
+    refreshToken: string,
+    userId: number
+  ): Observable<string | null> {
+    return this.http
+      .post<boolean>(`${environment.apiHost}authentication/validateRefresh`, {
+        userId,
+        refreshToken,
+      })
       .pipe(
         switchMap((refreshValid: boolean) => {
           if (refreshValid) {
-            return this.http.post<boolean>(`${environment.apiHost}authentication/validateAccess`, accessToken);
+            return this.http.post<boolean>(
+              `${environment.apiHost}authentication/validateAccess`,
+              accessToken
+            );
           } else {
             return of(false);
           }
         }),
         switchMap((accessValid: boolean) => {
           if (accessValid) {
-            return this.http.post<string>(`${environment.apiHost}authentication/updateAccess`, userId);
+            return this.http.post<string>(
+              `${environment.apiHost}authentication/updateAccess`,
+              userId
+            );
           } else {
             return of(null);
           }
         })
       );
   }
-  register(user: User): Observable<boolean> {
-    return this.http.post<boolean>(environment.apiHost + 'authentication/register', user)
+
+  register(user: User): Observable<RegistrationResponse> {
+    return this.http.post<RegistrationResponse>(
+      environment.apiHost + 'authentication/register',
+      user
+    );
+  }
+
+  registerVerify2fa(verify2faRequest: Verify2faRequest): Observable<boolean> {
+    return this.http.post<boolean>(
+      environment.apiHost + 'authentication/register/verify2fa',
+      verify2faRequest
+    );
   }
 
   deleteData(id: number): Observable<boolean> {
-    return this.http.delete<boolean>(`${environment.apiHost}authentication/delete-data/${id}`)
+    return this.http
+      .delete<boolean>(`${environment.apiHost}authentication/delete-data/${id}`)
       .pipe(
-        tap(
-          (response: boolean) => {
-            if (response) {
-              console.log('User data deleted successfully');
-            } else {
-              console.log('Failed to delete user data');
-            }
+        tap((response: boolean) => {
+          if (response) {
+            console.log('User data deleted successfully');
+          } else {
+            console.log('Failed to delete user data');
           }
-        )
+        })
       );
   }
 
-  login(login: Login): Observable<any> {
+  login_old(login: Credentials): Observable<any> {
     return this.http
       .post<AuthenticationResponse>(
         environment.apiHost + 'authentication/login',
@@ -126,10 +158,10 @@ export class UserService {
         tap(
           (authenticationResponse: any) => {
             this.tokenStorage.saveAccessToken(authenticationResponse.body);
-  
+
             const refreshToken = authenticationResponse.body.refreshToken;
             this.tokenStorage.saveRefreshToken(refreshToken);
-  
+
             this.setUser(refreshToken);
             this.router.navigate(['/home']);
           },
@@ -140,6 +172,62 @@ export class UserService {
         )
       );
   }
+
+  login(credentials: Credentials): Observable<Tokens> {
+    return this.http
+      .post<Tokens>(environment.apiHost + 'authentication/login', credentials)
+      .pipe(
+        tap(
+          (tokens: Tokens) => {
+            if (tokens && !tokens.isTwoFactorEnabled) {
+              this.tokenStorage.saveAccessToken({
+                accessToken: tokens.accessToken,
+                id: tokens.id,
+              });
+              this.tokenStorage.saveRefreshToken(tokens.refreshToken);
+              this.setUser(tokens.refreshToken);
+              this.router.navigate(['/home']);
+            } else if (tokens && tokens.isTwoFactorEnabled) {
+              const code = prompt('Please enter the verification code:');
+              if (code) {
+                this.http
+                  .post<Tokens>(
+                    environment.apiHost + 'authentication/login/verify2fa',
+                    { code, userId: tokens.id, tempToken: tokens.tempToken }
+                  )
+                  .subscribe(
+                    (response) => {
+                      if (response) {
+                        this.tokenStorage.saveAccessToken({
+                          accessToken: response.accessToken,
+                          id: response.id,
+                        });
+                        this.tokenStorage.saveRefreshToken(
+                          response.refreshToken
+                        );
+                        alert('Successfully logged in!');
+                        this.setUser(response.refreshToken);
+                        this.router.navigate(['/home']);
+                      }
+                    },
+                    (error) => {
+                      alert('Invalid two factor code.');
+                      console.error('Invalid code:', error);
+                    }
+                  );
+              } else {
+                alert('You must enter the code to login. Try again.');
+              }
+            }
+          },
+          (error) => {
+            alert('Invalid credentials or account not activated.');
+            console.error('Login failed:', error);
+          }
+        )
+      );
+  }
+
   getRefreshTokenFromCookie(): string | null {
     const cookie = document.cookie;
     const cookies = cookie.split('; ');
@@ -171,6 +259,7 @@ export class UserService {
       packageType: 0,
       clientType: 0,
       role: decodedToken.role,
+      isTwoFactorEnabled: false,
     };
     this.user$.next(user);
   }
@@ -196,9 +285,9 @@ export class UserService {
       });
     });
     this.tokenStorage.saveRefreshToken(null);
-    }
+  }
 
-  sendPasswordlessLink(login: Login): Observable<any> {
+  sendPasswordlessLink(login: Credentials): Observable<any> {
     login.password = '';
     return this.http.post<any>(
       environment.apiHost + 'authentication/requestPasswordlessLogin',
@@ -206,9 +295,7 @@ export class UserService {
     );
   }
 
-  authenticatePasswordlessToken(
-    token: EmailTokenRequest
-  ): Observable<any> {
+  authenticatePasswordlessToken(token: EmailTokenRequest): Observable<any> {
     return this.http
       .post<AuthenticationResponse>(
         environment.apiHost + 'authentication/authenticatePasswordlessLogin',
@@ -219,10 +306,10 @@ export class UserService {
         tap(
           (response) => {
             this.tokenStorage.saveAccessToken(response.body);
-  
+
             const refreshToken = response.body.refreshToken;
             this.tokenStorage.saveRefreshToken(refreshToken);
-  
+
             this.setUser(refreshToken);
             this.router.navigate(['/home']);
           },

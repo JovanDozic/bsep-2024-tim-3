@@ -186,6 +186,7 @@ namespace Marketing_system
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IEmailHandler, EmailHandler>();
             services.AddTransient<IAdvertisementService, AdvertisementService>();
+            services.AddSingleton<ITempTokenManagerService, TempTokenManagerService>();
         }
 
     }

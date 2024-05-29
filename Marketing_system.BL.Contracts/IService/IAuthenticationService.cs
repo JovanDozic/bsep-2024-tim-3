@@ -4,7 +4,7 @@ namespace Marketing_system.BL.Contracts.IService
 {
     public interface IAuthenticationService
     {
-        Task<bool> RegisterUser(UserDto userDto);
+        Task<RegistrationResponseDto> RegisterUser(UserDto userDto);
         Task<TokensDto?> Login(string email, string password);
         Task<string> UpdateAccessToken(int userId);
         Task<bool> ValidateRefreshToken(int userId, string refreshToken);
@@ -24,6 +24,7 @@ namespace Marketing_system.BL.Contracts.IService
         Task<bool> BlockUser(UserDto user);
         Task<IEnumerable<UserDto>> GetUnblocked();
         Task<bool> ChangePassword(ChangePasswordRequestDto request);
-
+        Task<bool> RegisterVerify2fa(Verify2faDto verifyDto);
+        public Task<TokensDto?> LoginVerify2fa(Verify2faDto verifyDto);
     }
 }

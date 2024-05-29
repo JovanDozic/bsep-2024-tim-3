@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../user.service';
-import { Login } from '../model/login.model';
+import { Credentials } from '../model/login.model';
 import { Router } from '@angular/router';
 
 @Component({
@@ -25,7 +25,7 @@ export class LoginPasswordlessComponent implements OnInit {
   ngOnInit(): void {}
 
   sendPasswordlessLink() {
-    const login: Login = {
+    const login: Credentials = {
       username: this.loginForm.value.username,
       password: '',
     };

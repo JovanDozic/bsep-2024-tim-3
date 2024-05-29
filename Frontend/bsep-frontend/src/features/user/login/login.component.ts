@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../user.service';
-import { Login } from '../model/login.model';
+import { Credentials } from '../model/login.model';
 
 @Component({
   selector: 'app-login',
@@ -11,6 +11,7 @@ import { Login } from '../model/login.model';
 })
 export class LoginComponent {
   loginForm: FormGroup;
+  recaptchaToken: string | null = null;
 
   constructor(
     private router: Router,
@@ -20,11 +21,12 @@ export class LoginComponent {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
+      recaptcha: ['', Validators.required],
     });
   }
 
   login(): void {
-    const login: Login = {
+    const login: Credentials = {
       username: this.loginForm.value.username || '',
       password: this.loginForm.value.password || '',
     };
@@ -43,5 +45,10 @@ export class LoginComponent {
 
   passwordless(): void {
     this.router.navigate(['/login-passwordless']);
+  }
+
+  onRecaptchaResolved(token: string): void {
+    this.recaptchaToken = token;
+    this.loginForm.patchValue({ recaptcha: token });
   }
 }
