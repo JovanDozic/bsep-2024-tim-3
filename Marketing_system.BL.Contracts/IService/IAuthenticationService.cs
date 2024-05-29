@@ -25,7 +25,6 @@ namespace Marketing_system.BL.Contracts.IService
         Task<IEnumerable<UserDto>> GetUnblocked();
         Task<bool> ChangePassword(ChangePasswordRequestDto request);
         Task<bool> RegisterVerify2fa(Verify2faDto verifyDto);
-
-
+        public Task<TokensDto?> LoginVerify2fa(Verify2faDto verifyDto);
     }
 }

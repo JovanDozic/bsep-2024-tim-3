@@ -69,15 +69,18 @@ public class AuthenticationController : Controller
         return Ok(token);
     }
 
+
+
+
+
     [HttpPost("login/verify2fa")]
     [AllowAnonymous]
-    public async Task<ActionResult<TokensDto>> VerifyLogin()
+    public async Task<ActionResult<TokensDto>> VerifyLogin([FromBody] Verify2faDto verifyDto)
     {
-        throw new NotImplementedException();
-        //var token = await _authenticationService.VerifyLogin(verifyLoginDto);
-        //if (token == null)
-        //    return BadRequest(token);
-        //return Ok(token);
+        var token = await _authenticationService.LoginVerify2fa(verifyDto);
+        if (token == null)
+            return BadRequest(token);
+        return Ok(token);
     }
 
     [HttpPost("updateAccess")]

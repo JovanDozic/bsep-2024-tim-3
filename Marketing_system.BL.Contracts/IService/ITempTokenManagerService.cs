@@ -2,8 +2,9 @@
 {
     public interface ITempTokenManagerService
     {
-        void AddToken(string token, string username);
-        bool TryGetUsername(string token, out string? username);
+        void AddToken(string token, string email);
+        bool TryGetEmail(string token, out string? email);
         void RemoveToken(string token);
+        public void RemoveTokenByEmail(string email);
     }
 }

@@ -21,33 +21,80 @@ namespace Marketing_system.BL.Service
         private readonly SMTPConfig _smtpConfig;
         private readonly IEmailHandler _emailHandler;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ITempTokenManagerService _tempTokens;
 
-        public AuthenticationService(IUnitOfWork unitOfWork, IOptions<HMACConfig> hmacConfig, IOptions<SMTPConfig> smtpConfig, IEmailHandler emailHandler, IHttpContextAccessor httpContextAccessor)
+        public AuthenticationService(IUnitOfWork unitOfWork, IOptions<HMACConfig> hmacConfig, IOptions<SMTPConfig> smtpConfig, IEmailHandler emailHandler, IHttpContextAccessor httpContextAccessor, ITempTokenManagerService tempTokens)
         {
             _unitOfWork = unitOfWork;
             _hmacConfig = hmacConfig.Value;
             _smtpConfig = smtpConfig.Value;
             _emailHandler = emailHandler;
             _httpContextAccessor = httpContextAccessor;
+            _tempTokens = tempTokens;
         }
 
         public async Task<TokensDto?> Login(string email, string password)
         {
             var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(email);
-            if (user != null)
-            {
-                if (user.AccountStatus != AccountStatus.Active) return null;
 
-                var hashedPassword = _unitOfWork.GetUserRepository().GetPasswordByEmail(email);
-                if (_unitOfWork.GetPasswordHasher().VerifyPassword(password, hashedPassword))
-                {
-                    var tokens = await _unitOfWork.GetTokenGeneratorRepository().GenerateTokens(user);
-                    SetRefreshTokenCookie(tokens.RefreshToken);
-                    return tokens;
-                }
+            if (user is null ||
+                user.AccountStatus != AccountStatus.Active ||
+                !_unitOfWork.GetPasswordHasher().VerifyPassword(password, user.Password))
+            {
+                return null;
             }
+
+            if (!user.IsTwoFactorEnabled)
+            {
+                var tokens = await _unitOfWork.GetTokenGeneratorRepository().GenerateTokens(user);
+                SetRefreshTokenCookie(tokens.RefreshToken);
+                return tokens;
+            }
+
+            var response = new TokensDto
+            {
+                Id = user.Id,
+                AccessToken = string.Empty,
+                RefreshToken = string.Empty,
+                IsTwoFactorEnabled = true,
+                TempToken = _unitOfWork.GetTokenGeneratorRepository().GenerateTempToken(user.Email)
+            };
+
+            _tempTokens.AddToken(response.TempToken, user.Email);
+
+            return response;
+        }
+
+        public async Task<TokensDto?> LoginVerify2fa(Verify2faDto verifyDto)
+        {
+            if (string.IsNullOrEmpty(verifyDto.TempToken) || string.IsNullOrEmpty(verifyDto.Code))
+            {
+                return null;
+            }
+
+            if (!_tempTokens.TryGetEmail(verifyDto.TempToken, out string? email) || email is null)
+            {
+                return null;
+            }
+
+            var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(email);
+            if (user is null) return null;
+
+            TwoFactorAuthenticator tfa = new();
+            if (tfa.ValidateTwoFactorPIN(user.TwoFactorSecret, verifyDto.Code, true))
+            {
+                var tokens = await _unitOfWork.GetTokenGeneratorRepository().GenerateTokens(user);
+                SetRefreshTokenCookie(tokens.RefreshToken);
+                _tempTokens.RemoveTokenByEmail(email);
+                return tokens;
+            }
+
             return null;
         }
+
+
+
+
 
         public async Task<RegistrationResponseDto> RegisterUser(UserDto userDto)
         {

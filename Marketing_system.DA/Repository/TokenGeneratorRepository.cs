@@ -112,15 +112,15 @@ namespace Marketing_system.DA.Repository
         }
 
         // Used for generating temporary token that validate user while Two factor authentication.
-        public string GenerateTempToken(string username)
+        public string GenerateTempToken(string email)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Convert.FromBase64String(_key);
+            var key = Convert.FromBase64String("BLEEna7sSymrSkmlHU2ceApML6q7aFmIEDcXjvYzXW4=");
             var securityKey = new SymmetricSecurityKey(key);
 
             var claims = new List<Claim>
             {
-                new("username", username)
+                new("email", email)
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor

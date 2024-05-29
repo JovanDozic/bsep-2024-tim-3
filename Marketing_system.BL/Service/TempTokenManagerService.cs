@@ -6,13 +6,13 @@ namespace Marketing_system.BL.Service
     {
         private readonly Dictionary<string, string> _temporaryTokens = new();
 
-        public void AddToken(string token, string username)
+        public void AddToken(string token, string email)
         {
-            if (_temporaryTokens.ContainsValue(username))
+            if (_temporaryTokens.ContainsValue(email))
             {
                 RemoveToken(token);
             }
-            _temporaryTokens[token] = username;
+            _temporaryTokens[token] = email;
         }
 
         public void RemoveToken(string token)
@@ -20,9 +20,14 @@ namespace Marketing_system.BL.Service
             _temporaryTokens.Remove(token);
         }
 
-        public bool TryGetUsername(string token, out string? username)
+        public bool TryGetEmail(string token, out string? email)
         {
-            return _temporaryTokens.TryGetValue(token, out username);
+            return _temporaryTokens.TryGetValue(token, out email);
+        }
+
+        public void RemoveTokenByEmail(string email)
+        {
+            _temporaryTokens.Remove(_temporaryTokens.FirstOrDefault(x => x.Value == email).Key);
         }
     }
 }

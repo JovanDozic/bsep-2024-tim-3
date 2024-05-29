@@ -5,6 +5,5 @@
         public string? Email { get; set; }
         public string? TempToken { get; set; }
         public string Code { get; set; }
-        public bool IsRegistration { get; set; }
     }
 }
