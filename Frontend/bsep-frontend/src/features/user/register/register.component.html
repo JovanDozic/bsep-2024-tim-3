@@ -1,67 +1,105 @@
 <form [formGroup]="registrationForm" (ngSubmit)="register()">
     <div class="form-check m-3">
-        <input class="form-check-input" type="radio" name="type" id="individualRadio" [defaultChecked]="true" [value]="true" (change)="onRadioChange()">
+        <input class="form-check-input" type="radio" name="type" id="individualRadio" [defaultChecked]="true"
+            [value]="true" (change)="onRadioChange()">
         <label class="form-check-label" for="individualRadio">
-          Individual
+            Individual
         </label>
-      </div>
-      <div class="form-check m-3">
-        <input class="form-check-input" type="radio" name="type" id="legalEntityRadio" [value]="false" (change)="onRadioChange()">
+    </div>
+    <div class="form-check m-3">
+        <input class="form-check-input" type="radio" name="type" id="legalEntityRadio" [value]="false"
+            (change)="onRadioChange()">
         <label class="form-check-label" for="legalEntityRadio">
-          Legal Entity
+            Legal Entity
         </label>
-      </div>
-      
-      
-      <input type="text" placeholder="Email" formControlName="email" class="form-control m-3">
-      
-      <div class="mb-3">
-        <input type="password" class="form-control m-3" id="passwordInput" placeholder="Password" formControlName="password" [ngClass]="{ 'is-invalid': !registrationForm.get('password')?.valid && registrationForm.get('password')?.touched }">
+    </div>
+
+
+    <input type="text" placeholder="Email" formControlName="email" class="form-control m-3">
+
+    <div class="mb-3">
+        <input type="password" class="form-control m-3" id="passwordInput" placeholder="Password"
+            formControlName="password"
+            [ngClass]="{ 'is-invalid': !registrationForm.get('password')?.valid && registrationForm.get('password')?.touched }">
         <div *ngIf="registrationForm.get('password')?.errors" class="invalid-feedback">
             <div class="m-3" *ngIf="registrationForm.get('password')?.errors.required">Password is required</div>
-            <div class="m-3" *ngIf="registrationForm.get('password')?.errors.minlength">Password must be at least 16 characters long</div>
-            <div class="m-3" *ngIf="registrationForm.get('password')?.errors.pattern">Password must contain at least one number, one lowercase, one uppercase letter, and one of the following special characters: -._@+!?</div>
+            <div class="m-3" *ngIf="registrationForm.get('password')?.errors.minlength">Password must be at least 16
+                characters long</div>
+            <div class="m-3" *ngIf="registrationForm.get('password')?.errors.pattern">Password must contain at least one
+                number, one lowercase, one uppercase letter, and one of the following special characters: -._@+!?</div>
         </div>
     </div>
 
     <div class="mb-3">
-        <input type="password" class="form-control m-3" id="confirmPasswordInput" placeholder="Confirm Password" formControlName="confirmPassword" [ngClass]="{ 'is-invalid': registrationForm.get('confirmPassword')?.touched && registrationForm.get('password')?.value !== registrationForm.get('confirmPassword')?.value }">
-        <div *ngIf="registrationForm.get('confirmPassword')?.touched && registrationForm.get('password')?.value !== registrationForm.get('confirmPassword')?.value" class="invalid-feedback">
+        <input type="password" class="form-control m-3" id="confirmPasswordInput" placeholder="Confirm Password"
+            formControlName="confirmPassword"
+            [ngClass]="{ 'is-invalid': registrationForm.get('confirmPassword')?.touched && registrationForm.get('password')?.value !== registrationForm.get('confirmPassword')?.value }">
+        <div *ngIf="registrationForm.get('confirmPassword')?.touched && registrationForm.get('password')?.value !== registrationForm.get('confirmPassword')?.value"
+            class="invalid-feedback">
             Passwords do not match
         </div>
     </div>
 
-  <input type="text" placeholder="City" formControlName="city" class="form-control m-3">
-  <input type="text" placeholder="Country" formControlName="country" class="form-control m-3">
-  <input type="text" placeholder="Phone" formControlName="phone" class="form-control m-3">
-  <input type="text" placeholder="Address" formControlName="address" class="form-control m-3">
-  <div *ngIf="!isIndividual; else legalEntityFields">
-    <input type="text" placeholder="Company Name" formControlName="companyName" class="form-control m-3">
-    <input type="text" placeholder="Tax ID" formControlName="taxId" class="form-control m-3">
-</div>
-<ng-template #legalEntityFields>
-      <input type="text" placeholder="First Name" formControlName="firstName" class="form-control m-3">
-      <input type="text" placeholder="Last Name" formControlName="lastName" class="form-control m-3">
-  </ng-template>
+    <div class="form-check m-3">
+        <input class="form-check-input" type="checkbox" formControlName="twoFactorAuth" id="twoFactorAuth">
+        <label class="form-check-label" for="twoFactorAuth">
+            Enable Two-Factor Authentication
+        </label>
+    </div>
 
-  <div class="btn-group m-3" role="group" aria-label="Package Type">
-    <input type="radio" id="basic" formControlName="packageType" value="0" hidden>
-    <label for="basic" class="btn btn-outline-primary" [ngClass]="{ 'btn-primary': registrationForm.get('packageType').value == 0, 'text-white': registrationForm.get('packageType').value == 0 }">Basic</label>
-  
-    <input type="radio" id="standard" formControlName="packageType" value="1" hidden>
-    <label for="standard" class="btn btn-outline-primary" [ngClass]="{ 'btn-primary': registrationForm.get('packageType').value == 1, 'text-white': registrationForm.get('packageType').value == 1 }">Standard</label>
-  
-    <input type="radio" id="golden" formControlName="packageType" value="2" hidden>
-    <label for="golden" class="btn btn-outline-primary" [ngClass]="{ 'btn-primary': registrationForm.get('packageType').value == 2, 'text-white': registrationForm.get('packageType').value == 2 }">Golden</label>
-  </div>
-  
-  
-  
-  
 
-      
-<div>
+    <input type="text" placeholder="City" formControlName="city" class="form-control m-3">
+    <input type="text" placeholder="Country" formControlName="country" class="form-control m-3">
+    <input type="text" placeholder="Phone" formControlName="phone" class="form-control m-3">
+    <input type="text" placeholder="Address" formControlName="address" class="form-control m-3">
+    <div *ngIf="!isIndividual; else legalEntityFields">
+        <input type="text" placeholder="Company Name" formControlName="companyName" class="form-control m-3">
+        <input type="text" placeholder="Tax ID" formControlName="taxId" class="form-control m-3">
+    </div>
+    <ng-template #legalEntityFields>
+        <input type="text" placeholder="First Name" formControlName="firstName" class="form-control m-3">
+        <input type="text" placeholder="Last Name" formControlName="lastName" class="form-control m-3">
+    </ng-template>
 
-    <button type="submit" class="btn btn-primary m-3" (submit)="register()">Register</button>
-</div>
+    <div class="btn-group m-3" role="group" aria-label="Package Type">
+        <input type="radio" id="basic" formControlName="packageType" value="0" hidden>
+        <label for="basic" class="btn btn-outline-primary"
+            [ngClass]="{ 'btn-primary': registrationForm.get('packageType').value == 0, 'text-white': registrationForm.get('packageType').value == 0 }">Basic</label>
+
+        <input type="radio" id="standard" formControlName="packageType" value="1" hidden>
+        <label for="standard" class="btn btn-outline-primary"
+            [ngClass]="{ 'btn-primary': registrationForm.get('packageType').value == 1, 'text-white': registrationForm.get('packageType').value == 1 }">Standard</label>
+
+        <input type="radio" id="golden" formControlName="packageType" value="2" hidden>
+        <label for="golden" class="btn btn-outline-primary"
+            [ngClass]="{ 'btn-primary': registrationForm.get('packageType').value == 2, 'text-white': registrationForm.get('packageType').value == 2 }">Golden</label>
+    </div>
+
+
+    <div>
+
+        <button type="submit" class="btn btn-primary m-3" (submit)="register()">Register</button>
+    </div>
 </form>
+
+<div class="modal fade" id="setup2faModal" tabindex="-1" aria-labelledby="setup2faModalLabel" aria-hidden="true"
+    data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="setup2faModalLabel">Setup Two-Factor Authentication</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <img [src]="qrCode" class="img-fluid" height="200px">
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" placeholder="Enter Code"
+                        [(ngModel)]="verify2faRequest.code">
+                </div>
+                <button type="button" class="btn btn-primary" (click)="registerVerify2fa()">Verify</button>
+            </div>
+        </div>
+    </div>
+</div>

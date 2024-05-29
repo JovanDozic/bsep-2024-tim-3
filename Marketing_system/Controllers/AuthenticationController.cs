@@ -17,6 +17,12 @@ public class AuthenticationController : Controller
     [AllowAnonymous]
     public async Task<ActionResult<RegistrationResponseDto>> RegisterUser([FromBody] UserDto user)
     {
+        if (user is null) return BadRequest(new RegistrationResponseDto()
+        {
+            IsSuccess = false,
+            Message = "UserDTO is null."
+        });
+
         // Specification states: `Potrebno je mogućiti dvofaktorsku prijavu na sistem, gde bi se od klijenta pored lozinke zahtevalo još nešto što “klijent zna ili poseduje.`
 
         RegistrationResponseDto response;
@@ -45,7 +51,7 @@ public class AuthenticationController : Controller
 
     [HttpPost("register/verify2fa")]
     [AllowAnonymous]
-    public async Task<ActionResult<RegistrationResponseDto>> RegisterVerify2fa([FromBody] Verify2faDto verifyDto)
+    public async Task<ActionResult<bool>> RegisterVerify2fa([FromBody] Verify2faDto verifyDto)
     {
         var isSuccess = await _authenticationService.RegisterVerify2fa(verifyDto);
         if (isSuccess)
