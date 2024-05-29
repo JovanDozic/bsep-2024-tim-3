@@ -171,4 +171,90 @@
   .register-section a:hover {
     text-decoration: underline;
   }
-  
+  .popup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    }
+    
+    .popup {
+    background-color: #f8f9fa; /* Light gray background */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Darker shadow */
+    width: 50%; /* Adjust width as needed */
+    max-width: 800px; /* Maximum width for larger screens */
+    max-height: 80%; /* Maximum height to allow scrolling */
+    overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
+    }
+    
+    .popup h2 {
+    font-size: 24px;
+    color: #333; /* Dark text color */
+    margin-bottom: 20px;
+    }
+    
+    .popup form {
+    margin-bottom: 0; /* Remove default margin */
+    }
+    
+    .popup .form-group {
+    margin-bottom: 20px;
+    }
+    
+    .popup label {
+    font-weight: bold;
+    color: #333; /* Dark text color */
+    }
+    
+    .popup input[type="text"],
+    .popup textarea,
+    .popup input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc; /* Light gray border */
+    }
+    
+    .popup input[type="text"]:focus,
+    .popup textarea:focus,
+    .popup input[type="number"]:focus {
+    outline: none;
+    border-color: #007bff; /* Blue border color on focus */
+    }
+    
+    .popup button {
+    background-color: #007bff; /* Blue button color */
+    border: none;
+    border-radius: 20px;
+    color: #fff; /* White text color */
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    }
+    
+    .popup button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    }
+    
+    .password-field {
+      display: flex; /* Align input field and button horizontally */
+      align-items: center; /* Align items vertically */
+      gap: 10px; /* Add space between input field and button */
+    }
+    
+    .password-field input[type="password"] {
+      width: 150px; /* Set a fixed width for the input field */
+    }
+    
+    .password-field button {
+      background-color: transparent; /* Remove button background color */
+      border: none; /* Remove button border */
+      cursor: pointer; /* Change cursor to pointer */
+    }

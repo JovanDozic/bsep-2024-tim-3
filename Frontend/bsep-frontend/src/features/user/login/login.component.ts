@@ -11,6 +11,10 @@ import { Login } from '../model/login.model';
 })
 export class LoginComponent {
   loginForm: FormGroup;
+  showPopupPassword = false;
+  sendEmailForm: FormGroup;
+
+
 
   constructor(
     private router: Router,
@@ -20,6 +24,10 @@ export class LoginComponent {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
+    });
+
+    this.sendEmailForm = this.fb.group({
+      email: ['', [Validators.required]]
     });
   }
 
@@ -43,5 +51,25 @@ export class LoginComponent {
 
   passwordless(): void {
     this.router.navigate(['/login-passwordless']);
+  }
+
+  enterEmail() : void {
+    this.showPopupPassword = true;
+  }
+
+  sendEmail() : void {
+    if(this.sendEmailForm.valid) {
+      const formData = this.sendEmailForm.value;
+      this.userService.requestPasswordReset(formData).subscribe(result => {
+        if(result) {
+          this.showPopupPassword = false;
+          console.log("Email for password reset sent successfully");
+        } else {
+          console.log("Error");
+        }
+      });
+    } else {
+      console.log("Form is invalid");
+    }
   }
 }

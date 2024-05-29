@@ -12,6 +12,7 @@ import { LoginPasswordlessComponent } from './login-passwordless/login-passwordl
 import { LoginPasswordlessAuthenticateComponent } from './login-passwordless-authenticate/login-passwordless-authenticate.component';
 import { RegistrationRequestsManagementComponent } from './registration-requests-management/registration-requests-management.component';
 import { EmailVerificationComponent } from './email-verification/email-verification.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { EmailVerificationComponent } from './email-verification/email-verificat
     LoginPasswordlessAuthenticateComponent,
     RegistrationRequestsManagementComponent,
     EmailVerificationComponent,
+    ResetPasswordComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
 })

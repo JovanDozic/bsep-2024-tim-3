@@ -15,6 +15,7 @@ import { LoginPasswordlessComponent } from 'src/features/user/login-passwordless
 import { LoginPasswordlessAuthenticateComponent } from 'src/features/user/login-passwordless-authenticate/login-passwordless-authenticate.component';
 import { RegistrationRequestsManagementComponent } from 'src/features/user/registration-requests-management/registration-requests-management.component';
 import { EmailVerificationComponent } from 'src/features/user/email-verification/email-verification.component';
+import { ResetPasswordComponent } from 'src/features/user/reset-password/reset-password.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -59,6 +60,10 @@ const routes: Routes = [
     component: RegistrationRequestsManagementComponent,
     canActivate: [AdminGuard],
   },
+  {
+    path: 'reset-password',
+    component: ResetPasswordComponent,
+  }
 ];
 
 @NgModule({

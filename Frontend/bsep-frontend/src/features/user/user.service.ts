@@ -12,6 +12,7 @@ import { EmailTokenRequest } from './model/passwordless-token-request.model';
 import { RegistrationRequest } from './model/registration-request.model';
 import { RegistrationRequestUpdate } from './model/registration-request-update.model';
 import { ChangePasswordRequest } from './model/change-password-request.model';
+import { ResetPassword } from './model/resetPassword.model';
 
 @Injectable({
   providedIn: 'root',
@@ -57,6 +58,13 @@ export class UserService {
     );
   }
 
+  requestPasswordReset(email: string) : Observable<boolean> {
+    return this.http.post<boolean>(
+      `${environment.apiHost}authentication/requestPasswordReset`,
+      email
+    );
+  }
+
   getUnblocked(): Observable<User[]> {
     return this.http.get<User[]>(
       environment.apiHost + 'authentication/getUnblocked'
@@ -77,6 +85,12 @@ export class UserService {
     );
   }
 
+  resetPassword(resetPassword: ResetPassword): Observable<boolean> {
+    return this.http.post<boolean>(
+      `${environment.apiHost}authentication/resetPassword`,
+      resetPassword
+    );
+  }
   updateAccessToken(accessToken: string, refreshToken: string, userId: number): Observable<string | null> {
     return this.http.post<boolean>(`${environment.apiHost}authentication/validateRefresh`, { userId, refreshToken })
       .pipe(
