@@ -11,6 +11,7 @@ import { Credentials } from '../model/login.model';
 })
 export class LoginComponent {
   loginForm: FormGroup;
+  recaptchaToken: string | null = null;
 
   constructor(
     private router: Router,
@@ -20,6 +21,7 @@ export class LoginComponent {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
+      recaptcha: ['', Validators.required],
     });
   }
 
@@ -43,5 +45,10 @@ export class LoginComponent {
 
   passwordless(): void {
     this.router.navigate(['/login-passwordless']);
+  }
+
+  onRecaptchaResolved(token: string): void {
+    this.recaptchaToken = token;
+    this.loginForm.patchValue({ recaptcha: token });
   }
 }
