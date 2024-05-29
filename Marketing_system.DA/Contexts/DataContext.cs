@@ -11,6 +11,7 @@ namespace Marketing_system.DA.Contexts
         public DbSet<PasswordlessToken> PasswordlessTokens { get; set; }
         public DbSet<Advertisement> Advertisements { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -186,6 +186,11 @@ namespace Marketing_system
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IEmailHandler, EmailHandler>();
             services.AddTransient<IAdvertisementService, AdvertisementService>();
+            services.AddScoped<IEncryptionService, EncryptionService>(provider =>
+            {
+                var encryptionKey = Configuration["EncryptionKey"]; // Ključ za šifrovanje, čuvajte ga u sigurnom okruženju
+                return new EncryptionService(encryptionKey);
+            });
         }
 
     }

@@ -20,24 +20,28 @@ namespace Marketing_system.BL.Service
         private readonly SMTPConfig _smtpConfig;
         private readonly IEmailHandler _emailHandler;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IEncryptionService _encryptionService;
 
-        public AuthenticationService(IUnitOfWork unitOfWork, IOptions<HMACConfig> hmacConfig, IOptions<SMTPConfig> smtpConfig, IEmailHandler emailHandler, IHttpContextAccessor httpContextAccessor)
+
+        public AuthenticationService(IUnitOfWork unitOfWork, IOptions<HMACConfig> hmacConfig, IOptions<SMTPConfig> smtpConfig, IEmailHandler emailHandler, IHttpContextAccessor httpContextAccessor, IEncryptionService encryptionService)
         {
             _unitOfWork = unitOfWork;
             _hmacConfig = hmacConfig.Value;
             _smtpConfig = smtpConfig.Value;
             _emailHandler = emailHandler;
             _httpContextAccessor = httpContextAccessor;
+            _encryptionService = encryptionService;
         }
 
         public async Task<TokensDto?> Login(string email, string password)
         {
-            var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(email);
+            var emailEnc = _encryptionService.Encrypt(email);
+            var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(emailEnc);
             if (user != null)
             {
                 if (user.AccountStatus != AccountStatus.Active) return null;
 
-                var hashedPassword = _unitOfWork.GetUserRepository().GetPasswordByEmail(email);
+                var hashedPassword = _unitOfWork.GetUserRepository().GetPasswordByEmail(emailEnc);
                 if (_unitOfWork.GetPasswordHasher().VerifyPassword(password, hashedPassword))
                 {
                     var tokens = await _unitOfWork.GetTokenGeneratorRepository().GenerateTokens(user);
@@ -50,11 +54,19 @@ namespace Marketing_system.BL.Service
 
         public async Task<bool> RegisterUser(UserDto userDto)
         {
+            userDto.Email = _encryptionService.Encrypt(userDto.Email);
+            userDto.Phone = _encryptionService.Encrypt(userDto.Phone);
+            userDto.Address = _encryptionService.Encrypt(userDto.Address);
+            userDto.Country = _encryptionService.Encrypt(userDto.Country);
+            userDto.City = _encryptionService.Encrypt(userDto.City);
+            userDto.Firstname = _encryptionService.Encrypt(userDto.Firstname);
+            userDto.Lastname = _encryptionService.Encrypt(userDto.Lastname);
+            /*
             var userdb = await _unitOfWork.GetUserRepository().GetByEmailAsync(userDto.Email);
             if (userdb != null)
             {
                 return false;
-            }
+            }*/
             /*
             var registrationRequests = _unitOfWork.GetRegistrationRequestRepository().GetAllByEmailAsync(userDto.Email);
             if (registrationRequests.Any(req => req.Status == DA.Contracts.Model.RegistrationRequestStatus.Pending))
@@ -85,6 +97,15 @@ namespace Marketing_system.BL.Service
 
         public async Task<bool> RegisterAdminOrEmployee(UserDto userDto)
         {
+
+            userDto.Email = _encryptionService.Encrypt(userDto.Email);
+            userDto.Phone = _encryptionService.Encrypt(userDto.Phone);
+            userDto.Address = _encryptionService.Encrypt(userDto.Address);
+            userDto.Country = _encryptionService.Encrypt(userDto.Country);
+            userDto.City = _encryptionService.Encrypt(userDto.City);
+            userDto.Firstname = _encryptionService.Encrypt(userDto.Firstname);
+            userDto.Lastname = _encryptionService.Encrypt(userDto.Lastname);
+
             var userdb = await _unitOfWork.GetUserRepository().GetByEmailAsync(userDto.Email);
             if (userdb != null)
             {
@@ -227,19 +248,19 @@ namespace Marketing_system.BL.Service
             var userDto = new UserDto
             {
                 Id = user.Id,
-                Email = user.Email,
+                Email = _encryptionService.Decrypt(user.Email),
                 Password = user.Password,
-                Firstname = user.Firstname,
-                Lastname = user.Lastname,
-                Address = user.Address,
-                City = user.City,
-                Country = user.Country,
-                Phone = user.Phone,
+                Firstname = _encryptionService.Decrypt(user.Firstname),
+                Lastname = _encryptionService.Decrypt(user.Lastname),
+                Address = _encryptionService.Decrypt(user.Address),
+                City = _encryptionService.Decrypt(user.City),
+                Country = _encryptionService.Decrypt(user.Country),
+                Phone = _encryptionService.Decrypt(user.Phone),
                 CompanyName = user.CompanyName,
                 TaxId = user.TaxId,
-                PackageType = (int)user.PackageType, // Convert PackageType enum to int
-                ClientType = (int)user.ClientType, // Convert ClientType enum to int
-                Role = (int)user.Role // Convert UserRole enum to int
+                PackageType = (int)user.PackageType, 
+                ClientType = (int)user.ClientType, 
+                Role = (int)user.Role 
             };
 
             return userDto;
@@ -252,18 +273,19 @@ namespace Marketing_system.BL.Service
             var userDtos = users.Select(user => new UserDto
             {
                 Id = user.Id,
-                Email = user.Email,
-                Firstname = user.Firstname,
-                Lastname = user.Lastname,
-                Address = user.Address,
-                City = user.City,
-                Country = user.Country,
-                Phone = user.Phone,
+                Email = _encryptionService.Decrypt(user.Email),
+                Password = user.Password,
+                Firstname = _encryptionService.Decrypt(user.Firstname),
+                Lastname = _encryptionService.Decrypt(user.Lastname),
+                Address = _encryptionService.Decrypt(user.Address),
+                City = _encryptionService.Decrypt(user.City),
+                Country = _encryptionService.Decrypt(user.Country),
+                Phone = _encryptionService.Decrypt(user.Phone),
                 CompanyName = user.CompanyName,
                 TaxId = user.TaxId,
-                PackageType = (int)user.PackageType,
-                ClientType = (int)user.ClientType,
-                Role = (int)user.Role
+                PackageType = (int)user.PackageType, 
+                ClientType = (int)user.ClientType, 
+                Role = (int)user.Role 
             });
             return userDtos;
         }
@@ -273,36 +295,37 @@ namespace Marketing_system.BL.Service
             var users = await _unitOfWork.GetUserRepository().GetAll();
 
             var userDtos = users
-                .Where(user => user.AccountStatus != AccountStatus.Blocked) // Filter by AccountStatus
+                .Where(user => user.AccountStatus != AccountStatus.Blocked) 
                 .Select(user => new UserDto
                 {
                     Id = user.Id,
-                    Email = user.Email,
-                    Firstname = user.Firstname,
-                    Lastname = user.Lastname,
-                    Address = user.Address,
-                    City = user.City,
-                    Country = user.Country,
-                    Phone = user.Phone,
+                    Email = _encryptionService.Decrypt(user.Email),
+                    Password = user.Password,
+                    Firstname = _encryptionService.Decrypt(user.Firstname),
+                    Lastname = _encryptionService.Decrypt(user.Lastname),
+                    Address = _encryptionService.Decrypt(user.Address),
+                    City = _encryptionService.Decrypt(user.City),
+                    Country = _encryptionService.Decrypt(user.Country),
+                    Phone = _encryptionService.Decrypt(user.Phone),
                     CompanyName = user.CompanyName,
                     TaxId = user.TaxId,
                     PackageType = (int)user.PackageType,
                     ClientType = (int)user.ClientType,
                     Role = (int)user.Role
                 });
-            return userDtos; // ToList() materializes the query and returns a List<UserDto>
+            return userDtos; 
 
         }
 
+        // TO-DO: promeniti zbog dodatog sifrovanja osetljivih podataka
         public async Task<bool> UpdateUser(UserDto user)
         {
             var userToUpdate = await _unitOfWork.GetUserRepository().GetByIdAsync(user.Id);
             if (userToUpdate == null)
             {
-                return false; // User not found
+                return false;
             }
 
-            // Update user properties
             userToUpdate.Password = _unitOfWork.GetPasswordHasher().HashPassword(user.Password);
             userToUpdate.Firstname = user.Firstname;
             userToUpdate.Lastname = user.Lastname;
@@ -494,6 +517,48 @@ namespace Marketing_system.BL.Service
             return requestDtos;
         }
 
+        public async Task<bool> SendPasswordResetEmailAsync(string email)
+        {
+            var emailEnc = _encryptionService.Encrypt(email);
 
+            var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(emailEnc);
+            if (user == null) return false;
+  
+
+            var token = GenerateTempEmailToken(email);
+            var link = $"http://localhost:4200/reset-password?token={token}";
+
+            await _unitOfWork.GetPasswordResetTokenRepository().Add(
+                new PasswordResetToken()
+                {
+                    Token = token,
+                    ExpirationDate = DateTime.UtcNow.AddHours(1),
+                    IsUsed = false,
+                    UserId = user.Id
+                });
+            await _unitOfWork.Save();
+
+            return await _emailHandler.SendLinkToEmail(email, link, "Password Reset");
+        }
+
+        public async Task<bool> ResetPasswordAsync(string token, string newPassword)
+        {
+            var resetToken = await _unitOfWork.GetPasswordResetTokenRepository().GetByTokenAsync(token);
+            if (resetToken == null || resetToken.IsUsed || resetToken.ExpirationDate < DateTime.UtcNow)
+            {
+                return false;
+            }
+
+            var user = await _unitOfWork.GetUserRepository().GetByIdAsync(resetToken.UserId);
+            if (user == null) return false;
+
+            user.Password = _unitOfWork.GetPasswordHasher().HashPassword(newPassword);
+            _unitOfWork.GetUserRepository().Update(user);
+            resetToken.IsUsed = true;
+            await _unitOfWork.GetPasswordResetTokenRepository().MarkAsUsedAsync(token);
+            await _unitOfWork.Save();
+
+            return true;
+        }
     }
 }

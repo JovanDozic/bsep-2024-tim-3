@@ -210,4 +210,24 @@ public class AuthenticationController : Controller
         var requests = await _authenticationService.GetAllRegistrationRequestsAsync();
         return Ok(requests);
     }
+
+    [HttpPost("requestPasswordReset")]
+    public async Task<ActionResult<bool>> RequestPasswordReset([FromBody] ForgotPasswordDto emailDto)
+    {
+        
+        var result = await _authenticationService.SendPasswordResetEmailAsync(emailDto.Email);
+        if (!result)
+            return BadRequest(result);
+        return Ok(result);
+        
+    }
+
+    [HttpPost("resetPassword")]
+    public async Task<ActionResult<bool>> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+    {
+        var result = await _authenticationService.ResetPasswordAsync(resetPasswordDto.Token, resetPasswordDto.NewPassword);
+        if (!result)
+            return BadRequest(result);
+        return Ok(result);
+    }
 }
