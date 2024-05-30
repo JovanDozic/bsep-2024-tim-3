@@ -14,6 +14,8 @@ import { RegistrationRequestUpdate } from './model/registration-request-update.m
 import { RegistrationResponse } from './model/registration-response.model';
 import { Verify2faRequest } from './model/verify-2fa.model';
 import { Tokens } from './model/tokens.model';
+import { ChangePasswordRequest } from './model/change-password-request.model';
+import { ResetPassword } from './model/resetPassword.model';
 
 @Injectable({
   providedIn: 'root',
@@ -43,15 +45,10 @@ export class UserService {
     private tokenStorage: TokenStorage
   ) {}
 
-  changePassword(
-    userId: number,
-    oldPassword: string,
-    newPassword: string
-  ): Observable<boolean> {
-    const requestData = { userId, oldPassword, newPassword };
+  changePassword(request: ChangePasswordRequest): Observable<boolean> {
     return this.http.post<boolean>(
       `${environment.apiHost}authentication/changePassword`,
-      requestData
+      request
     );
   }
   getUserById(userId: number): Observable<User> {
@@ -62,6 +59,13 @@ export class UserService {
   getAllUsers(): Observable<User[]> {
     return this.http.get<User[]>(
       environment.apiHost + 'authentication/getAllUsers'
+    );
+  }
+
+  requestPasswordReset(email: string) : Observable<boolean> {
+    return this.http.post<boolean>(
+      `${environment.apiHost}authentication/requestPasswordReset`,
+      email
     );
   }
 
@@ -85,16 +89,14 @@ export class UserService {
     );
   }
 
-  updateAccessToken(
-    accessToken: string,
-    refreshToken: string,
-    userId: number
-  ): Observable<string | null> {
-    return this.http
-      .post<boolean>(`${environment.apiHost}authentication/validateRefresh`, {
-        userId,
-        refreshToken,
-      })
+  resetPassword(resetPassword: ResetPassword): Observable<boolean> {
+    return this.http.post<boolean>(
+      `${environment.apiHost}authentication/resetPassword`,
+      resetPassword
+    );
+  }
+  updateAccessToken(accessToken: string, refreshToken: string, userId: number): Observable<string | null> {
+    return this.http.post<boolean>(`${environment.apiHost}authentication/validateRefresh`, { userId, refreshToken })
       .pipe(
         switchMap((refreshValid: boolean) => {
           if (refreshValid) {

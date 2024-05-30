@@ -12,6 +12,7 @@ import { LoginPasswordlessComponent } from './login-passwordless/login-passwordl
 import { LoginPasswordlessAuthenticateComponent } from './login-passwordless-authenticate/login-passwordless-authenticate.component';
 import { RegistrationRequestsManagementComponent } from './registration-requests-management/registration-requests-management.component';
 import { EmailVerificationComponent } from './email-verification/email-verification.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { RecaptchaValueAccessorDirective } from './directives/recaptcha-value-accessor.directive';
 import { RecaptchaModule } from 'ng-recaptcha';
 
@@ -29,6 +30,7 @@ import { RecaptchaModule } from 'ng-recaptcha';
     RegistrationRequestsManagementComponent,
     EmailVerificationComponent,
     RecaptchaValueAccessorDirective,
+    ResetPasswordComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule, FormsModule, RecaptchaModule],
 })

@@ -3,6 +3,13 @@
       <h2>Client Profile</h2>
       <button class="delete-data-button" (click)="deleteData()" *ngIf="isGolden">Delete my data</button>
   </div>
+  <hr style="border-top: 2px solid black;"> <!-- Black line -->
+  <div class="register-section">
+    <label for="firstname" class="register-text" >To change your password click here</label>
+    <div class="register-button">
+    <button (click)="openPopupPassword()">CHANGE PASSWORD</button>
+    </div>
+</div>
     <div class="personal-info">
         <h3>Personal Information</h3>
         <form>
@@ -91,5 +98,31 @@
         <button class="delete-data-button" (click)="optionYes()">Yes</button>
         <button class="delete-data-button" (click)="optionNo()">No</button>
       </div>
+  </div>
+</div>
+
+
+<div class="popup-container" *ngIf="showPopupPassword">
+  <div class="popup">
+      <h2>Change password</h2>
+      <form [formGroup]="changePasswordForm" (ngSubmit)="changePassword()">
+        <div class="form-group">
+            <label for="currentPassword">Enter current password:</label>
+            <div class="password-field">
+                <input type="password" formControlName="currentPassword" id="currentPassword" required>
+                <!-- Button to toggle password visibility -->
+                <button type="button" data-field="currentPassword" (click)="togglePasswordVisibility('currentPassword')">Show</button>
+            </div>
+        </div>
+        <div class="form-group">
+          <label for="newPassword">Enter new password:</label>
+          <div class="password-field">
+              <input type="password" formControlName="newPassword" id="newPassword" required>
+              <!-- Button to toggle password visibility -->
+              <button type="button" data-field="newPassword" (click)="togglePasswordVisibility('newPassword')">Show</button>
+          </div>
+      </div>
+        <button type="submit" class="btn btn-primary rounded-pill btn-lg">Submit</button>
+    </form>
   </div>
 </div>

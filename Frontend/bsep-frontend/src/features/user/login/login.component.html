@@ -9,3 +9,19 @@
 </form>
 <a class="btn btn-outline-secondary m-3" (click)="passwordless()">Use Passwordless Login</a>
 <a class="btn btn-outline-primary m-3" (click)="register()">Register</a>
+<a class="btn btn-outline-primary m-3" (click)="enterEmail()">Forgot your password?</a>
+
+
+<div class="popup-container" *ngIf="showPopupPassword">
+  <div class="popup">
+      <h2>Change your password with your email adress</h2>
+      <form [formGroup]="sendEmailForm" (ngSubmit)="sendEmail()">
+        <div class="form-group">
+            <label for="email">Enter your email adress:</label>
+            <div class="password-field">
+                <input type="text" formControlName="email" id="email" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary rounded-pill btn-lg">Submit</button>
+    </form>
+  </div>

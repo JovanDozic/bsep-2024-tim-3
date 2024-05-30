@@ -46,6 +46,7 @@ namespace Marketing_system.DA
         private IPasswordlessTokenRepository _passwordlessTokenRepository { get; set; }
         private IAdvertisementRepository _advertisementRepository { get; set; }
         private IRoleRepository _roleRepository { get; set; }
+        private IPasswordResetTokenRepository _passwordResetTokenRepository { get; set; }
 
         public IUserRepository GetUserRepository()
         {
@@ -75,6 +76,11 @@ namespace Marketing_system.DA
         public IRoleRepository GetRoleRepository()
         {
             return _roleRepository ?? (_roleRepository = new RoleRepository(_context));
+        }
+
+        public IPasswordResetTokenRepository GetPasswordResetTokenRepository()
+        {
+            return _passwordResetTokenRepository ?? (_passwordResetTokenRepository = new PasswordResetTokenRepository(_context));
         }
     }
 }

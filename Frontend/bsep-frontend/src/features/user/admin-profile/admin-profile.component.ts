@@ -3,6 +3,7 @@ import { User } from '../model/user.model';
 import { UserService } from '../user.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TokenStorage } from '../jwt/token.service';
+import { ChangePasswordRequest } from '../model/change-password-request.model';
 
 @Component({
   selector: 'app-admin-profile',
@@ -71,7 +72,30 @@ export class AdminProfileComponent implements OnInit {
     this.showPopupPassword = true;
   }
   changePassword() {
-    this.showPopupPassword = false;
+    if (this.changePasswordForm.valid) {
+      const changePasswordRequest: ChangePasswordRequest = {
+        userId: this.tokenStorage.getUserId(),
+        oldPassword: this.changePasswordForm.value.currentPassword,
+        newPassword: this.changePasswordForm.value.newPassword
+      };
+
+      this.userService.changePassword(changePasswordRequest).subscribe(
+        (response: boolean) => { 
+          if(response) {
+          console.log("Password changed successfully");
+        } else {
+          console.error("Failed to change password");
+        }
+        this.showPopupPassword = false;
+      },
+      error => {
+        console.error("Error changing password:", error);
+        this.showPopupPassword = false;
+      }
+      );
+    } else {
+      console.log("Form is invalid");
+    }
   }
 
   togglePasswordVisibility(fieldId: string): void {
