@@ -12,7 +12,7 @@ namespace Marketing_system.DA.Repository
             _smtpConfig = smtpConfig.Value;
         }
 
-        public async Task<bool> SendLinkToEmail(string email, string link, string subject)
+        public async Task<bool> SendEmail(string email, string link, string subject)
         {
             var from = new MailAddress(_smtpConfig.SenderAddress, _smtpConfig.SenderDisplayName);
             var to = new MailAddress(email);

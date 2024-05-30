@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using Serilog;
+using Marketing_system.BL.Hubs;
 
 namespace Marketing_system
 {
@@ -153,6 +154,10 @@ namespace Marketing_system
                 options.AddPolicy("clientPolicy", policy => policy.RequireRole("Client"));
                 options.AddPolicy("employeePolicy", policy => policy.RequireRole("Employee"));
             });
+
+            services.AddControllersWithViews();
+            services.AddSignalR();
+
             BindServices(services);
         }
 
@@ -171,7 +176,7 @@ namespace Marketing_system
 
             app.UseCors("AllowOrigin");
 
-            app.UseCors("_mySpecificOrigins");
+            app.UseCors("AllowHttps");
 
 
             app.UseAuthentication();
@@ -181,6 +186,7 @@ namespace Marketing_system
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<NotificationHub>("/notificationHub");
             });
         }
 
@@ -192,6 +198,7 @@ namespace Marketing_system
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IEmailHandler, EmailHandler>();
             services.AddTransient<IAdvertisementService, AdvertisementService>();
+            services.AddTransient<IAlertService, AlertService>();
             services.AddScoped<IEncryptionService, EncryptionService>(provider =>
             {
                 var encryptionKey = Configuration["EncryptionKey"]; // Ključ za šifrovanje, čuvajte ga u sigurnom okruženju

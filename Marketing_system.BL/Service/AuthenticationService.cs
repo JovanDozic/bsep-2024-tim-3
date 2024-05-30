@@ -313,7 +313,7 @@ namespace Marketing_system.BL.Service
                 });
             await _unitOfWork.Save();
 
-            return await _emailHandler.SendLinkToEmail(email, link, "Passwordless Login");
+            return await _emailHandler.SendEmail(email, link, "Passwordless Login");
         }
 
         public async Task<TokensDto?> AuthenticatePasswordlessTokenAsync(string token)
@@ -589,7 +589,7 @@ namespace Marketing_system.BL.Service
             _unitOfWork.GetRegistrationRequestRepository().Update(request);
             await _unitOfWork.Save();
 
-            return await _emailHandler.SendLinkToEmail(user.Email, $"<p>Please verify your account using the following <a href=\"{link}\">link</a>.</p>", "Registration Approved!");
+            return await _emailHandler.SendEmail(user.Email, $"<p>Please verify your account using the following <a href=\"{link}\">link</a>.</p>", "Registration Approved!");
         }
 
         public async Task<bool> RejectRegisterRequestAsync(int requestId, string reason)
@@ -617,7 +617,7 @@ namespace Marketing_system.BL.Service
 
             await _unitOfWork.Save();
 
-            return await _emailHandler.SendLinkToEmail(user.Email, $"<p>Administrator decided to reject your registration request.</p> {(request.Reason is null ? "" : $"Reason: {request.Reason}")}", "Registration Rejected");
+            return await _emailHandler.SendEmail(user.Email, $"<p>Administrator decided to reject your registration request.</p> {(request.Reason is null ? "" : $"Reason: {request.Reason}")}", "Registration Rejected");
         }
 
         public async Task<IEnumerable<RegistrationRequestDto>> GetAllRegistrationRequestsAsync()
