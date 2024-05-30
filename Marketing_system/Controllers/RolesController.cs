@@ -5,6 +5,7 @@ using Marketing_system.DA.Contracts.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace Marketing_system.Controllers
 {
@@ -21,13 +22,17 @@ namespace Marketing_system.Controllers
         [HttpGet("getAll")]
         public async Task<ActionResult<IEnumerable<RoleDto>>> GetAll()
         {
+            Log.Information("Requested all roles.");
             var roles = await _roleService.GetAllRoles();
+            Log.Information("All roles returned!");
             return Ok(roles);
         }
         [HttpPost("update")]
         public async Task<IActionResult> UpdateRole([FromBody] RoleDto roleDto)
         {
+            Log.Information("Requested role update.");
             var isUpdated = await _roleService.UpdateRole(roleDto);
+            Log.Information("Role updated!");
             return Ok(isUpdated);
         }
     }

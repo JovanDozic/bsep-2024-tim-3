@@ -138,7 +138,7 @@ namespace Marketing_system.BL.Service
                 return new() { IsSuccess = false, Message = "Account with provided email was recently rejected. Please try again soon." };
             }
 
-            var user = new User // Mili zasto nismo mapper koristili?
+            var user = new User // Mili zasto nismo mapper koristili? Ne znam, promijeni
             {
                 Email = userDto.Email,
                 Password = _unitOfWork.GetPasswordHasher().HashPassword(userDto.Password),

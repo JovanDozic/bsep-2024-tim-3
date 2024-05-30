@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Serilog;
 
 namespace Marketing_system
 {
@@ -42,6 +43,10 @@ namespace Marketing_system
             });
             services.AddHttpContextAccessor();
 
+            services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.AddSerilog(dispose: true);
+            });
 
             services.AddAutoMapper(typeof(UserProfile));
             services.AddSwaggerGen(setup =>
@@ -159,6 +164,7 @@ namespace Marketing_system
                 app.UseSwaggerUI();
             }
 
+            app.UseSerilogRequestLogging();
             app.UseHttpsRedirection();
 
             app.UseRouting();
