@@ -47,12 +47,16 @@ namespace Marketing_system.BL.Service
                 return null;
             }
 
+            user = DecryptUser(user);
+
             if (!user.IsTwoFactorEnabled)
             {
                 var tokens = await _unitOfWork.GetTokenGeneratorRepository().GenerateTokens(user);
                 SetRefreshTokenCookie(tokens.RefreshToken);
                 return tokens;
             }
+
+            
 
             var response = new TokensDto
             {
@@ -66,6 +70,18 @@ namespace Marketing_system.BL.Service
             _tempTokens.AddToken(response.TempToken, user.Email);
 
             return response;
+        }
+
+        public User DecryptUser(User user)
+        {
+            user.Address = _encryptionService.Decrypt(user.Address);
+            user.City = _encryptionService.Decrypt(user.City);
+            user.Country = _encryptionService.Decrypt(user.Country);
+            user.Firstname = _encryptionService.Decrypt(user.Firstname);
+            user.Lastname = _encryptionService.Decrypt(user.Lastname);
+            user.Phone = _encryptionService.Decrypt(user.Phone);
+
+            return user;
         }
 
         public async Task<TokensDto?> LoginVerify2fa(Verify2faDto verifyDto)
@@ -126,12 +142,12 @@ namespace Marketing_system.BL.Service
             {
                 Email = userDto.Email,
                 Password = _unitOfWork.GetPasswordHasher().HashPassword(userDto.Password),
-                Firstname = ((ClientType)userDto.ClientType == ClientType.Legal_entity) ? null : userDto.Firstname,
-                Lastname = ((ClientType)userDto.ClientType == ClientType.Legal_entity) ? null : userDto.Lastname,
-                Address = userDto.Address,
-                City = userDto.City,
-                Country = userDto.Country,
-                Phone = userDto.Phone,
+                Firstname = ((ClientType)userDto.ClientType == ClientType.Legal_entity) ? null : _encryptionService.Encrypt(userDto.Firstname),
+                Lastname = ((ClientType)userDto.ClientType == ClientType.Legal_entity) ? null : _encryptionService.Encrypt(userDto.Lastname),
+                Address = _encryptionService.Encrypt(userDto.Address),
+                City = _encryptionService.Encrypt(userDto.City),
+                Country = _encryptionService.Encrypt(userDto.Country),
+                Phone = _encryptionService.Encrypt(userDto.Phone),
                 Role = (UserRole)userDto.Role,
                 ClientType = (ClientType)userDto.ClientType,
                 PackageType = (PackageType)userDto.PackageType,
@@ -203,7 +219,6 @@ namespace Marketing_system.BL.Service
         public async Task<bool> RegisterAdminOrEmployee(UserDto userDto)
         {
 
-            userDto.Email = _encryptionService.Encrypt(userDto.Email);
             userDto.Phone = _encryptionService.Encrypt(userDto.Phone);
             userDto.Address = _encryptionService.Encrypt(userDto.Address);
             userDto.Country = _encryptionService.Encrypt(userDto.Country);
@@ -353,7 +368,7 @@ namespace Marketing_system.BL.Service
             var userDto = new UserDto
             {
                 Id = user.Id,
-                Email = _encryptionService.Decrypt(user.Email),
+                Email = user.Email,
                 Password = user.Password,
                 Firstname = _encryptionService.Decrypt(user.Firstname),
                 Lastname = _encryptionService.Decrypt(user.Lastname),
@@ -378,7 +393,7 @@ namespace Marketing_system.BL.Service
             var userDtos = users.Select(user => new UserDto
             {
                 Id = user.Id,
-                Email = _encryptionService.Decrypt(user.Email),
+                Email = user.Email,
                 Password = user.Password,
                 Firstname = _encryptionService.Decrypt(user.Firstname),
                 Lastname = _encryptionService.Decrypt(user.Lastname),
