@@ -419,7 +419,7 @@ namespace Marketing_system.BL.Service
                 .Select(user => new UserDto
                 {
                     Id = user.Id,
-                    Email = _encryptionService.Decrypt(user.Email),
+                    Email = user.Email,
                     Password = user.Password,
                     Firstname = _encryptionService.Decrypt(user.Firstname),
                     Lastname = _encryptionService.Decrypt(user.Lastname),
@@ -639,9 +639,8 @@ namespace Marketing_system.BL.Service
 
         public async Task<bool> SendPasswordResetEmailAsync(string email)
         {
-            var emailEnc = _encryptionService.Encrypt(email);
 
-            var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(emailEnc);
+            var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(email);
             if (user == null) return false;
   
 
