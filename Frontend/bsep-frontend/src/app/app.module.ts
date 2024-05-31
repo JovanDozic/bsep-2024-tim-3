@@ -9,6 +9,7 @@ import { LayoutModule } from 'src/features/layout/layout.module';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { JwtInterceptor } from 'src/features/user/jwt/jwt.interceptor';
 import { RecaptchaModule } from 'ng-recaptcha';
+import { NotificationsModule } from 'src/features/notifications/notifications.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -20,6 +21,7 @@ import { RecaptchaModule } from 'ng-recaptcha';
     AppRoutingModule,
     HttpClientModule,
     RecaptchaModule,
+    NotificationsModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }, // Opciono, možete registrovati interceptor kao HTTP_INTERCEPTOR

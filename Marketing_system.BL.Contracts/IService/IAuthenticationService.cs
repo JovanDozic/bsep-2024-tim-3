@@ -28,5 +28,6 @@ namespace Marketing_system.BL.Contracts.IService
         Task<bool> ResetPasswordAsync(string token, string newPassword);
         Task<bool> RegisterVerify2fa(Verify2faDto verifyDto);
         public Task<TokensDto?> LoginVerify2fa(Verify2faDto verifyDto);
+        Task<string> GetAllLogs();
     }
 }

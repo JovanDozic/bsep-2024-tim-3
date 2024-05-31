@@ -667,7 +667,6 @@ namespace Marketing_system.BL.Service
             {
                 return false;
             }
-
             var user = await _unitOfWork.GetUserRepository().GetByIdAsync(resetToken.UserId);
             if (user == null) return false;
 
@@ -679,5 +678,47 @@ namespace Marketing_system.BL.Service
 
             return true;
         }
+
+        public async Task<string> GetAllLogs()
+        {
+            string appDirectory = "C:\\Users\\mbovan\\Desktop\\Bezbjednost\\projekat\\bsep-ra-2024-kt2-tim-3\\Marketing_system\\logs\\";
+            string logFilePath = Path.Combine(appDirectory, $"log-{DateTime.Now.ToString("yyyyMMdd")}.txt");
+
+            try
+            {
+                // Proveri da li datoteka postoji
+                if (!File.Exists(logFilePath))
+                {
+                    throw new FileNotFoundException($"Log file not found: {logFilePath}");
+                }
+
+                using FileStream fs = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using StreamReader sr = new StreamReader(fs);
+
+                string logs = await sr.ReadToEndAsync();
+
+                var logEntries = logs.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+                var stringBuilder = new StringBuilder();
+                stringBuilder.Append("[");
+                for (int i = 0; i < logEntries.Length; i++)
+                {
+                    stringBuilder.Append(logEntries[i]);
+                    if (i < logEntries.Length - 1)
+                    {
+                        stringBuilder.Append(",");
+                    }
+                }
+                stringBuilder.Append("]");
+
+                return stringBuilder.ToString();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error reading log file: {ex.Message}");
+                throw;
+            }
+        }
+
     }
 }

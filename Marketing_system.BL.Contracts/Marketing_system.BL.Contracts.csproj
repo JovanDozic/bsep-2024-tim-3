@@ -17,6 +17,7 @@
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="4.1.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.1" />
+    <PackageReference Include="Twilio" Version="7.1.0" />
   </ItemGroup>
 
 </Project>

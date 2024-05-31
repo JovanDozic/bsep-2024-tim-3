@@ -1,6 +1,7 @@
 ﻿using Marketing_system.DA.Contexts;
 using Marketing_system.DA.Contracts.IRepository;
 using Marketing_system.DA.Contracts.Model;
+using Marketing_system.DA.Contracts.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marketing_system.DA.Repository
@@ -36,5 +37,11 @@ namespace Marketing_system.DA.Repository
             if (user == null) { return null; }
             return user.Password;
         }
+
+        public async Task<List<User>> GetAdmins()
+        {
+            return await _dbContext.Set<User>().Where(user => user.Role == UserRole.Admin).ToListAsync();
+        }
+
     }
 }

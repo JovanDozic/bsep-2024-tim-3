@@ -6,6 +6,7 @@
     <ul>
       <li><button (click)="navigateToProfile()">My profile</button></li>
       <li><button (click)="logout()">Logout</button></li>
+      <li><button *ngIf="isAdmin" (click)="logs()">See logs</button></li>
     </ul>
   </nav>
 </div>
