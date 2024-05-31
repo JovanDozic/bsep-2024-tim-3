@@ -657,7 +657,7 @@ namespace Marketing_system.BL.Service
                 });
             await _unitOfWork.Save();
 
-            return await _emailHandler.SendLinkToEmail(email, link, "Password Reset");
+            return await _emailHandler.SendEmail(email, link, "Password Reset");
         }
 
         public async Task<bool> ResetPasswordAsync(string token, string newPassword)
