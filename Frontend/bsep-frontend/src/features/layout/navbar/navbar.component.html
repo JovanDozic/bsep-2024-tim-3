@@ -6,6 +6,9 @@
     <ul>
       <li><button (click)="navigateToProfile()">My profile</button></li>
       <li><button (click)="logout()">Logout</button></li>
+      <li><button (click)="rateLimiterTest('basic', 20)">Test limiter basic</button></li>
+      <li><button (click)="rateLimiterTest('standard', 110)">Test limiter standard</button></li>
+      <li><button (click)="rateLimiterTest('golden', 10010)">Test limiter golden</button></li>
       <li><button *ngIf="isAdmin" (click)="logs()">See logs</button></li>
     </ul>
   </nav>

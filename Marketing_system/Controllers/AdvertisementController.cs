@@ -1,20 +1,41 @@
-﻿using Marketing_system.BL.Contracts.DTO;
+﻿using System.Reflection;
+using Marketing_system.BL.Contracts.DTO;
 using Marketing_system.BL.Contracts.IService;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using Microsoft.AspNetCore.RateLimiting;
 
-namespace Marketing_system.Controllers
+namespace Marketing_system.Controllers;
+
+[Route("api/advertisements")]
+public class AdvertisementController : Controller
 {
-    [Route("api/advertisements")]
-    public class AdvertisementController : Controller
-    {
-        private readonly IAdvertisementService _advertisementService;
+    private readonly IAdvertisementService _advertisementService;
 
-        public AdvertisementController(IAdvertisementService advertisementService)
-        {
-            _advertisementService = advertisementService;
-        }
+    public AdvertisementController(IAdvertisementService advertisementService)
+    {
+        _advertisementService = advertisementService;
+    }
+    [HttpGet("basic")]
+    [EnableRateLimiting("fixed-basic")]
+    public async Task<ActionResult<bool>> AdClickSimulationBasic()
+    {
+        return Ok(true);
+    }
+    [HttpGet("standard")]
+    [EnableRateLimiting("fixed-standard")]
+    public async Task<ActionResult<bool>> AdClickSimulationStandard()
+    {
+        return Ok(true);
+    }
+    [HttpGet("golden")]
+    [EnableRateLimiting("fixed-golden")]
+    public async Task<ActionResult<bool>> AdClickSimulationGold()
+    {
+        return Ok(true);
+    }
 
         [HttpPost("create")]
         [Authorize(Roles = "Client")]
