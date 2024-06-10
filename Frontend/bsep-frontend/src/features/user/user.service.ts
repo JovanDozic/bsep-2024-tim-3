@@ -359,7 +359,7 @@ export class UserService {
   }
 
   testRateLimiter(type: string) : Observable<any> {
-    return this.http.get<any>(`${environment.apiHost}authentication/basic`)
+    return this.http.get<any>(`${environment.apiHost}advertisements/${type}`)
     .pipe(
       tap(
         (response) => {

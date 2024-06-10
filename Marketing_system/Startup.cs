@@ -8,13 +8,17 @@ using Marketing_system.DA.Contracts;
 using Marketing_system.DA.Contracts.IRepository;
 using Marketing_system.DA.Contracts.Model;
 using Marketing_system.DA.Repository;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text;
+using System.Threading.RateLimiting;
 
 namespace Marketing_system
 {
@@ -159,6 +163,33 @@ namespace Marketing_system
             services.AddSignalR();
 
             BindServices(services);
+
+            services.AddRateLimiter(options =>
+            {
+                options.AddFixedWindowLimiter("fixed-basic", options =>
+                {
+                    options.PermitLimit = 10;
+                    options.Window = TimeSpan.FromSeconds(30);
+                    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    options.QueueLimit = 0;
+                });
+
+                options.AddFixedWindowLimiter("fixed-standard", options =>
+                {
+                    options.PermitLimit = 100;
+                    options.Window = TimeSpan.FromSeconds(30);
+                    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    options.QueueLimit = 0;
+                });
+
+                options.AddFixedWindowLimiter("fixed-golden", options =>
+                {
+                    options.PermitLimit = 10000;
+                    options.Window = TimeSpan.FromSeconds(300);
+                    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    options.QueueLimit = 0;
+                });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -178,10 +209,11 @@ namespace Marketing_system
 
             app.UseCors("AllowHttps");
 
-
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            app.UseRateLimiter();
 
             app.UseEndpoints(endpoints =>
             {

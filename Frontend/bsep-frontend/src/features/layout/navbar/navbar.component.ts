@@ -46,16 +46,30 @@ export class NavbarComponent implements OnInit {
     this.router.navigate(['/logs']);
   }
 
-  rateLimiterTest(packageType: string, quantity: number) : void {
-    for(var i = 0; i < quantity; ++i) {
-      this.service.testRateLimiter(packageType).subscribe(
-        (data) => {
-          console.log("Request OK")
-        },
-        (error) => {
-          alert('Limit achieved!')
+  async rateLimiterTest(packageType: string, quantity: number): Promise<void> {
+    let isLimitAchieved = false;
+    for (let i = 0; i < quantity; ++i) {
+        if (isLimitAchieved) {
+            break;
         }
-      )
+        try {
+            await new Promise<void>((resolve, reject) => {
+                this.service.testRateLimiter(packageType).subscribe(
+                    (data) => {
+                        console.log("Request OK");
+                        resolve();
+                    },
+                    (error) => {
+                        alert('Limit achieved! Try again in 30 seconds.');
+                        isLimitAchieved = true;
+                        reject(error);
+                    }
+                );
+            });
+        } catch (error) {
+            console.error('Error occurred:', error);
+            break;
+        }
     }
-  }
+}
 }
