@@ -6,6 +6,7 @@
         public string Password { get; set; }
         public string? TwoFactorTempToken { get; set; }
         public string? TwoFactorCode { get; set; }
+        public string ReCAPTCHAToken { get; set; }
 
     }
 }

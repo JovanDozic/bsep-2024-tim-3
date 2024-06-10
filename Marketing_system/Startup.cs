@@ -1,4 +1,5 @@
 ﻿using Marketing_system.BL.Contracts.IService;
+using Marketing_system.BL.Hubs;
 using Marketing_system.BL.Mapper;
 using Marketing_system.BL.Service;
 using Marketing_system.DA;
@@ -12,9 +13,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 using Serilog;
-using Marketing_system.BL.Hubs;
+using System.Text;
 
 namespace Marketing_system
 {
@@ -205,6 +205,8 @@ namespace Marketing_system
                 return new EncryptionService(encryptionKey);
             });
             services.AddSingleton<ITempTokenManagerService, TempTokenManagerService>();
+            services.AddHttpClient();
+            services.AddSingleton<IReCAPTCHAService, ReCAPTCHAService>();
         }
 
     }

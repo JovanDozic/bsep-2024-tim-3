@@ -3,19 +3,19 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../user.service';
 import { Credentials } from '../model/login.model';
+import { environment } from 'src/app/env/environment';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   showPopupPassword = false;
   sendEmailForm: FormGroup;
-  recaptchaToken: string | null = null;
-
-
+  reCAPTCHAToken: string | null = null;
+  recaptchaSiteKey: string = environment.RECAPTCHA_V3_SITE_KEY;
 
   constructor(
     private router: Router,
@@ -33,12 +33,15 @@ export class LoginComponent {
     });
   }
 
+  ngOnInit(): void {}
+
   login(): void {
     const login: Credentials = {
       username: this.loginForm.value.username || '',
       password: this.loginForm.value.password || '',
+      reCAPTCHAToken: this.reCAPTCHAToken || '',
     };
-    if (this.loginForm.valid) {
+    if (this.loginForm.valid && this.reCAPTCHAToken) {
       this.userService.login(login).subscribe({
         next: () => {
           const user = this.userService.user$.getValue();
@@ -55,11 +58,11 @@ export class LoginComponent {
     this.router.navigate(['/login-passwordless']);
   }
 
-  enterEmail() : void {
+  enterEmail(): void {
     this.showPopupPassword = true;
   }
 
-  sendEmail() : void {
+  sendEmail(): void {
     if(this.sendEmailForm.valid) {
       const formData = this.sendEmailForm.value;
       this.userService.requestPasswordReset(formData).subscribe(result => {
@@ -76,7 +79,7 @@ export class LoginComponent {
   }
 
   onRecaptchaResolved(token: string): void {
-    this.recaptchaToken = token;
+    this.reCAPTCHAToken = token;
     this.loginForm.patchValue({ recaptcha: token });
   }
 }

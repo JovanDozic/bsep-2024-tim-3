@@ -28,6 +28,7 @@ export class LoginPasswordlessComponent implements OnInit {
     const login: Credentials = {
       username: this.loginForm.value.username,
       password: '',
+      isPasswordless: true,
     };
     this.userService.sendPasswordlessLink(login).subscribe({
       next: () => {

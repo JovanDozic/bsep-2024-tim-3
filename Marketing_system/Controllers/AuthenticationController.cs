@@ -1,11 +1,9 @@
 ﻿using Marketing_system.BL.Contracts.DTO;
 using Marketing_system.BL.Contracts.IService;
-using Marketing_system.DA.Contracts.Model;
 using Marketing_system.DA.Contracts.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using System;
 
 namespace Marketing_system.Controllers
 {
@@ -13,10 +11,12 @@ namespace Marketing_system.Controllers
     public class AuthenticationController : Controller
     {
         private readonly IAuthenticationService _authenticationService;
+        private readonly IReCAPTCHAService _reCAPTCHAService;
 
-        public AuthenticationController(IAuthenticationService authenticationService)
+        public AuthenticationController(IAuthenticationService authenticationService, IReCAPTCHAService reCAPTCHAService)
         {
             _authenticationService = authenticationService;
+            _reCAPTCHAService = reCAPTCHAService;
         }
 
         [HttpPost("register")]
@@ -80,6 +80,15 @@ namespace Marketing_system.Controllers
         public async Task<ActionResult<TokensDto>> Login([FromBody] CredentialsDto credentialsDto)
         {
             Log.Information($"Login attempt for user: {credentialsDto.Username} from IP: {HttpContext.Connection.RemoteIpAddress}");
+
+            var isReCAPTCHAValid = await _reCAPTCHAService.VerifyToken(credentialsDto.ReCAPTCHAToken);
+
+            if (!isReCAPTCHAValid)
+            {
+                Log.Warning($"Failed reCAPTCHA validation for user: {credentialsDto.Username} from IP: {HttpContext.Connection.RemoteIpAddress}");
+                return BadRequest("Invalid reCAPTCHA token");
+            }
+
             var token = await _authenticationService.Login(credentialsDto.Username, credentialsDto.Password);
             if (token == null)
             {
@@ -301,7 +310,7 @@ namespace Marketing_system.Controllers
                 Log.Information($"Registration request ID: {dto.Id} rejected by user: {User?.Identity?.Name} from IP: {HttpContext.Connection.RemoteIpAddress}");
                 return Ok(isRejected);
             }
-            Log.Warning($"Failed to reject registration request ID: {dto.Id} by user: {User?.Identity?.Name} from IP: {HttpContext.Connection.RemoteIpAddress}" );
+            Log.Warning($"Failed to reject registration request ID: {dto.Id} by user: {User?.Identity?.Name} from IP: {HttpContext.Connection.RemoteIpAddress}");
             return BadRequest("Rejection failed");
         }
 
@@ -341,12 +350,12 @@ namespace Marketing_system.Controllers
         [HttpPost("requestPasswordReset")]
         public async Task<ActionResult<bool>> RequestPasswordReset([FromBody] ForgotPasswordDto emailDto)
         {
-        
+
             var result = await _authenticationService.SendPasswordResetEmailAsync(emailDto.Email);
             if (!result)
                 return BadRequest(result);
             return Ok(result);
-        
+
         }
 
         [HttpPost("resetPassword")]
