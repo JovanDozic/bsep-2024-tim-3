@@ -16,7 +16,7 @@ import { LoginPasswordlessAuthenticateComponent } from 'src/features/user/login-
 import { RegistrationRequestsManagementComponent } from 'src/features/user/registration-requests-management/registration-requests-management.component';
 import { EmailVerificationComponent } from 'src/features/user/email-verification/email-verification.component';
 import { ResetPasswordComponent } from 'src/features/user/reset-password/reset-password.component';
-import { LogsComponent } from 'src/features/notifications/logs/logs.component';
+import { LogsComponent } from 'src/features/notifications/notifications_logs/logs.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },

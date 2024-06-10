@@ -1,0 +1,12 @@
+<h2>Logs</h2>
+
+<div *ngIf="logs.length > 0" class="container">
+  <ul class="list-group">
+    <li *ngFor="let log of logs" class="list-group-item">
+      <pre>{{ log | json }}</pre>
+    </li>
+  </ul>
+</div>
+<div *ngIf="logs.length === 0" class="alert alert-warning" role="alert">
+  No logs available.
+</div>
