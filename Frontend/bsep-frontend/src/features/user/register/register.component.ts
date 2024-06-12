@@ -121,6 +121,9 @@ export class RegisterComponent implements OnInit {
         role: 0,
         isTwoFactorEnabled: this.registrationForm.value.twoFactorAuth,
       };
+      if (Number.isNaN(user.packageType) || user.packageType < 0) {
+        user.packageType = 0;
+      }
       this.userService.register(user).subscribe((response) => {
         if (response && response.isSuccess) {
           console.log('Registration request sent.');
@@ -150,9 +153,9 @@ export class RegisterComponent implements OnInit {
   }
 
   registerVerify2fa(): void {
-    // TODO: send code
-    // TODO: if code is correct, close modal and redirect
-    // TODO: if not, remove code and show error
+    // done: send code
+    // done: if code is correct, close modal and redirect
+    // done: if not, remove code and show error
     // ?: maybe add cancel button and if pressed, send request to disable 2fa.
 
     this.userService.registerVerify2fa(this.verify2faRequest).subscribe(
