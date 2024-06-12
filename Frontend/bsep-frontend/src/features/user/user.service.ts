@@ -193,7 +193,6 @@ export class UserService {
             } else if (tokens && tokens.isTwoFactorEnabled) {
               const code = prompt('Please enter the verification code:');
               console.log(tokens.id);
-              const email = "lukazelovic@gmail.com";
               if (code) {
                 this.http
                   .post<Tokens>(
