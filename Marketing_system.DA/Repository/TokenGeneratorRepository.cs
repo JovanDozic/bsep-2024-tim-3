@@ -14,6 +14,12 @@ namespace Marketing_system.DA.Repository
         private readonly string _key = Environment.GetEnvironmentVariable("JWT_KEY") ?? "marketingsystem_superssecret_key";
         private readonly string _issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "marketingsystem";
         private readonly string _audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "marketingsystem-front.com";
+        private readonly SymmetricSecurityKey _securityKey;
+
+        public TokenGeneratorRepository()
+        {
+            _securityKey = GenerateSecurityKey();
+        }
 
         public async Task<TokensDto> GenerateTokens(User user)
         {
@@ -111,12 +117,22 @@ namespace Marketing_system.DA.Repository
             return Convert.ToBase64String(keyBytes);
         }
 
-        // Used for generating temporary token that validate user while Two factor authentication.
+        private SymmetricSecurityKey GenerateSecurityKey()
+        {
+            var key = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(key);
+            }
+            return new SymmetricSecurityKey(key);
+        }
+
         public string GenerateTempToken(string email)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Convert.FromBase64String("BLEEna7sSymrSkmlHU2ceApML6q7aFmIEDcXjvYzXW4=");
-            var securityKey = new SymmetricSecurityKey(key);
+            //var key = Convert.FromBase64String("BLEEna7sSymrSkmlHU2ceApML6q7aFmIEDcXjvYzXW4=");
+            //var securityKey = new SymmetricSecurityKey(key);
+            var securityKey = _securityKey;
 
             var claims = new List<Claim>
             {
