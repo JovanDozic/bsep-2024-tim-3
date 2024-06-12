@@ -1,0 +1,8 @@
+<div>
+  <button (click)="getHiddenComponentMessage()">Get Message from Hidden Component</button>
+  <div *ngIf="messageFromComponent">
+    <h1>Message from Hidden Component:</h1>
+    <p>{{ messageFromComponent }}</p>
+    <p>{{ decodedMessage }}</p>
+  </div>
+</div>

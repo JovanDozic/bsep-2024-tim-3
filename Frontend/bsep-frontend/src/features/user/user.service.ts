@@ -129,6 +129,7 @@ export class UserService {
   }
 
   registerVerify2fa(verify2faRequest: Verify2faRequest): Observable<boolean> {
+    console.log(verify2faRequest.code);
     return this.http.post<boolean>(
       environment.apiHost + 'authentication/register/verify2fa',
       verify2faRequest
@@ -191,6 +192,7 @@ export class UserService {
               this.router.navigate(['/home']);
             } else if (tokens && tokens.isTwoFactorEnabled) {
               const code = prompt('Please enter the verification code:');
+              console.log(tokens.id);
               if (code) {
                 this.http
                   .post<Tokens>(

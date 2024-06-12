@@ -99,6 +99,8 @@ namespace Marketing_system.BL.Service
             var user = await _unitOfWork.GetUserRepository().GetByEmailAsync(email);
             if (user is null) return null;
 
+            user = DecryptUser(user);
+
             TwoFactorAuthenticator tfa = new();
             if (tfa.ValidateTwoFactorPIN(user.TwoFactorSecret, verifyDto.Code, true))
             {
@@ -409,6 +411,7 @@ namespace Marketing_system.BL.Service
             });
             return userDtos;
         }
+
 
         public async Task<IEnumerable<UserDto>> GetUnblocked()
         {
