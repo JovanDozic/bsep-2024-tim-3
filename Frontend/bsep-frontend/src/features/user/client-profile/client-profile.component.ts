@@ -6,6 +6,7 @@ import { Advertisement } from 'src/features/advertisement/model/advertisement.mo
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { TokenStorage } from '../jwt/token.service';
 import { ChangePasswordRequest } from '../model/change-password-request.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-client-profile',
@@ -25,7 +26,7 @@ export class ClientProfileComponent implements OnInit {
   showPopupPassword = false;
   changePasswordForm: FormGroup;
 
-  constructor(private formBuilder: FormBuilder,private userService: UserService, private adservis: AdvertisementService, private tokenStorage: TokenStorage) { }
+  constructor(private formBuilder: FormBuilder,private userService: UserService, private adservis: AdvertisementService, private tokenStorage: TokenStorage,private router: Router) { }
   
   ngOnInit(): void {
     this.id = 1;
@@ -153,6 +154,7 @@ changePassword() {
       (response: boolean) => { 
         if(response) {
         console.log("Password changed successfully");
+        this.router.navigate(['/login']);
       } else {
         console.error("Failed to change password");
       }

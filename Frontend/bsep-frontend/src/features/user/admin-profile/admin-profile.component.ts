@@ -4,6 +4,7 @@ import { UserService } from '../user.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TokenStorage } from '../jwt/token.service';
 import { ChangePasswordRequest } from '../model/change-password-request.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin-profile',
@@ -23,7 +24,7 @@ export class AdminProfileComponent implements OnInit {
   showPopupPassword = false;
   changePasswordForm: FormGroup;
 
-  constructor(private formBuilder: FormBuilder,private userService: UserService, private tokenStorage: TokenStorage) { }
+  constructor(private formBuilder: FormBuilder,private userService: UserService, private tokenStorage: TokenStorage,private router: Router) { }
 
   ngOnInit(): void {
     this.id = 3;
@@ -83,6 +84,7 @@ export class AdminProfileComponent implements OnInit {
         (response: boolean) => { 
           if(response) {
           console.log("Password changed successfully");
+          this.router.navigate(['/login']);
         } else {
           console.error("Failed to change password");
         }

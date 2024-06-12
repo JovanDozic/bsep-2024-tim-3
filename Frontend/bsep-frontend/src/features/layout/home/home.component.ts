@@ -25,7 +25,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() : void {
     this.newPassword = '';
-    this.fetchUserWithDelay();
+    //this.fetchUserWithDelay();
     
     this.userService.getAllUsers().subscribe(users => {
       this.allUsers = users;

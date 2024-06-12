@@ -15,6 +15,7 @@ import { EmailVerificationComponent } from './email-verification/email-verificat
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { RecaptchaValueAccessorDirective } from './directives/recaptcha-value-accessor.directive';
 import { RecaptchaModule } from 'ng-recaptcha';
+import { VpnComponent } from './vpn/vpn.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { RecaptchaModule } from 'ng-recaptcha';
     EmailVerificationComponent,
     RecaptchaValueAccessorDirective,
     ResetPasswordComponent,
+    VpnComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule, FormsModule, RecaptchaModule],
 })
