@@ -18,8 +18,30 @@ export class ResetPasswordComponent implements OnInit {
 
   constructor(private router: Router,private route: ActivatedRoute,private fb: FormBuilder, private userService: UserService) {
     this.changePasswordForm = this.fb.group({
-      newPassword: ['', [Validators.required, Validators.minLength(6)]]
+      newPassword: ['', [Validators.required]],
+      newPasswordAgain: ['', [Validators.required]]
+    }, {
+      validator: this.MustMatch('newPassword', 'newPasswordAgain')
     });
+   }
+
+   MustMatch(controlName: string, matchingControlName: string) {
+    return (formGroup: FormGroup) => {
+        const control = formGroup.controls[controlName];
+        const matchingControl = formGroup.controls[matchingControlName];
+   
+        // return if another validator has already found an error on the matchingControl
+        if (matchingControl.errors && !matchingControl.errors.mustMatch) {
+            return;
+        }
+   
+        // set error on matchingControl if validation fails
+        if (control.value !== matchingControl.value) {
+            matchingControl.setErrors({ mustMatch: true });
+        } else {
+            matchingControl.setErrors(null);
+        }
+    };
    }
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {

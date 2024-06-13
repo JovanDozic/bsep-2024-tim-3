@@ -21,7 +21,41 @@ export class NavbarComponent implements OnInit {
   }
 
   navigateToProfile(): void {
-    this.router.navigate(['/my-profile']);
+    this.service.getUserById(this.tokenStorage.getUserId()).subscribe(
+      (user: User) => {
+        this.loggedUser = user;
+      },
+      error => {
+        console.log("Error fetching user", error);
+      }
+    );
+    switch(this.loggedUser.role) {
+      case 0:
+        this.router.navigate(['/client-profile']);
+        break;
+      case 1:
+        this.router.navigate(['/employee-profile']);
+        break;
+      case 2:
+        this.router.navigate(['/admin-profile']);
+        break;
+      default:
+        this.router.navigate(['/login']);
+    }
+  }
+
+  navigateToVpn() : void {
+    this.service.getUserById(this.tokenStorage.getUserId()).subscribe(
+      (user: User) => {
+        this.loggedUser = user;
+      },
+      error => {
+        console.log("Error fetching user", error);
+      }
+    );
+    if(this.loggedUser.role != null) {
+      this.router.navigate(['/vpn']);
+    }
   }
 
   logout(): void {
