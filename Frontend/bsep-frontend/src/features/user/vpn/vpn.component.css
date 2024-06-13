@@ -1,0 +1,13 @@
+.container {
+    max-width: 600px;
+    margin: auto;
+  }
+  
+  h1.h4 {
+    margin-bottom: 20px;
+  }
+  
+  .alert {
+    padding: 20px;
+  }
+  

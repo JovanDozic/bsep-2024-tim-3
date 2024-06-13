@@ -44,8 +44,12 @@ export class ClientProfileComponent implements OnInit {
     );
     this.changePasswordForm = this.formBuilder.group({
       currentPassword: ['', [Validators.required]],
-      newPassword: ['', [Validators.required]]
-    });
+      newPassword: ['', [Validators.required]],
+      newPasswordAgain: ['', [Validators.required]]
+   }, {
+      validator: this.MustMatch('newPassword', 'newPasswordAgain')
+   });
+
     this.adRequestForm = this.formBuilder.group({
       description: ['', Validators.required],
       startDate: ['', Validators.required],
@@ -139,6 +143,26 @@ export class ClientProfileComponent implements OnInit {
         }
     );
 }
+
+MustMatch(controlName: string, matchingControlName: string) {
+  return (formGroup: FormGroup) => {
+      const control = formGroup.controls[controlName];
+      const matchingControl = formGroup.controls[matchingControlName];
+ 
+      // return if another validator has already found an error on the matchingControl
+      if (matchingControl.errors && !matchingControl.errors.mustMatch) {
+          return;
+      }
+ 
+      // set error on matchingControl if validation fails
+      if (control.value !== matchingControl.value) {
+          matchingControl.setErrors({ mustMatch: true });
+      } else {
+          matchingControl.setErrors(null);
+      }
+  };
+ }
+
 openPopupPassword(): void {
   this.showPopupPassword = true;
 }

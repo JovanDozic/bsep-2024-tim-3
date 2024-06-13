@@ -1,8 +1,18 @@
-<div>
-  <button (click)="getHiddenComponentMessage()">Get Message from Hidden Component</button>
-  <div *ngIf="messageFromComponent">
-    <h1>Message from Hidden Component:</h1>
-    <p>{{ messageFromComponent }}</p>
-    <p>{{ decodedMessage }}</p>
+<div class="container mt-4">
+  <div class="text-center">
+    <button class="btn btn-primary mb-4" (click)="getHiddenComponentMessage()">
+      Get Message from Hidden Component
+    </button>
+  </div>
+  <div *ngIf="messageFromComponent" class="alert alert-info">
+    <h1 class="h4">Message from Hidden Component:</h1>
+    <div class="mb-2">
+      <strong>Encoded Message:</strong>
+      <p class="mb-1">{{ messageFromComponent }}</p>
+    </div>
+    <div>
+      <strong>Decoded Message:</strong>
+      <p>{{ decodedMessage }}</p>
+    </div>
   </div>
 </div>
