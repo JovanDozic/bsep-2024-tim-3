@@ -14,8 +14,8 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   showPopupPassword = false;
   sendEmailForm: FormGroup;
-  reCAPTCHAToken: string | null = null;
-  recaptchaSiteKey: string = environment.RECAPTCHA_V3_SITE_KEY;
+  reCAPTCHAResponse: string | null = null;
+  reCAPTCHASiteKey: string = environment.RECAPTCHA_SITE_KEY;
 
   constructor(
     private router: Router,
@@ -25,7 +25,6 @@ export class LoginComponent implements OnInit {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
-      recaptcha: ['', Validators.required],
     });
 
     this.sendEmailForm = this.fb.group({
@@ -39,9 +38,9 @@ export class LoginComponent implements OnInit {
     const login: Credentials = {
       username: this.loginForm.value.username || '',
       password: this.loginForm.value.password || '',
-      reCAPTCHAToken: this.reCAPTCHAToken || '',
+      reCAPTCHAToken: this.reCAPTCHAResponse,
     };
-    if (this.loginForm.valid && this.reCAPTCHAToken) {
+    if (this.loginForm.valid && this.reCAPTCHAResponse) {
       this.userService.login(login).subscribe({
         next: () => {
           const user = this.userService.user$.getValue();
@@ -78,8 +77,14 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  onRecaptchaResolved(token: string): void {
-    this.reCAPTCHAToken = token;
-    this.loginForm.patchValue({ recaptcha: token });
+  onReCAPTCHAResolved(response: string | null): void {
+    if (response) {
+      this.reCAPTCHAResponse = response;
+      // console.log('reCAPTCHA resolved with response: ', response);
+    }
+    else {
+      console.log('reCAPTCHA resolved with error');
+      alert('reCAPTCHA resolved with error');
+    }
   }
 }

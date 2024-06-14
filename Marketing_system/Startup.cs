@@ -10,14 +10,13 @@ using Marketing_system.DA.Contracts;
 using Marketing_system.DA.Contracts.IRepository;
 using Marketing_system.DA.Contracts.Model;
 using Marketing_system.DA.Repository;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using reCAPTCHA.AspNetCore;
 using Serilog;
 using System.Text;
 using System.Threading.RateLimiting;
@@ -192,6 +191,12 @@ namespace Marketing_system
                     options.QueueLimit = 0;
                 });
             });
+
+            services.AddRecaptcha(options =>
+            {
+                options.SiteKey = Configuration["ReCAPTCHA:SiteKey"];
+                options.SecretKey = Configuration["ReCAPTCHA:SecretKey"];
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -241,7 +246,7 @@ namespace Marketing_system
             services.AddSingleton<IEncryptionService, EncryptionService>();
             services.AddSingleton<ITempTokenManagerService, TempTokenManagerService>();
             services.AddHttpClient();
-            services.AddSingleton<IReCAPTCHAService, ReCAPTCHAService>();
+            services.AddSingleton<IRecaptchaService, RecaptchaService>();
         }
 
     }
