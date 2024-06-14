@@ -1,4 +1,6 @@
-﻿using Marketing_system.BL.Contracts.IService;
+﻿using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Marketing_system.BL.Contracts.IService;
 using Marketing_system.BL.Hubs;
 using Marketing_system.BL.Mapper;
 using Marketing_system.BL.Service;
@@ -231,11 +233,12 @@ namespace Marketing_system
             services.AddTransient<IEmailHandler, EmailHandler>();
             services.AddTransient<IAdvertisementService, AdvertisementService>();
             services.AddTransient<IAlertService, AlertService>();
-            services.AddScoped<IEncryptionService, EncryptionService>(provider =>
-            {
-                var encryptionKey = Configuration["EncryptionKey"]; // Ključ za šifrovanje, čuvajte ga u sigurnom okruženju
-                return new EncryptionService(encryptionKey);
-            });
+            string keyVaultUri = Configuration["AzureKeyVault:VaultUri"];
+            var credential = new DefaultAzureCredential();
+            var secretClient = new SecretClient(new Uri(keyVaultUri), credential);
+            KeyVaultSecret encryptionKeySecret = secretClient.GetSecret("EncryptionKey");
+            services.AddSingleton(encryptionKeySecret.Value);
+            services.AddSingleton<IEncryptionService, EncryptionService>();
             services.AddSingleton<ITempTokenManagerService, TempTokenManagerService>();
             services.AddHttpClient();
             services.AddSingleton<IReCAPTCHAService, ReCAPTCHAService>();
