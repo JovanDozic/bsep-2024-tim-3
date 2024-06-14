@@ -225,7 +225,7 @@ export class UserService {
             }
           },
           (error) => {
-            alert('Invalid credentials or account not activated.');
+            alert('Invalid credentials / account not activated / reCAPTCHA verification failed.');
             console.error('Login failed:', error);
           }
         )
