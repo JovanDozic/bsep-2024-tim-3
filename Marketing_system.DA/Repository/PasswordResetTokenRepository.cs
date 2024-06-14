@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Twilio.Jwt.AccessToken;
 
 namespace Marketing_system.DA.Repository
 {
@@ -33,6 +34,27 @@ namespace Marketing_system.DA.Repository
                 tokenEntity.IsUsed = true;
                 _dbContext.Update(tokenEntity);
                 await _dbContext.SaveChangesAsync();
+            }
+        }
+        public async Task<bool> DeleteTokenByUserIdAsync(long id)
+        {
+            var tokenEntity = await _dbContext.Set<PasswordResetToken>().FirstOrDefaultAsync(t => t.UserId == id);
+            if (tokenEntity != null)
+            {
+                try
+                {
+                    _dbContext.Set<PasswordResetToken>().Remove(tokenEntity);
+                    await _dbContext.SaveChangesAsync();
+                    return true;
+
+                } catch (Exception e)
+                {
+                    return false;
+                }
+            } 
+            else
+            {
+                return true;
             }
         }
     }

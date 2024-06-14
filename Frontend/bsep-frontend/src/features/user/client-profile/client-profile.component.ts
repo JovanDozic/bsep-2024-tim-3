@@ -89,6 +89,8 @@ export class ClientProfileComponent implements OnInit {
     this.userService.deleteData(this.client.id).subscribe(result => {
       if (result) {
         console.log("Your data deleted successfully");
+        this.userService.logout()
+        this.router.navigate(['/login'])
       } else {
 
         console.log("Error in deleting data");

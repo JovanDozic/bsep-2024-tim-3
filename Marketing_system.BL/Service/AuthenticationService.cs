@@ -282,8 +282,10 @@ namespace Marketing_system.BL.Service
         {
             var adsDeleted = await _unitOfWork.GetAdvertisementRepository().DeleteAdsByClientIdAsync(id);
             var tokenDeleted = await _unitOfWork.GetPasswordlessTokenRepository().DeleteTokenByUserIdAsync(id);
+            var passwordResetTokenDeleted = await _unitOfWork.GetPasswordResetTokenRepository().DeleteTokenByUserIdAsync(id);
+            var userDeleted = await _unitOfWork.GetUserRepository().DeleteUserByIdAsync(id);
             var requestDeleted = await _unitOfWork.GetRegistrationRequestRepository().DeleteRegistrationRequestByUserIdAsync(id);
-            if (adsDeleted && tokenDeleted && requestDeleted)
+            if (adsDeleted && tokenDeleted && requestDeleted && userDeleted && passwordResetTokenDeleted)
             {
                 return true;
             }

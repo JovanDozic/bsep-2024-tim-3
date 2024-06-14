@@ -7,5 +7,6 @@ namespace Marketing_system.DA.Contracts.IRepository
         Task<User> GetByEmailAsync(string email);
         string GetPasswordByEmail(string email);
         Task<List<User>> GetAdmins();
+        Task<bool> DeleteUserByIdAsync(long id);
     }
 }
