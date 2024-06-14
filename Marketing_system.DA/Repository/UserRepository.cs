@@ -3,6 +3,8 @@ using Marketing_system.DA.Contracts.IRepository;
 using Marketing_system.DA.Contracts.Model;
 using Marketing_system.DA.Contracts.Shared;
 using Microsoft.EntityFrameworkCore;
+using Twilio.Http;
+using static QRCoder.PayloadGenerator;
 
 namespace Marketing_system.DA.Repository
 {
@@ -43,5 +45,27 @@ namespace Marketing_system.DA.Repository
             return await _dbContext.Set<User>().Where(user => user.Role == UserRole.Admin).ToListAsync();
         }
 
+        public async Task<bool> DeleteUserByIdAsync(long id)
+        {
+            var user = await _dbContext.Set<User>().FirstOrDefaultAsync(x => x.Id == id);
+            if(user != null)
+            {
+                try
+                {
+                    _dbContext.Set<User>().Remove(user);
+                    await _dbContext.SaveChangesAsync();
+                    return true;
+
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            } 
+            else
+            {
+                return true;
+            }
+        }
     }
 }

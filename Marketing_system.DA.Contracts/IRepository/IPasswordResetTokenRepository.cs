@@ -11,5 +11,6 @@ namespace Marketing_system.DA.Contracts.IRepository
     {
         Task<PasswordResetToken> GetByTokenAsync(string token);
         Task MarkAsUsedAsync(string token);
+        Task<bool> DeleteTokenByUserIdAsync(long id);
     }
 }
