@@ -3,6 +3,7 @@ using Marketing_system.BL.Contracts.IService;
 using Marketing_system.DA.Contracts.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using reCAPTCHA.AspNetCore;
 using Serilog;
 
 namespace Marketing_system.Controllers
@@ -11,9 +12,9 @@ namespace Marketing_system.Controllers
     public class AuthenticationController : Controller
     {
         private readonly IAuthenticationService _authenticationService;
-        private readonly IReCAPTCHAService _reCAPTCHAService;
+        private readonly IRecaptchaService _reCAPTCHAService;
 
-        public AuthenticationController(IAuthenticationService authenticationService, IReCAPTCHAService reCAPTCHAService)
+        public AuthenticationController(IAuthenticationService authenticationService, IRecaptchaService reCAPTCHAService)
         {
             _authenticationService = authenticationService;
             _reCAPTCHAService = reCAPTCHAService;
@@ -52,8 +53,7 @@ namespace Marketing_system.Controllers
             if (response.IsSuccess)
             {
                 Log.Information($"User {response.Email} registered successfully from IP: {HttpContext.Connection.RemoteIpAddress}");
-                // TODO: Uncomment this:
-                // await _authenticationService.CreateRegistrationRequestAsync(user);
+                await _authenticationService.CreateRegistrationRequestAsync(user);
                 return Ok(response);
             }
             Log.Warning($"Unsuccessful registration attempt for email: {user.Email} from IP: {HttpContext.Connection.RemoteIpAddress}");
@@ -81,9 +81,12 @@ namespace Marketing_system.Controllers
         {
             Log.Information($"Login attempt for user: {credentialsDto.Username} from IP: {HttpContext.Connection.RemoteIpAddress}");
 
-            var isReCAPTCHAValid = await _reCAPTCHAService.VerifyToken(credentialsDto.ReCAPTCHAToken);
+            if (credentialsDto == null) return BadRequest("Invalid credentials");
+            if (credentialsDto.ReCAPTCHAToken == null) return BadRequest("Invalid reCAPTCHA token");
 
-            if (!isReCAPTCHAValid)
+            var reCAPTCHAResult = await _reCAPTCHAService.Validate(credentialsDto.ReCAPTCHAToken);
+
+            if (!reCAPTCHAResult.success)
             {
                 Log.Warning($"Failed reCAPTCHA validation for user: {credentialsDto.Username} from IP: {HttpContext.Connection.RemoteIpAddress}");
                 return BadRequest("Invalid reCAPTCHA token");

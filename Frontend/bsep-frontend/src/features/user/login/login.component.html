@@ -2,9 +2,9 @@
   <div class="col-6">
     <input type="text" formControlName="username" placeholder="Username" class="form-control m-3">
     <input type="password" formControlName="password" placeholder="Password" class="form-control m-3">
-    <re-captcha (resolved)="onRecaptchaResolved($event)"
-      siteKey="6LcnCOwpAAAAAL0dZNpj7O92D_WJT_RC_4AvMMaS"></re-captcha>
-    <button type="submit" class="btn btn-primary m-3" [disabled]="!loginForm.valid || !reCAPTCHAToken">Log in</button>
+    <re-captcha (resolved)="onReCAPTCHAResolved($event)"
+      siteKey="{{this.reCAPTCHASiteKey}}"></re-captcha>
+    <button type="submit" class="btn btn-primary m-3" [disabled]="!loginForm.valid || !reCAPTCHAResponse">Log in</button>
   </div>
 </form>
 <a class="btn btn-outline-secondary m-3" (click)="passwordless()">Use Passwordless Login</a>
