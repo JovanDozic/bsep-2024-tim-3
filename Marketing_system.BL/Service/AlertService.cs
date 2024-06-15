@@ -35,15 +35,16 @@ namespace Marketing_system.BL.Service
             var users = await _unitOfWork.GetUserRepository().GetAdmins();
             foreach (var user in users)
             {
-                await _emailService.SendEmail(user.Email, "Critical Alert", message);
+                await _emailService.SendEmail(user.Email, "<p>Please check your app, because fatal error has happend</p>", message);
             }
             var messageOptions = new CreateMessageOptions(
                 new PhoneNumber("+381649460263"))
             {
-                From = new PhoneNumber("+15513776301")
+                From = new PhoneNumber("+15513776301"),
+                Body = message
             };
-            var sms = MessageResource.Create(messageOptions);
-            Log.Information(sms.Body);
+            //var sms = MessageResource.Create(messageOptions);
+            //Log.Information(sms.Body);
         }
     }
 }

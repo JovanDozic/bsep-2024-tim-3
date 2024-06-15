@@ -369,6 +369,18 @@ namespace Marketing_system.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
+
+        [HttpGet("getFatal")]
+        public void GetFatal()
+        {
+            Log.Fatal("Fatal error happened");
+        }
+
+        [HttpGet("getError")]
+        public void GetError()
+        {
+            Log.Error("Error happened");
+        }
     }
 
 }
