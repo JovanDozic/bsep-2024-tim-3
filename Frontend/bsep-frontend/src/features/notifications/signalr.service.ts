@@ -16,14 +16,14 @@ export class SignalrService {
     private router: Router,
   ) {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('/notificationHub')
+      .withUrl(`${environment.apiHost}/notificationHub`)
       .build();
+    
+    this.hubConnection.start().catch(err => console.error('SignalR connecting error: ', err));
 
     this.hubConnection.on('ReceiveNotification', (message: string) => {
       this.showNotification(message);
     });
-
-    this.hubConnection.start().catch(err => console.error('SignalR connecting error: ', err));
 
     this.getAllLogs().subscribe(logs => {
       console.log('Initial logs:', logs);
@@ -49,7 +49,7 @@ export class SignalrService {
 
   private displayNotification(message: string): void {
     const notification = new Notification('New Notification', {
-      body: message
+      body: message,
     });
 
     notification.onclick = () => {
@@ -58,6 +58,6 @@ export class SignalrService {
   }
 
   getAllLogs(): Observable<any> {
-    return this.http.get<any>(`${environment.apiHost}authentication/getAllLogs`);
+    return this.http.get<any>(`${environment.apiHost}/authentication/getAllLogs`);
   }
 }
