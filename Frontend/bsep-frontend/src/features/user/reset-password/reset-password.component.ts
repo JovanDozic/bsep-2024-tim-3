@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../user.service';
 import { ResetPassword } from '../model/resetPassword.model';
@@ -18,12 +18,28 @@ export class ResetPasswordComponent implements OnInit {
 
   constructor(private router: Router,private route: ActivatedRoute,private fb: FormBuilder, private userService: UserService) {
     this.changePasswordForm = this.fb.group({
-      newPassword: ['', [Validators.required]],
+      newPassword: ['', [Validators.required, this.passwordValidator()]],
       newPasswordAgain: ['', [Validators.required]]
     }, {
       validator: this.MustMatch('newPassword', 'newPasswordAgain')
     });
    }
+
+   passwordValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const value = control.value;
+      if (!value) {
+        return null;
+      }
+      const hasUpperCase = /[A-Z]/.test(value);
+      const hasLowerCase = /[a-z]/.test(value);
+      const hasNumber = /[0-9]/.test(value);
+      const hasSpecialCharacter = /[-._@+!?]/.test(value);
+      const isValidLength = value.length >= 16;
+      const passwordValid = hasUpperCase && hasLowerCase && hasNumber && hasSpecialCharacter && isValidLength;
+      return !passwordValid ? { passwordInvalid: true } : null;
+    };
+  }
 
    MustMatch(controlName: string, matchingControlName: string) {
     return (formGroup: FormGroup) => {

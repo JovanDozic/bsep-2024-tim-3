@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from '../model/user.model';
 import { UserService } from '../user.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { TokenStorage } from '../jwt/token.service';
 import { ChangePasswordRequest } from '../model/change-password-request.model';
 import { Router } from '@angular/router';
@@ -42,7 +42,7 @@ export class AdminProfileComponent implements OnInit {
 
     this.changePasswordForm = this.formBuilder.group({
       currentPassword: ['', [Validators.required]],
-      newPassword: ['', [Validators.required]],
+      newPassword: ['', [Validators.required, this.passwordValidator()]],
       newPasswordAgain: ['', [Validators.required]]
    }, {
       validator: this.MustMatch('newPassword', 'newPasswordAgain')
@@ -72,6 +72,10 @@ export class AdminProfileComponent implements OnInit {
   openPopup(): void {
     this.showPopup = true;
   }
+  closePopup() : void {
+    this.showPopupPassword = false;
+  }
+
   openPopupPassword(): void {
     this.showPopupPassword = true;
   }
@@ -207,4 +211,20 @@ MustMatch(controlName: string, matchingControlName: string) {
       }
   };
  }
+
+ passwordValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const value = control.value;
+    if (!value) {
+      return null;
+    }
+    const hasUpperCase = /[A-Z]/.test(value);
+    const hasLowerCase = /[a-z]/.test(value);
+    const hasNumber = /[0-9]/.test(value);
+    const hasSpecialCharacter = /[-._@+!?]/.test(value);
+    const isValidLength = value.length >= 16;
+    const passwordValid = hasUpperCase && hasLowerCase && hasNumber && hasSpecialCharacter && isValidLength;
+    return !passwordValid ? { passwordInvalid: true } : null;
+  };
+}
 }

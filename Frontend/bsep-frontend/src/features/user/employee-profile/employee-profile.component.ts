@@ -4,7 +4,7 @@ import { concat } from 'rxjs';
 import { User } from '../model/user.model';
 import { Advertisement } from 'src/features/advertisement/model/advertisement.model';
 import { AdvertisementService } from 'src/features/advertisement/advertisement.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { TokenStorage } from '../jwt/token.service';
 import { ChangePasswordRequest } from '../model/change-password-request.model';
 import { Router } from '@angular/router';
@@ -43,7 +43,7 @@ export class EmployeeProfileComponent implements OnInit {
     this.loadAdvertisements();
     this.changePasswordForm = this.formBuilder.group({
       currentPassword: ['', [Validators.required]],
-      newPassword: ['', [Validators.required]],
+      newPassword: ['', [Validators.required, this.passwordValidator()]],
       newPasswordAgain: ['', [Validators.required]]
    }, {
       validator: this.MustMatch('newPassword', 'newPasswordAgain')
@@ -54,6 +54,22 @@ export class EmployeeProfileComponent implements OnInit {
     this.addSloganForm = this.formBuilder.group({
       slogan: ['', Validators.required]
     })
+  }
+
+  passwordValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const value = control.value;
+      if (!value) {
+        return null;
+      }
+      const hasUpperCase = /[A-Z]/.test(value);
+      const hasLowerCase = /[a-z]/.test(value);
+      const hasNumber = /[0-9]/.test(value);
+      const hasSpecialCharacter = /[-._@+!?]/.test(value);
+      const isValidLength = value.length >= 16;
+      const passwordValid = hasUpperCase && hasLowerCase && hasNumber && hasSpecialCharacter && isValidLength;
+      return !passwordValid ? { passwordInvalid: true } : null;
+    };
   }
 
   MustMatch(controlName: string, matchingControlName: string) {
