@@ -8,6 +8,7 @@ using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
 using Serilog;
 using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
 
 namespace Marketing_system.BL.Service
 {
@@ -18,7 +19,8 @@ namespace Marketing_system.BL.Service
         private readonly IUnitOfWork _unitOfWork;
         private string? accountSid;
         private string? authToken;
-        public AlertService(IUnitOfWork unitOfWork,IHubContext<NotificationHub> hubContext, IEmailHandler emailService, IConfiguration configuration)
+
+        public AlertService(IUnitOfWork unitOfWork, IHubContext<NotificationHub> hubContext, IEmailHandler emailService, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _hubContext = hubContext;
@@ -35,16 +37,16 @@ namespace Marketing_system.BL.Service
             var users = await _unitOfWork.GetUserRepository().GetAdmins();
             foreach (var user in users)
             {
-                await _emailService.SendEmail(user.Email, "<p>Please check your app, because fatal error has happend</p>", message);
+                await _emailService.SendEmail(user.Email, message, "<p>Please check your app, because a fatal error has occurred</p>");
             }
-            var messageOptions = new CreateMessageOptions(
-                new PhoneNumber("+381649460263"))
+
+            var messageOptions = new CreateMessageOptions(new PhoneNumber("+381649460263"))
             {
                 From = new PhoneNumber("+15513776301"),
                 Body = message
             };
-            //var sms = MessageResource.Create(messageOptions);
-            //Log.Information(sms.Body);
+            // var sms = MessageResource.Create(messageOptions);
+            // Log.Information(sms.Body);
         }
     }
 }

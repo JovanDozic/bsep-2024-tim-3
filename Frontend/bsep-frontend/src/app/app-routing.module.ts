@@ -18,6 +18,7 @@ import { EmailVerificationComponent } from 'src/features/user/email-verification
 import { ResetPasswordComponent } from 'src/features/user/reset-password/reset-password.component';
 import { LogsComponent } from 'src/features/notifications/notifications_logs/logs.component';
 import { VpnComponent } from 'src/features/user/vpn/vpn.component';
+import { NotificationsComponent } from 'src/features/notifications/notifications/notifications.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -73,6 +74,10 @@ const routes: Routes = [
   {
     path: 'vpn',
     component: VpnComponent
+  },
+  {
+    path: 'notifications',
+    component: NotificationsComponent
   }
 ];
 

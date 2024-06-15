@@ -107,16 +107,18 @@ namespace Marketing_system
                 options.LoginPath = "/Login";
                 options.SlidingExpiration = true;
             });
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigins",
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:4200")
+                               .AllowAnyMethod()
+                               .AllowAnyHeader()
+                               .AllowCredentials();
+                    });
+            });
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyMethod().
-                 AllowAnyHeader());
-            });
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowHttps", options => options.WithOrigins("https://localhost:4200").AllowAnyMethod());
-            });
             var key = Environment.GetEnvironmentVariable("JWT_KEY") ?? "marketingsystem_superssecret_key";
             var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "marketingsystem";
             var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "marketingsystem-front.com";
@@ -219,10 +221,7 @@ namespace Marketing_system
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
-            app.UseCors("AllowOrigin");
-
-            app.UseCors("AllowHttps");
+            app.UseCors("AllowSpecificOrigins");
 
             app.UseAuthentication();
 

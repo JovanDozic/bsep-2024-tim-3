@@ -1,0 +1,7 @@
+<div class="bottom-right-container bg-light p-3 rounded-circle position-fixed" style="bottom: 20px; right: 20px; width: 200px;">
+    <h6 class="mb-3">Notifications</h6>
+    <div *ngFor="let notification of notifications" class="mb-2">
+        <p>{{ notification }}</p>
+    </div>
+    <button (click)="goToLogs()" class="btn btn-primary btn-sm">View Logs</button>
+</div>

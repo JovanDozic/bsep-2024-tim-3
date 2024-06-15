@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import * as signalR from '@microsoft/signalr';
 import { Observable } from 'rxjs';
@@ -10,54 +10,31 @@ import { environment } from 'src/app/env/environment';
 })
 export class SignalrService {
   private hubConnection: signalR.HubConnection;
+  notificationReceived: EventEmitter<string> = new EventEmitter<string>();
 
   constructor(
     private http: HttpClient,
     private router: Router,
   ) {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`${environment.apiHost}/notificationHub`)
+      .withUrl(`https://localhost:7198/notificationHub`)
       .build();
     
-    this.hubConnection.start().catch(err => console.error('SignalR connecting error: ', err));
+      this.hubConnection.start()
+      .then(() => console.log('SignalR connected'))
+      .catch(err => {
+        console.error('SignalR connecting error: ', err);
+        console.log('Connection URL:', `https://localhost:7198/notificationHub`);
+      });
+    
 
     this.hubConnection.on('ReceiveNotification', (message: string) => {
-      this.showNotification(message);
+      console.log('Received message:', message);
+      this.notificationReceived.emit(message);
     });
-
-    this.getAllLogs().subscribe(logs => {
-      console.log('Initial logs:', logs);
-    });
-  }
-
-  private showNotification(message: string): void {
-    if (!('Notification' in window)) {
-      console.log('This browser does not support desktop notification');
-      return;
-    }
-
-    if (Notification.permission === 'granted') {
-      this.displayNotification(message);
-    } else if (Notification.permission !== 'denied') {
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          this.displayNotification(message);
-        }
-      });
-    }
-  }
-
-  private displayNotification(message: string): void {
-    const notification = new Notification('New Notification', {
-      body: message,
-    });
-
-    notification.onclick = () => {
-      console.log('Notification clicked');
-    };
   }
 
   getAllLogs(): Observable<any> {
-    return this.http.get<any>(`${environment.apiHost}/authentication/getAllLogs`);
+    return this.http.get<any>(`${environment.apiHost}authentication/getAllLogs`);
   }
 }
