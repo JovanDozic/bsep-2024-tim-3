@@ -104,34 +104,42 @@
 
 <div class="popup-container" *ngIf="showPopupPassword">
   <div class="popup">
-      <h2>Change password</h2>
-      <form [formGroup]="changePasswordForm" (ngSubmit)="changePassword()">
-        <div class="form-group">
-            <label for="currentPassword">Enter current password:</label>
-            <div class="password-field">
-                <input type="password" formControlName="currentPassword" id="currentPassword" required>
-                <!-- Button to toggle password visibility -->
-                <button type="button" data-field="currentPassword" (click)="togglePasswordVisibility('currentPassword')">Show</button>
-            </div>
-        </div>
-        <div class="form-group">
-          <label for="newPassword">Enter new password:</label>
-          <div class="password-field">
-              <input type="password" formControlName="newPassword" id="newPassword" required>
-              <!-- Button to toggle password visibility -->
-              <button type="button" data-field="newPassword" (click)="togglePasswordVisibility('newPassword')">Show</button>
-          </div>
-      </div>
-      <div class="form-group" [ngClass]="{'has-error': changePasswordForm.hasError('mustMatch')}">
-        <label for="newPasswordAgain">Enter new password again:</label>
+    <h2>Change password</h2>
+    <form [formGroup]="changePasswordForm" (ngSubmit)="changePassword()">
+      <div class="form-group">
+        <label for="currentPassword">Enter current password:</label>
         <div class="password-field">
-            <input type="password" formControlName="newPasswordAgain" id="newPasswordAgain" required>
-            <button type="button" data-field="newPasswordAgain" (click)="togglePasswordVisibility('newPasswordAgain')">Show</button>
+          <input type="password" formControlName="currentPassword" id="currentPassword" required>
+          <button type="button" data-field="currentPassword" (click)="togglePasswordVisibility('currentPassword')">Show</button>
         </div>
-        <div *ngIf="changePasswordForm.get('newPasswordAgain').errors?.mustMatch" class="text-danger">Passwords do not match.</div>
-     </div>
-        <button type="submit" class="btn btn-primary rounded-pill btn-lg">Submit</button>
-        <button type="button" class="btn btn-secondary rounded-pill btn-lg" (click)="closePopup()">Close</button>
-      </form>
+        <div *ngIf="changePasswordForm.get('currentPassword').touched && changePasswordForm.get('currentPassword').invalid">
+          <small class="text-danger">Current password is required.</small>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="newPassword">Enter new password:</label>
+        <div class="password-field">
+          <input type="password" formControlName="newPassword" id="newPassword" required>
+          <button type="button" data-field="newPassword" (click)="togglePasswordVisibility('newPassword')">Show</button>
+        </div>
+        <div *ngIf="changePasswordForm.get('newPassword').touched && changePasswordForm.get('newPassword').invalid">
+          <small class="text-danger" *ngIf="changePasswordForm.get('newPassword').errors.required">New password is required.</small>
+          <small class="text-danger" *ngIf="changePasswordForm.get('newPassword').errors.passwordInvalid">Password must be at least 16 characters long, contain uppercase and lowercase letters, a number, and a special character.</small>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="newPasswordAgain">Repeat new password:</label>
+        <div class="password-field">
+          <input type="password" formControlName="newPasswordAgain" id="newPasswordAgain" required>
+          <button type="button" data-field="newPasswordAgain" (click)="togglePasswordVisibility('newPasswordAgain')">Show</button>
+        </div>
+        <div *ngIf="changePasswordForm.get('newPasswordAgain').touched && changePasswordForm.get('newPasswordAgain').invalid">
+          <small class="text-danger" *ngIf="changePasswordForm.get('newPasswordAgain').errors.required">Please repeat the new password.</small>
+          <small class="text-danger" *ngIf="changePasswordForm.get('newPasswordAgain').errors?.mustMatch">Passwords must match.</small>
+        </div>
+      </div>
+      <button type="submit" [disabled]="changePasswordForm.invalid">Change Password</button>
+      <button type="button" (click)="showPopupPassword = false">Cancel</button>
+    </form>
   </div>
 </div>
