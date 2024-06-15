@@ -192,10 +192,18 @@ namespace Marketing_system
                 });
             });
 
+            string keyVaultUri = Configuration["AzureKeyVault:VaultUri"];
+            var credential = new DefaultAzureCredential();
+            var secretClient = new SecretClient(new Uri(keyVaultUri), credential);
+            KeyVaultSecret reCAPTCHASiteKey = secretClient.GetSecret("ReCAPTCHASiteKey");
+            KeyVaultSecret reCAPTCHASecret = secretClient.GetSecret("ReCAPTCHASecret");
+            services.AddSingleton(reCAPTCHASiteKey.Value);
+            services.AddSingleton(reCAPTCHASecret.Value);
+
             services.AddRecaptcha(options =>
             {
-                options.SiteKey = Configuration["ReCAPTCHA:SiteKey"];
-                options.SecretKey = Configuration["ReCAPTCHA:SecretKey"];
+                options.SiteKey = reCAPTCHASiteKey.Value;
+                options.SecretKey = reCAPTCHASecret.Value;
             });
         }
 
@@ -243,7 +251,10 @@ namespace Marketing_system
             var secretClient = new SecretClient(new Uri(keyVaultUri), credential);
             KeyVaultSecret encryptionKeySecret = secretClient.GetSecret("EncryptionKey");
             services.AddSingleton(encryptionKeySecret.Value);
-            services.AddSingleton<IEncryptionService, EncryptionService>();
+            services.AddSingleton<IEncryptionService, EncryptionService>(provider =>
+            {
+                return new EncryptionService(encryptionKeySecret.Value);
+            });
             services.AddSingleton<ITempTokenManagerService, TempTokenManagerService>();
             services.AddHttpClient();
             services.AddSingleton<IRecaptchaService, RecaptchaService>();
