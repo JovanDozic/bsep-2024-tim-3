@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Marketing_system.BL.Contracts.IService;
-using Marketing_system.DA.Contracts.IRepository;
+﻿using Marketing_system.BL.Contracts.IService;
 using Marketing_system.BL.Hubs;
 using Marketing_system.DA.Contracts;
+using Marketing_system.DA.Contracts.IRepository;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
-using Serilog;
-using Microsoft.Extensions.Configuration;
-using System.Threading.Tasks;
 
 namespace Marketing_system.BL.Service
 {
@@ -45,8 +44,8 @@ namespace Marketing_system.BL.Service
                 From = new PhoneNumber("+15513776301"),
                 Body = message
             };
-            // var sms = MessageResource.Create(messageOptions);
-            // Log.Information(sms.Body);
+            var sms = MessageResource.Create(messageOptions);
+            Log.Information(sms.Body);
         }
     }
 }
